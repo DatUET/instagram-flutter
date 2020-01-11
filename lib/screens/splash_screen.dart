@@ -71,7 +71,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.grey[200],
       body: Container(
         width: double.infinity,
         height: double.infinity,
@@ -80,8 +80,8 @@ class _SplashScreenState extends State<SplashScreen> {
           children: <Widget>[
             Shimmer.fromColors(
               period: Duration(milliseconds: 1000),
-              baseColor: Colors.black,
-              highlightColor: Colors.black12,
+              baseColor: Color.fromRGBO(143, 148, 251, 1),
+              highlightColor: Color.fromRGBO(143, 148, 251, .2),
               child: Container(
                 padding: EdgeInsets.all(16.0),
                 child: Text(
@@ -93,7 +93,7 @@ class _SplashScreenState extends State<SplashScreen> {
                       shadows: <Shadow>[
                         Shadow(
                             blurRadius: 18.0,
-                            color: Colors.black87,
+                            color: Color.fromRGBO(143, 148, 251, .7),
                             offset: Offset.fromDirection(120, 12)
                         )
                       ]

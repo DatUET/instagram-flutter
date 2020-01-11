@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram_v2/models/user_data.dart';
+import 'package:instagram_v2/screens/home_screen.dart';
 import 'package:instagram_v2/screens/login_screen.dart';
 import 'package:instagram_v2/screens/splash_screen.dart';
 import 'package:instagram_v2/services/database_service.dart';
@@ -38,9 +39,14 @@ class AuthService {
     _auth.signOut();
   }
 
-  static void login(String email, String password) async {
+  static void login(String email, String password, BuildContext context) async {
     try {
-      await _auth.signInWithEmailAndPassword(email: email, password: password);
+      AuthResult authResult = await _auth.signInWithEmailAndPassword(email: email, password: password);
+      FirebaseUser user = authResult.user;
+      if(user != null){
+        Provider.of<UserData>(context).currentUserId = user.uid;
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => HomeScreen()));
+      }
     } catch (e) {
       print(e);
     }
