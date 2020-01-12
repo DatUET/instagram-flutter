@@ -26,6 +26,7 @@ class DatabaseService {
       'likeCount': post.likeCount,
       'authorId': post.authorId,
       'timestamp': post.timestamp,
+      'location': post.location,
     });
   }
 

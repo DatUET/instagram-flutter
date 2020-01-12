@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:animator/animator.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:instagram_v2/animations/fadeanimationup.dart';
 import 'package:instagram_v2/models/post_model.dart';
 import 'package:instagram_v2/models/user_model.dart';
 import 'package:instagram_v2/screens/comments_screen.dart';
@@ -13,8 +14,9 @@ class PostView extends StatefulWidget {
   final String currentUserId;
   final Post post;
   final User author;
+  final int index;
 
-  PostView({this.currentUserId, this.post, this.author});
+  PostView({this.currentUserId, this.post, this.author, this.index});
 
   @override
   _PostViewState createState() => _PostViewState();
@@ -97,133 +99,156 @@ class _PostViewState extends State<PostView> {
               horizontal: 16.0,
               vertical: 10.0,
             ),
-            child: Row(
-              children: <Widget>[
-                CircleAvatar(
-                  radius: 25.0,
-                  backgroundColor: Colors.grey,
-                  backgroundImage: widget.author.profileImageUrl.isEmpty
-                      ? AssetImage('assets/images/user_placeholder.jpg')
-                      : CachedNetworkImageProvider(
-                          widget.author.profileImageUrl),
-                ),
-                SizedBox(width: 8.0),
-                Text(
-                  widget.author.name,
-                  style: TextStyle(
-                    fontSize: 18.0,
-                    fontWeight: FontWeight.w600,
+            child: FadeAnimationUp(
+              0.2 + widget.index * 0.6,
+              Row(
+                children: <Widget>[
+                  CircleAvatar(
+                    radius: 25.0,
+                    backgroundColor: Colors.grey,
+                    backgroundImage: widget.author.profileImageUrl.isEmpty
+                        ? AssetImage('assets/images/user_placeholder.jpg')
+                        : CachedNetworkImageProvider(
+                            widget.author.profileImageUrl),
                   ),
-                )
+                  SizedBox(width: 8.0),
+                  Column(
+                    children: <Widget>[
+                      Text(
+                        widget.author.name,
+                        style: TextStyle(
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      widget.post.location.isEmpty
+                          ? Container()
+                          : Text(
+                              widget.post.location,
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 13.0,
+                              ),
+                            ),
+                    ],
+                  )
+                ],
+              ),
+            ),
+          ),
+        ),
+        FadeAnimationUp(
+          0.4 + widget.index * 0.6,
+          GestureDetector(
+            onDoubleTap: _likePost,
+            child: Stack(
+              alignment: Alignment.center,
+              children: <Widget>[
+                Container(
+                  height: MediaQuery.of(context).size.width,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: CachedNetworkImageProvider(widget.post.imageUrl),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+                _heartAnim
+                    ? Animator(
+                        duration: Duration(milliseconds: 300),
+                        tween: Tween(begin: 0.5, end: 1.4),
+                        curve: Curves.elasticOut,
+                        builder: (anim) => Transform.scale(
+                          scale: anim.value,
+                          child: Icon(
+                            Icons.favorite,
+                            size: 100.0,
+                            color: Colors.red[400],
+                          ),
+                        ),
+                      )
+                    : SizedBox.shrink(),
               ],
             ),
           ),
         ),
-        GestureDetector(
-          onDoubleTap: _likePost,
-          child: Stack(
-            alignment: Alignment.center,
-            children: <Widget>[
-              Container(
-                height: MediaQuery.of(context).size.width,
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: CachedNetworkImageProvider(widget.post.imageUrl),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-              _heartAnim
-                  ? Animator(
-                      duration: Duration(milliseconds: 300),
-                      tween: Tween(begin: 0.5, end: 1.4),
-                      curve: Curves.elasticOut,
-                      builder: (anim) => Transform.scale(
-                        scale: anim.value,
-                        child: Icon(
-                          Icons.favorite,
-                          size: 100.0,
-                          color: Colors.red[400],
-                        ),
-                      ),
-                    )
-                  : SizedBox.shrink(),
-            ],
-          ),
-        ),
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Row(
-                children: <Widget>[
-                  IconButton(
-                    icon: _isLiked
-                        ? Icon(
-                            Icons.favorite,
-                            color: Colors.red,
-                          )
-                        : Icon(Icons.favorite_border),
-                    iconSize: 30.0,
-                    onPressed: _likePost,
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.comment),
-                    iconSize: 30.0,
-                    onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => CommentsScreen(
-                          post: widget.post,
-                          likeCount: _likeCount,
+        FadeAnimationUp(
+          0.6 + widget.index * 0.6,
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    IconButton(
+                      icon: _isLiked
+                          ? Icon(
+                              Icons.favorite,
+                              color: Colors.red,
+                            )
+                          : Icon(Icons.favorite_border),
+                      iconSize: 30.0,
+                      onPressed: _likePost,
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.comment),
+                      iconSize: 30.0,
+                      onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => CommentsScreen(
+                            post: widget.post,
+                            likeCount: _likeCount,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 12.0),
-                child: Text(
-                  '${_likeCount.toString()} likes',
-                  style: TextStyle(
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.bold,
+                  ],
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 12.0),
+                  child: Text(
+                    '${_likeCount.toString()} likes',
+                    style: TextStyle(
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(height: 4.0),
-              Row(
-                children: <Widget>[
-                  Container(
-                    margin: EdgeInsets.only(
-                      left: 12.0,
-                      right: 6.0,
-                    ),
-                    child: Text(
-                      widget.author.name,
-                      style: TextStyle(
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.bold,
+                SizedBox(height: 4.0),
+                Row(
+                  children: <Widget>[
+                    Container(
+                      margin: EdgeInsets.only(
+                        left: 12.0,
+                        right: 6.0,
+                      ),
+                      child: Text(
+                        widget.author.name,
+                        style: TextStyle(
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                  ),
-                  Expanded(
-                    child: Text(
-                      widget.post.caption,
-                      style: TextStyle(
-                        fontSize: 16.0,
+                    Expanded(
+                      child: Text(
+                        widget.post.caption,
+                        style: TextStyle(
+                          fontSize: 16.0,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 12.0),
-            ],
+                  ],
+                ),
+                SizedBox(height: 12.0),
+              ],
+            ),
           ),
         ),
+        FadeAnimationUp(0.8 + widget.index * 0.6, Divider())
       ],
     );
   }

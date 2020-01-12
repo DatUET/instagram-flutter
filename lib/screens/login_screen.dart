@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:instagram_v2/animations/fadeanimation.dart';
+import 'package:instagram_v2/animations/fadeanimationdown.dart';
 import 'package:instagram_v2/screens/signup_screen.dart';
 import 'package:instagram_v2/services/auth_service.dart';
 
@@ -13,17 +13,28 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   String _email, _password;
-  bool _isLoading = false;
+  bool _isLoading = false, _isSccuess = true;
 
   _submit(BuildContext context) async {
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
       // Logging in the user w/ Firebase
-      AuthService.login(_email, _password, context);
       setState(() {
         _isLoading = true;
       });
+      bool isSccuess = await AuthService.login(_email, _password, context);
+      if(!isSccuess){
+        setState(() {
+          _isSccuess = isSccuess;
+        });
+      }
     }
+  }
+
+  _okError(){
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
@@ -279,7 +290,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           color: Colors.white),
                       child: Padding(
                         padding: const EdgeInsets.only(left: 20.0, right: 20, bottom: 15, top: 15),
-                        child: Column(
+                        child: _isSccuess ? Column(
                           children: <Widget>[
                             SizedBox(
                               height: 20,
@@ -294,6 +305,48 @@ class _LoginScreenState extends State<LoginScreen> {
                               textAlign: TextAlign.center,
                               style: TextStyle(fontSize: 20),
                             ))
+                          ],
+                        ) :
+                        Column(
+                          children: <Widget>[
+                            Icon(Icons.error_outline, color: Colors.red, size: 40,),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Center(
+                                child: Text(
+                                  'Email or Password is not match',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(fontSize: 17),
+                                )),
+                            SizedBox(height: 10,),
+                            Center(
+                              child: Container(
+                                height: 30,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    gradient: LinearGradient(colors: [
+                                      Color.fromRGBO(143, 148, 251, 1),
+                                      Color.fromRGBO(143, 148, 251, .6),
+                                    ]),
+                                    boxShadow: [
+                                      BoxShadow(
+                                          color: Color.fromRGBO(143, 148, 251, .4),
+                                          blurRadius: 20,
+                                          offset: Offset(0, 10))
+                                    ]),
+                                child: FlatButton(
+                                  onPressed: () => _okError(),
+                                  child: Center(
+                                    child: Text(
+                                      'OK',
+                                      style: TextStyle(
+                                          color: Colors.white,),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            )
                           ],
                         ),
                       ),

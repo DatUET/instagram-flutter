@@ -42,7 +42,10 @@ class _ActivityScreenState extends State<ActivityScreen> {
       future: DatabaseService.getUserWithId(activity.fromUserId),
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         if (!snapshot.hasData) {
-          return SizedBox.shrink();
+          return Center(child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: CircularProgressIndicator(),
+          ));
         }
         User user = snapshot.data;
         return ListTile(

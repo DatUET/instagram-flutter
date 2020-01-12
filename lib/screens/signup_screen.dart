@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:instagram_v2/animations/fadeanimation.dart';
+import 'package:instagram_v2/animations/fadeanimationdown.dart';
 import 'package:instagram_v2/screens/login_screen.dart';
 import 'package:instagram_v2/screens/splash_screen.dart';
 import 'package:instagram_v2/services/auth_service.dart';
@@ -14,17 +14,28 @@ class SignupScreen extends StatefulWidget {
 class _SignupScreenState extends State<SignupScreen> {
   final _formKey = GlobalKey<FormState>();
   String _name, _email, _password;
-  bool _isLoading = false;
+  bool _isLoading = false, _isSccuess = true;
 
-  _submit() {
+  _submit() async {
     if (_formKey.currentState.validate()) {
       setState(() {
         _isLoading = true;
       });
       _formKey.currentState.save();
       // Logging in the user w/ Firebase
-      AuthService.signUpUser(context, _name, _email, _password);
+      bool isSccuess = await AuthService.signUpUser(context, _name, _email, _password);
+      if(!isSccuess){
+        setState(() {
+          _isSccuess = isSccuess;
+        });
+      }
     }
+  }
+
+  _okError(){
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
@@ -263,12 +274,63 @@ class _SignupScreenState extends State<SignupScreen> {
                 ),
                 child: Padding(
                   padding: const EdgeInsets.only(left: 20.0, right: 20, bottom: 15, top: 15),
-                  child: Column(
+                  child: _isSccuess ? Column(
                     children: <Widget>[
-                      SizedBox(height: 20,),
+                      SizedBox(
+                        height: 20,
+                      ),
                       CircularProgressIndicator(),
-                      SizedBox(height: 35,),
-                      Center(child: Text('Registering!\n Please wait....', textAlign: TextAlign.center, style: TextStyle(fontSize: 20),))
+                      SizedBox(
+                        height: 35,
+                      ),
+                      Center(
+                          child: Text(
+                            'Registing!\n Please wait...',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 20),
+                          ))
+                    ],
+                  ) :
+                  Column(
+                    children: <Widget>[
+                      Icon(Icons.error_outline, color: Colors.red, size: 40,),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Center(
+                          child: Text(
+                            'Sorry!\nAn error occurred',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 17),
+                          )),
+                      SizedBox(height: 10,),
+                      Center(
+                        child: Container(
+                          height: 30,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              gradient: LinearGradient(colors: [
+                                Color.fromRGBO(143, 148, 251, 1),
+                                Color.fromRGBO(143, 148, 251, .6),
+                              ]),
+                              boxShadow: [
+                                BoxShadow(
+                                    color: Color.fromRGBO(143, 148, 251, .4),
+                                    blurRadius: 20,
+                                    offset: Offset(0, 10))
+                              ]),
+                          child: FlatButton(
+                            onPressed: () => _okError(),
+                            child: Center(
+                              child: Text(
+                                'OK',
+                                style: TextStyle(
+                                  color: Colors.white,),
+                              ),
+                            ),
+                          ),
+                        ),
+                      )
                     ],
                   ),
                 ),

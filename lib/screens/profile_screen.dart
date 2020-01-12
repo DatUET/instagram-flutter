@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:instagram_v2/animations/fadeanimationup.dart';
 import 'package:instagram_v2/models/post_model.dart';
 import 'package:instagram_v2/models/user_data.dart';
 import 'package:instagram_v2/models/user_model.dart';
@@ -151,12 +152,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
           padding: EdgeInsets.fromLTRB(30.0, 30.0, 30.0, 0.0),
           child: Row(
             children: <Widget>[
-              CircleAvatar(
-                radius: 50.0,
-                backgroundColor: Colors.grey,
-                backgroundImage: user.profileImageUrl.isEmpty
-                    ? AssetImage('assets/images/user_placeholder.jpg')
-                    : CachedNetworkImageProvider(user.profileImageUrl),
+              FadeAnimationUp(0.2, CircleAvatar(
+                  radius: 50.0,
+                  backgroundColor: Colors.grey,
+                  backgroundImage: user.profileImageUrl.isEmpty
+                      ? AssetImage('assets/images/user_placeholder.jpg')
+                      : CachedNetworkImageProvider(user.profileImageUrl),
+                ),
               ),
               Expanded(
                 child: Column(
@@ -164,54 +166,57 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: <Widget>[
-                        Column(
-                          children: <Widget>[
-                            Text(
-                              _posts.length.toString(),
-                              style: TextStyle(
-                                fontSize: 18.0,
-                                fontWeight: FontWeight.w600,
+                        FadeAnimationUp(0.4, Column(
+                            children: <Widget>[
+                              Text(
+                                _posts.length.toString(),
+                                style: TextStyle(
+                                  fontSize: 18.0,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
-                            ),
-                            Text(
-                              'posts',
-                              style: TextStyle(color: Colors.black54),
-                            ),
-                          ],
+                              Text(
+                                'posts',
+                                style: TextStyle(color: Colors.black54),
+                              ),
+                            ],
+                          ),
                         ),
-                        Column(
-                          children: <Widget>[
-                            Text(
-                              _followerCount.toString(),
-                              style: TextStyle(
-                                fontSize: 18.0,
-                                fontWeight: FontWeight.w600,
+                        FadeAnimationUp(0.6, Column(
+                            children: <Widget>[
+                              Text(
+                                _followerCount.toString(),
+                                style: TextStyle(
+                                  fontSize: 18.0,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
-                            ),
-                            Text(
-                              'followers',
-                              style: TextStyle(color: Colors.black54),
-                            ),
-                          ],
+                              Text(
+                                'followers',
+                                style: TextStyle(color: Colors.black54),
+                              ),
+                            ],
+                          ),
                         ),
-                        Column(
-                          children: <Widget>[
-                            Text(
-                              _followingCount.toString(),
-                              style: TextStyle(
-                                fontSize: 18.0,
-                                fontWeight: FontWeight.w600,
+                        FadeAnimationUp(0.8, Column(
+                            children: <Widget>[
+                              Text(
+                                _followingCount.toString(),
+                                style: TextStyle(
+                                  fontSize: 18.0,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
-                            ),
-                            Text(
-                              'following',
-                              style: TextStyle(color: Colors.black54),
-                            ),
-                          ],
+                              Text(
+                                'following',
+                                style: TextStyle(color: Colors.black54),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
-                    _displayButton(user),
+                    FadeAnimationUp(1, _displayButton(user)),
                   ],
                 ),
               )
@@ -223,19 +228,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text(
-                user.name,
-                style: TextStyle(
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.bold,
+              FadeAnimationUp(1.2, Text(
+                  user.name,
+                  style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
               SizedBox(height: 5.0),
               Container(
-                height: 80.0,
-                child: Text(
-                  user.bio,
-                  style: TextStyle(fontSize: 15.0),
+                height: 30.0,
+                child: FadeAnimationUp(1.4, Text(
+                    user.bio,
+                    style: TextStyle(fontSize: 15.0),
+                  ),
                 ),
               ),
               Divider(),
@@ -274,21 +281,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  _buildTilePost(Post post) {
+  _buildTilePost(Post post, int indext) {
     return GridTile(
-      child: GestureDetector(
-        onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => CommentsScreen(
-              post: post,
-              likeCount: post.likeCount,
+      child: FadeAnimationUp((indext*2) / 10.0, GestureDetector(
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => CommentsScreen(
+                post: post,
+                likeCount: post.likeCount,
+              ),
             ),
           ),
-        ),
-        child: Image(
-          image: CachedNetworkImageProvider(post.imageUrl),
-          fit: BoxFit.cover,
+          child: Image(
+            image: CachedNetworkImageProvider(post.imageUrl),
+            fit: BoxFit.cover,
+          ),
         ),
       ),
     );
@@ -298,9 +306,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (_displayPosts == 0) {
       // Grid
       List<GridTile> tiles = [];
-      _posts.forEach(
-        (post) => tiles.add(_buildTilePost(post)),
-      );
+     for(int i=0; i<_posts.length; i++){
+       Post post = _posts[i];
+       tiles.add(_buildTilePost(post, i));
+     }
       return GridView.count(
         crossAxisCount: 3,
         childAspectRatio: 1.0,
@@ -313,15 +322,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
     } else {
       // Column
       List<PostView> postViews = [];
-      _posts.forEach((post) {
+      for(int i=0; i<_posts.length; i++){
         postViews.add(
           PostView(
             currentUserId: widget.currentUserId,
-            post: post,
+            post: _posts[i],
             author: _profileUser,
+            index: i,
           ),
         );
-      });
+      }
       return Column(children: postViews);
     }
   }
