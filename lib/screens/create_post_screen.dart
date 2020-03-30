@@ -11,7 +11,10 @@ import 'package:instagram_v2/models/user_data.dart';
 import 'package:instagram_v2/services/database_service.dart';
 import 'package:instagram_v2/services/location.dart';
 import 'package:instagram_v2/services/storage_service.dart';
+import 'package:photofilters/photofilters.dart';
 import 'package:provider/provider.dart';
+import 'package:path/path.dart' as path;
+import 'package:image/image.dart' as imageLib;
 
 class CreatePostScreen extends StatefulWidget {
   @override
@@ -95,6 +98,23 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
       imageFile = await _cropImage(imageFile);
       setState(() {
         _image = imageFile;
+      });
+    }
+    var image = imageLib.decodeImage(imageFile.readAsBytesSync());
+    String fileName = path.basename(imageFile.path);
+    Map imagefile = await Navigator.push(
+        context, MaterialPageRoute(builder: (context) =>
+        PhotoFilterSelector(
+          title: Text("Photo Filter Example"),
+          image: image,
+          filters: presetFiltersList,
+          filename: fileName,
+          loader: Center(child: CircularProgressIndicator()),
+          fit: BoxFit.contain,
+        )));
+    if (imagefile != null && imagefile.containsKey('image_filtered')) {
+      setState(() {
+        _image = imagefile['image_filtered'];
       });
     }
   }

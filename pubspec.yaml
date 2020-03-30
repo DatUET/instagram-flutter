@@ -42,6 +42,7 @@ dependencies:
   location: ^2.3.5
   geocoder: ^0.2.1
   flare_flutter: ^1.8.3
+  photofilters: ^1.0.5
 
 dev_dependencies:
   flutter_test:
@@ -79,6 +80,18 @@ flutter:
     - family: Billabong
       fonts:
         - asset: assets/fonts/Billabong.ttf
+    - family: Ubunutu
+      fonts:
+        - asset: assets/fonts/Ubuntu-Regular.ttf
+    - family: UbunutuMono
+      fonts:
+        - asset: assets/fonts/UbuntuMono.ttf
+    - family: RobotoMono
+      fonts:
+        - asset: assets/fonts/RobotoMono.ttf
+    - family: B612Mono
+      fonts:
+        - asset: assets/fonts/B612Mono.ttf
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
   #   - family: Trajan Pro
