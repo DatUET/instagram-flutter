@@ -42,7 +42,7 @@ dependencies:
   location: ^2.3.5
   geocoder: ^0.2.1
   flare_flutter: ^1.8.3
-  photofilters: ^1.0.5
+
 
 dev_dependencies:
   flutter_test:

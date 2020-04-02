@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
@@ -11,10 +12,7 @@ import 'package:instagram_v2/models/user_data.dart';
 import 'package:instagram_v2/services/database_service.dart';
 import 'package:instagram_v2/services/location.dart';
 import 'package:instagram_v2/services/storage_service.dart';
-import 'package:photofilters/photofilters.dart';
 import 'package:provider/provider.dart';
-import 'package:path/path.dart' as path;
-import 'package:image/image.dart' as imageLib;
 
 class CreatePostScreen extends StatefulWidget {
   @override
@@ -100,23 +98,17 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
         _image = imageFile;
       });
     }
-    var image = imageLib.decodeImage(imageFile.readAsBytesSync());
-    String fileName = path.basename(imageFile.path);
-    Map imagefile = await Navigator.push(
-        context, MaterialPageRoute(builder: (context) =>
-        PhotoFilterSelector(
-          title: Text("Photo Filter Example"),
-          image: image,
-          filters: presetFiltersList,
-          filename: fileName,
-          loader: Center(child: CircularProgressIndicator()),
-          fit: BoxFit.contain,
-        )));
-    if (imagefile != null && imagefile.containsKey('image_filtered')) {
+    MethodChannel platform = MethodChannel('photogram');
+    try {
+      String temp = await platform.invokeMethod('edit photo', {'arg': _image.path});
       setState(() {
-        _image = imagefile['image_filtered'];
+        _image = new File(temp);
       });
+      print('tempfile $temp');
+    } catch (e) {
+      print(e);
     }
+
   }
 
   _cropImage(File imageFile) async {
