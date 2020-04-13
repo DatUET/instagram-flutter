@@ -10,11 +10,16 @@ import 'package:image_picker/image_picker.dart';
 import 'package:instagram_v2/models/post_model.dart';
 import 'package:instagram_v2/models/user_data.dart';
 import 'package:instagram_v2/services/database_service.dart';
+import 'package:instagram_v2/services/edit_photo.dart';
 import 'package:instagram_v2/services/location.dart';
 import 'package:instagram_v2/services/storage_service.dart';
 import 'package:provider/provider.dart';
 
 class CreatePostScreen extends StatefulWidget {
+  final File imagePost;
+
+  CreatePostScreen({this.imagePost});
+
   @override
   _CreatePostScreenState createState() => _CreatePostScreenState();
 }
@@ -25,6 +30,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   TextEditingController _locationController = TextEditingController();
   String _caption = '';
   bool _isLoading = false;
+  var themeStyle;
 
   Address _address;
 
@@ -64,14 +70,15 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
       context: context,
       builder: (BuildContext context) {
         return SimpleDialog(
-          title: Text('Add Photo'),
+          backgroundColor: themeStyle.primaryBackgroundColor,
+          title: Text('Add Photo', style: TextStyle(color: themeStyle.primaryTextColor),),
           children: <Widget>[
             SimpleDialogOption(
-              child: Text('Take Photo'),
+              child: Text('Take Photo', style: TextStyle(color: themeStyle.primaryTextColor),),
               onPressed: () => _handleImage(ImageSource.camera),
             ),
             SimpleDialogOption(
-              child: Text('Choose From Gallery'),
+              child: Text('Choose From Gallery', style: TextStyle(color: themeStyle.primaryTextColor),),
               onPressed: () => _handleImage(ImageSource.gallery),
             ),
             SimpleDialogOption(
@@ -98,17 +105,6 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
         _image = imageFile;
       });
     }
-    MethodChannel platform = MethodChannel('photogram');
-    try {
-      String temp = await platform.invokeMethod('edit photo', {'arg': _image.path});
-      setState(() {
-        _image = new File(temp);
-      });
-      print('tempfile $temp');
-    } catch (e) {
-      print(e);
-    }
-
   }
 
   _cropImage(File imageFile) async {
@@ -193,143 +189,174 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     _currentLocation['latitude'] = 0.0;
     _currentLocation['longitude'] = 0.0;
     _initPlatformState();
+    _image = widget.imagePost;
+  }
+
+  _buildBodyScreen(double height, double width) {
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Stack(
+        children: <Widget>[
+          SingleChildScrollView(
+            child: Container(
+              color: themeStyle.primaryBackgroundColor,
+              height: height,
+              child: Column(
+                children: <Widget>[
+                  GestureDetector(
+                    onTap: _showSelectImageDialog,
+                    child: Container(
+                      height: width,
+                      width: width,
+                      color: themeStyle.typeMessageBoxColor,
+                      child: _image == null
+                          ? Icon(
+                        Icons.add_a_photo,
+                        color: themeStyle.primaryIconColor,
+                        size: 150.0,
+                      )
+                          : Image(
+                        image: FileImage(_image),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20.0),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 30.0),
+                    child: TextField(
+                      controller: _captionController,
+                      style: TextStyle(fontSize: 18.0, color: themeStyle.primaryTextColor),
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: themeStyle.primaryBackgroundColor,
+                        labelText: 'Caption',
+                        labelStyle: TextStyle(color: themeStyle.primaryTextColor),
+                      ),
+                      onChanged: (input) => _caption = input,
+                    ),
+                  ),
+                  SizedBox(height: 20,),
+                  ListTile(
+                    leading: Icon(Icons.pin_drop, color: themeStyle.primaryIconColor,),
+                    title: Container(
+                      width: 250.0,
+                      child: TextField(
+                        controller: _locationController,
+                        style: TextStyle(color: themeStyle.primaryTextColor),
+                        decoration: InputDecoration(
+                          filled: true,
+                            fillColor: themeStyle.primaryBackgroundColor,
+                            hintText: "Where was this photo taken?",
+                            hintStyle: TextStyle(color: themeStyle.primaryTextColor),
+                            border: InputBorder.none),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 10,),
+                  (_address == null)
+                      ? Container()
+                      : SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    padding: EdgeInsets.only(right: 5.0, left: 5.0),
+                    child: Row(
+                      children: <Widget>[
+                        buildLocationButton(_address.featureName),
+                        buildLocationButton(_address.subLocality),
+                        buildLocationButton(_address.locality),
+                        buildLocationButton(_address.subAdminArea),
+                        buildLocationButton(_address.adminArea),
+                        buildLocationButton(_address.countryName),
+                      ],
+                    ),
+                  ),
+                  (_address == null) ? Container() : Divider(),
+                  SizedBox(height: 30,),
+                  Container(
+                      margin: EdgeInsets.symmetric(horizontal: 60),
+                      height: 50,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          gradient: LinearGradient(colors: [
+                            Color.fromRGBO(143, 148, 251, .6),
+                            Color.fromRGBO(143, 148, 251, 1),
+                          ]),
+                          boxShadow: [
+                            BoxShadow(
+                                color: Color.fromRGBO(143, 148, 251, .4),
+                                blurRadius: 20,
+                                offset: Offset(0, 10))
+                          ]),
+                      child: FlatButton(
+                        onPressed: () => _submit(),
+                        child: Center(
+                          child: Text(
+                            'Post',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ))],
+              ),
+            ),
+          ),
+          _isLoading
+              ? Container(
+            width: double.infinity,
+            height: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.grey.withOpacity(.5),
+            ),
+            child: Center(
+              child: Container(
+                height: 180,
+                width: 180,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: themeStyle.primaryBackgroundColor,),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 20.0, right: 20, bottom: 15, top: 15),
+                  child: Column(
+                    children: <Widget>[
+                      SizedBox(
+                        height: 20,
+                      ),
+                      CircularProgressIndicator(),
+                      SizedBox(
+                        height: 35,
+                      ),
+                      Center(
+                          child: Text(
+                            'Uploading!\n Please wait....',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 20, color: themeStyle.primaryTextColor),
+                          ))
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          )
+              : Container(),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
-    return Scaffold(
+    themeStyle = Provider.of<UserData>(context);
+    return widget.imagePost != null
+        ? Scaffold(
+      backgroundColor: themeStyle.primaryBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: Text(
-          'Create Post',
-          style: TextStyle(
-            color: Colors.black,
-          ),
-        ),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.add),
-            onPressed: _submit,
-          ),
-        ],
+        title: Text('Create New Post', style: TextStyle(color: themeStyle.primaryTextColor),),
+        backgroundColor: themeStyle.primaryBackgroundColor,
       ),
-      body: GestureDetector(
-        onTap: () => FocusScope.of(context).unfocus(),
-        child: Stack(
-          children: <Widget>[
-            SingleChildScrollView(
-              child: Container(
-                height: height,
-                child: Column(
-                  children: <Widget>[
-                    GestureDetector(
-                      onTap: _showSelectImageDialog,
-                      child: Container(
-                        height: width,
-                        width: width,
-                        color: Colors.grey[300],
-                        child: _image == null
-                            ? Icon(
-                                Icons.add_a_photo,
-                                color: Colors.white70,
-                                size: 150.0,
-                              )
-                            : Image(
-                                image: FileImage(_image),
-                                fit: BoxFit.cover,
-                              ),
-                      ),
-                    ),
-                    SizedBox(height: 20.0),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 30.0),
-                      child: TextField(
-                        controller: _captionController,
-                        style: TextStyle(fontSize: 18.0),
-                        decoration: InputDecoration(
-                          labelText: 'Caption',
-                        ),
-                        onChanged: (input) => _caption = input,
-                      ),
-                    ),
-                    SizedBox(height: 20,),
-                    ListTile(
-                      leading: Icon(Icons.pin_drop),
-                      title: Container(
-                        width: 250.0,
-                        child: TextField(
-                          controller: _locationController,
-                          decoration: InputDecoration(
-                              hintText: "Where was this photo taken?",
-                              border: InputBorder.none),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 10,),
-                    (_address == null)
-                        ? Container()
-                        : SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      padding: EdgeInsets.only(right: 5.0, left: 5.0),
-                      child: Row(
-                        children: <Widget>[
-                          buildLocationButton(_address.featureName),
-                          buildLocationButton(_address.subLocality),
-                          buildLocationButton(_address.locality),
-                          buildLocationButton(_address.subAdminArea),
-                          buildLocationButton(_address.adminArea),
-                          buildLocationButton(_address.countryName),
-                        ],
-                      ),
-                    ),
-                    (_address == null) ? Container() : Divider(),
-                  ],
-                ),
-              ),
-            ),
-            _isLoading
-                ? Container(
-              width: double.infinity,
-              height: double.infinity,
-              decoration: BoxDecoration(
-                color: Colors.grey.withOpacity(.5),
-              ),
-              child: Center(
-                child: Container(
-                  height: 180,
-                  width: 180,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color: Colors.white),
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 20.0, right: 20, bottom: 15, top: 15),
-                    child: Column(
-                      children: <Widget>[
-                        SizedBox(
-                          height: 20,
-                        ),
-                        CircularProgressIndicator(),
-                        SizedBox(
-                          height: 35,
-                        ),
-                        Center(
-                            child: Text(
-                              'Uploading!\n Please wait....',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(fontSize: 20),
-                            ))
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            )
-                : Container(),
-          ],
-        ),
-      ),
-    );
+      body: _buildBodyScreen(height, width),)
+        : _buildBodyScreen(height, width);
   }
 }

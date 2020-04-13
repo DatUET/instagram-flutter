@@ -31,6 +31,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   List<Post> _posts = [];
   int _displayPosts = 0; // 0 - grid, 1 - column
   User _profileUser;
+  var themeStyle;
 
   @override
   void initState() {
@@ -171,13 +172,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               Text(
                                 _posts.length.toString(),
                                 style: TextStyle(
+                                  color: themeStyle.primaryTextColor,
                                   fontSize: 18.0,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
                               Text(
                                 'posts',
-                                style: TextStyle(color: Colors.black54),
+                                style: TextStyle(color: themeStyle.primaryTextColor),
                               ),
                             ],
                           ),
@@ -187,13 +189,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               Text(
                                 _followerCount.toString(),
                                 style: TextStyle(
+                                  color: themeStyle.primaryTextColor,
                                   fontSize: 18.0,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
                               Text(
                                 'followers',
-                                style: TextStyle(color: Colors.black54),
+                                style: TextStyle(color: themeStyle.primaryTextColor),
                               ),
                             ],
                           ),
@@ -203,13 +206,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               Text(
                                 _followingCount.toString(),
                                 style: TextStyle(
+                                  color: themeStyle.primaryTextColor,
                                   fontSize: 18.0,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
                               Text(
                                 'following',
-                                style: TextStyle(color: Colors.black54),
+                                style: TextStyle(color: themeStyle.primaryTextColor),
                               ),
                             ],
                           ),
@@ -231,6 +235,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               FadeAnimationUp(1.2, Text(
                   user.name,
                   style: TextStyle(
+                    color: themeStyle.primaryTextColor,
                     fontSize: 18.0,
                     fontWeight: FontWeight.bold,
                   ),
@@ -241,11 +246,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 height: 30.0,
                 child: FadeAnimationUp(1.4, Text(
                     user.bio,
-                    style: TextStyle(fontSize: 15.0),
+                    style: TextStyle(color: themeStyle.primaryTextColor, fontSize: 15.0),
                   ),
                 ),
               ),
-              Divider(),
+              Divider(color: themeStyle.primaryTextColorLight,),
             ],
           ),
         ),
@@ -262,7 +267,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           iconSize: 30.0,
           color: _displayPosts == 0
               ? Theme.of(context).primaryColor
-              : Colors.grey[300],
+              : themeStyle.primaryIconColor,
           onPressed: () => setState(() {
             _displayPosts = 0;
           }),
@@ -272,7 +277,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           iconSize: 30.0,
           color: _displayPosts == 1
               ? Theme.of(context).primaryColor
-              : Colors.grey[300],
+              : themeStyle.primaryIconColor,
           onPressed: () => setState(() {
             _displayPosts = 1;
           }),
@@ -281,9 +286,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  _buildTilePost(Post post, int indext) {
+  _buildTilePost(Post post, int index) {
     return GridTile(
-      child: FadeAnimationUp((indext*2) / 10.0, GestureDetector(
+      child: FadeAnimationUp((index*2) / 10.0, GestureDetector(
           onTap: () => Navigator.push(
             context,
             MaterialPageRoute(
@@ -328,7 +333,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             currentUserId: widget.currentUserId,
             post: _posts[i],
             author: _profileUser,
-            index: i,
           ),
         );
       }
@@ -338,21 +342,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    themeStyle = Provider.of<UserData>(context);
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: themeStyle.primaryBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: themeStyle.primaryBackgroundColor,
         title: Text(
           'Instagram',
           style: TextStyle(
-            color: Colors.black,
+            color: themeStyle.primaryTextColor,
             fontFamily: 'Billabong',
             fontSize: 35.0,
           ),
         ),
         actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.exit_to_app),
+            icon: Icon(Icons.exit_to_app, color: themeStyle.primaryIconColor,),
             onPressed: () {
               AuthService.logout();
               Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => LoginScreen()));},

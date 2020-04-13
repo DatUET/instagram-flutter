@@ -15,6 +15,7 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   TextEditingController _searchController = TextEditingController();
   Future<QuerySnapshot> _users;
+  var themeStyle;
 
   _buildUserTile(User user) {
     return ListTile(
@@ -24,7 +25,7 @@ class _SearchScreenState extends State<SearchScreen> {
             ? AssetImage('assets/images/user_placeholder.jpg')
             : CachedNetworkImageProvider(user.profileImageUrl),
       ),
-      title: Text(user.name),
+      title: Text(user.name, style: TextStyle(color: themeStyle.primaryTextColor),),
       onTap: () => Navigator.push(
         context,
         MaterialPageRoute(
@@ -47,22 +48,29 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    themeStyle = Provider.of<UserData>(context);
     return Scaffold(
+      backgroundColor: themeStyle.primaryBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: themeStyle.primaryBackgroundColor,
         title: TextField(
           controller: _searchController,
+          style: TextStyle(color: themeStyle.primaryTextColor),
           decoration: InputDecoration(
+            fillColor: themeStyle.typeMessageBoxColor,
             contentPadding: EdgeInsets.symmetric(vertical: 15.0),
             border: InputBorder.none,
             hintText: 'Search',
+            hintStyle: TextStyle(color: themeStyle.primaryTextColor),
             prefixIcon: Icon(
               Icons.search,
               size: 30.0,
+              color: themeStyle.primaryIconColor,
             ),
             suffixIcon: IconButton(
               icon: Icon(
                 Icons.clear,
+                color: themeStyle.primaryIconColor,
               ),
               onPressed: _clearSearch,
             ),
@@ -79,7 +87,7 @@ class _SearchScreenState extends State<SearchScreen> {
       ),
       body: _users == null
           ? Center(
-              child: Text('Search for a user'),
+              child: Text('Search for a user', style: TextStyle(color: themeStyle.primaryTextColor),),
             )
           : FutureBuilder(
               future: _users,

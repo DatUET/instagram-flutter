@@ -2,10 +2,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram_v2/models/user_data.dart';
 import 'package:instagram_v2/screens/activity_screen.dart';
+import 'package:instagram_v2/screens/camera_screen.dart';
 import 'package:instagram_v2/screens/create_post_screen.dart';
 import 'package:instagram_v2/screens/feed_screen.dart';
+import 'package:instagram_v2/screens/gallery_screen.dart';
 import 'package:instagram_v2/screens/profile_screen.dart';
 import 'package:instagram_v2/screens/search_screen.dart';
+import 'package:instagram_v2/screens/social_screen.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -26,18 +30,14 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final String currentUserId = Provider.of<UserData>(context).currentUserId;
+    final themeStyle = Provider.of<UserData>(context);
     return Scaffold(
       body: PageView(
         controller: _pageController,
         children: <Widget>[
-          FeedScreen(currentUserId: currentUserId),
-          SearchScreen(),
-          CreatePostScreen(),
-          ActivityScreen(currentUserId: currentUserId),
-          ProfileScreen(
-            currentUserId: currentUserId,
-            userId: currentUserId,
-          ),
+          SocialScreen(currentUserId: currentUserId,),
+          GalleyScreen(),
+          CameraScreen()
         ],
         onPageChanged: (int index) {
           setState(() {
@@ -46,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
         },
       ),
       bottomNavigationBar: CupertinoTabBar(
-        backgroundColor: Colors.white,
+        backgroundColor: themeStyle.primaryBackgroundColor,
         currentIndex: _currentTab,
         onTap: (int index) {
           setState(() {
@@ -64,30 +64,21 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: Icon(
               Icons.home,
               size: 32.0,
+              color: themeStyle.primaryIconColor,
             ),
           ),
           BottomNavigationBarItem(
             icon: Icon(
-              Icons.search,
+              Icons.photo_library,
               size: 32.0,
+              color: themeStyle.primaryIconColor,
             ),
           ),
           BottomNavigationBarItem(
             icon: Icon(
-              Icons.photo_camera,
+              Icons.camera,
               size: 32.0,
-            ),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.notifications,
-              size: 32.0,
-            ),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.account_circle,
-              size: 32.0,
+              color: themeStyle.primaryIconColor,
             ),
           ),
         ],

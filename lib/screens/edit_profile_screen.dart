@@ -3,9 +3,11 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:instagram_v2/models/user_data.dart';
 import 'package:instagram_v2/models/user_model.dart';
 import 'package:instagram_v2/services/database_service.dart';
 import 'package:instagram_v2/services/storage_service.dart';
+import 'package:provider/provider.dart';
 
 class EditProfileScreen extends StatefulWidget {
   final User user;
@@ -22,6 +24,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   String _name = '';
   String _bio = '';
   bool _isLoading = false;
+  var themeStyle;
 
   @override
   void initState() {
@@ -91,13 +94,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    themeStyle = Provider.of<UserData>(context);
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: themeStyle.primaryBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: themeStyle.primaryBackgroundColor,
         title: Text(
           'Edit Profile',
-          style: TextStyle(color: Colors.black),
+          style: TextStyle(color: themeStyle.primaryTextColor),
         ),
       ),
       body: GestureDetector(
@@ -132,13 +136,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     TextFormField(
                       initialValue: _name,
-                      style: TextStyle(fontSize: 18.0),
+                      style: TextStyle(fontSize: 18.0, color: themeStyle.primaryTextColor),
                       decoration: InputDecoration(
                         icon: Icon(
                           Icons.person,
                           size: 30.0,
+                          color: themeStyle.primaryIconColor,
                         ),
                         labelText: 'Name',
+                        labelStyle: TextStyle(color: themeStyle.primaryTextColor)
                       ),
                       validator: (input) => input.trim().length < 1
                           ? 'Please enter a valid name'
@@ -147,13 +153,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     TextFormField(
                       initialValue: _bio,
-                      style: TextStyle(fontSize: 18.0),
+                      style: TextStyle(fontSize: 18.0, color: themeStyle.primaryTextColor),
                       decoration: InputDecoration(
                         icon: Icon(
                           Icons.book,
                           size: 30.0,
+                          color: themeStyle.primaryIconColor,
                         ),
                         labelText: 'Bio',
+                        labelStyle: TextStyle(color: themeStyle.primaryTextColor)
                       ),
                       validator: (input) => input.trim().length > 150
                           ? 'Please enter a bio less than 150 characters'
@@ -178,6 +186,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ),
               ),
             ),
+            Divider(color: themeStyle.primaryTextColorLight,),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Text('Dark Theme', style: TextStyle(color: themeStyle.primaryTextColor, fontSize: 18.0),),
+                  Switch(value: themeStyle.mode == 1, onChanged: (value) {
+                    themeStyle.switchMode();
+                  })
+                ],
+              ),
+            )
           ],
         ),
       ),

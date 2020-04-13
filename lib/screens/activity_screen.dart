@@ -8,6 +8,7 @@ import 'package:instagram_v2/screens/comments_screen.dart';
 import 'package:instagram_v2/services/database_service.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class ActivityScreen extends StatefulWidget {
   final String currentUserId;
@@ -20,6 +21,8 @@ class ActivityScreen extends StatefulWidget {
 
 class _ActivityScreenState extends State<ActivityScreen> {
   List<Activity> _activities = [];
+  RefreshController _refreshController = RefreshController(initialRefresh: false);
+  var themeStyle;
 
   @override
   void initState() {
@@ -28,11 +31,13 @@ class _ActivityScreenState extends State<ActivityScreen> {
   }
 
   _setupActivities() async {
+    _refreshController.loadComplete();
     List<Activity> activities =
         await DatabaseService.getActivities(widget.currentUserId);
     if (mounted) {
       setState(() {
         _activities = activities;
+        _refreshController.refreshCompleted();
       });
     }
   }
@@ -48,42 +53,46 @@ class _ActivityScreenState extends State<ActivityScreen> {
           ));
         }
         User user = snapshot.data;
-        return ListTile(
-          leading: CircleAvatar(
-            radius: 20.0,
-            backgroundColor: Colors.grey,
-            backgroundImage: user.profileImageUrl.isEmpty
-                ? AssetImage('assets/images/user_placeholder.jpg')
-                : CachedNetworkImageProvider(user.profileImageUrl),
-          ),
-          title: activity.comment != null
-              ? Text('${user.name} commented: "${activity.comment}"')
-              : Text('${user.name} liked your post'),
-          subtitle: Text(
-            DateFormat.yMd().add_jm().format(activity.timestamp.toDate()),
-          ),
-          trailing: CachedNetworkImage(
-            imageUrl: activity.postImageUrl,
-            height: 40.0,
-            width: 40.0,
-            fit: BoxFit.cover,
-          ),
-          onTap: () async {
-            String currentUserId = Provider.of<UserData>(context).currentUserId;
-            Post post = await DatabaseService.getUserPost(
-              currentUserId,
-              activity.postId,
-            );
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => CommentsScreen(
-                  post: post,
-                  likeCount: post.likeCount,
+        return Container(
+          color: themeStyle.primaryBackgroundColor,
+          child: ListTile(
+            leading: CircleAvatar(
+              radius: 20.0,
+              backgroundColor: Colors.grey,
+              backgroundImage: user.profileImageUrl.isEmpty
+                  ? AssetImage('assets/images/user_placeholder.jpg')
+                  : CachedNetworkImageProvider(user.profileImageUrl),
+            ),
+            title: activity.comment != null
+                ? Text('${user.name} commented: "${activity.comment}"', style: TextStyle(color: themeStyle.primaryTextColor,))
+                : Text('${user.name} liked your post', style: TextStyle(color: themeStyle.primaryTextColor,)),
+            subtitle: Text(
+              DateFormat.yMd().add_jm().format(activity.timestamp.toDate(),),
+                style: TextStyle(color: themeStyle.primaryTextColor,)
+            ),
+            trailing: CachedNetworkImage(
+              imageUrl: activity.postImageUrl,
+              height: 40.0,
+              width: 40.0,
+              fit: BoxFit.cover,
+            ),
+            onTap: () async {
+              String currentUserId = Provider.of<UserData>(context).currentUserId;
+              Post post = await DatabaseService.getUserPost(
+                currentUserId,
+                activity.postId,
+              );
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => CommentsScreen(
+                    post: post,
+                    likeCount: post.likeCount,
+                  ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         );
       },
     );
@@ -91,19 +100,9 @@ class _ActivityScreenState extends State<ActivityScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: Text(
-          'Instagram',
-          style: TextStyle(
-            color: Colors.black,
-            fontFamily: 'Billabong',
-            fontSize: 35.0,
-          ),
-        ),
-      ),
-      body: RefreshIndicator(
+    themeStyle = Provider.of<UserData>(context);
+    return SmartRefresher(
+      controller: _refreshController,
         onRefresh: () => _setupActivities(),
         child: ListView.builder(
           itemCount: _activities.length,
@@ -112,7 +111,6 @@ class _ActivityScreenState extends State<ActivityScreen> {
             return _buildActivity(activity);
           },
         ),
-      ),
-    );
+      );
   }
 }

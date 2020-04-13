@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:instagram_v2/animations/fadeanimationdown.dart';
+import 'package:instagram_v2/models/user_data.dart';
 import 'package:instagram_v2/screens/signup_screen.dart';
 import 'package:instagram_v2/services/auth_service.dart';
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
   static final String id = 'login_screen';
@@ -14,6 +16,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   String _email, _password;
   bool _isLoading = false, _isSccuess = true;
+  var themeStyle;
 
   _submit(BuildContext context) async {
     if (_formKey.currentState.validate()) {
@@ -34,13 +37,15 @@ class _LoginScreenState extends State<LoginScreen> {
   _okError(){
     setState(() {
       _isLoading = false;
+      _isSccuess = true;
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    themeStyle = Provider.of<UserData>(context);
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: themeStyle.primaryBackgroundColor,
       body: Stack(
         children: <Widget>[
           SingleChildScrollView(
@@ -127,7 +132,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           Container(
                             padding: EdgeInsets.all(5),
                             decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: themeStyle.typeMessageBoxColor,
                                 borderRadius: BorderRadius.circular(10),
                                 boxShadow: [
                                   BoxShadow(
@@ -139,10 +144,6 @@ class _LoginScreenState extends State<LoginScreen> {
                               children: <Widget>[
                                 Container(
                                   padding: EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                      border: Border(
-                                          bottom: BorderSide(
-                                              color: Colors.grey[100]))),
                                   child: Form(
                                     key: _formKey,
                                     child: Column(
@@ -154,8 +155,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                               vertical: 10.0,
                                             ),
                                             child: TextFormField(
+                                              style: TextStyle(color: themeStyle.primaryTextColor),
                                               decoration: InputDecoration(
-                                                  labelText: 'Email'),
+                                                  labelText: 'Email',
+                                              labelStyle: TextStyle(color: themeStyle.primaryTextColor)),
                                               validator: (input) => !input
                                                       .contains('@')
                                                   ? 'Please enter a valid email'
@@ -170,8 +173,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                               vertical: 10.0,
                                             ),
                                             child: TextFormField(
+                                              style: TextStyle(color: themeStyle.primaryTextColor),
                                               decoration: InputDecoration(
-                                                  labelText: 'Password'),
+                                                  labelText: 'Password',
+                                                  labelStyle: TextStyle(color: themeStyle.primaryTextColor),
+                                            ),
                                               validator: (input) => input
                                                           .length <
                                                       6
@@ -287,7 +293,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       width: 180,
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(20),
-                          color: Colors.white),
+                          color: themeStyle.primaryBackgroundColor),
                       child: Padding(
                         padding: const EdgeInsets.only(left: 20.0, right: 20, bottom: 15, top: 15),
                         child: _isSccuess ? Column(
@@ -303,7 +309,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 child: Text(
                               'Logging in!\n Please wait....',
                               textAlign: TextAlign.center,
-                              style: TextStyle(fontSize: 20),
+                              style: TextStyle(color: themeStyle.primaryTextColor, fontSize: 20),
                             ))
                           ],
                         ) :
@@ -317,7 +323,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 child: Text(
                                   'Email or Password is not match',
                                   textAlign: TextAlign.center,
-                                  style: TextStyle(fontSize: 17),
+                                  style: TextStyle(color: themeStyle.primaryTextColor, fontSize: 17),
                                 )),
                             SizedBox(height: 10,),
                             Center(

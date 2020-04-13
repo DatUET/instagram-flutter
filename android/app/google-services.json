@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "456381249365",
-    "firebase_url": "https://photogram-92dc4.firebaseio.com",
-    "project_id": "photogram-92dc4",
-    "storage_bucket": "photogram-92dc4.appspot.com"
+    "project_number": "611078740370",
+    "firebase_url": "https://photogram-43391.firebaseio.com",
+    "project_id": "photogram-43391",
+    "storage_bucket": "photogram-43391.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:456381249365:android:93d0ecd0761b9ebd38a1dc",
+        "mobilesdk_app_id": "1:611078740370:android:65d38e682b6a933dd4c94b",
         "android_client_info": {
           "package_name": "com.example.instagram_v2"
         }
       },
       "oauth_client": [
         {
-          "client_id": "456381249365-u4he2veqt9l6bhhiic2a7gue5koaskpc.apps.googleusercontent.com",
+          "client_id": "611078740370-npbe83ofu86kghpv7a10ttsn94cclp2p.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.instagram_v2",
@@ -23,20 +23,20 @@
           }
         },
         {
-          "client_id": "456381249365-ru1fq3d4q34l8tt23a40frkja6uoo48k.apps.googleusercontent.com",
+          "client_id": "611078740370-2eedsbvlufcs68go0guje0s82upd7gis.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDgqHSYA2UD9dbzZayECfMc11mkJ_Ux9Fc"
+          "current_key": "AIzaSyCzIZlBGuL7BJJETpJxm1olIujo03EAVlA"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "456381249365-ru1fq3d4q34l8tt23a40frkja6uoo48k.apps.googleusercontent.com",
+              "client_id": "611078740370-2eedsbvlufcs68go0guje0s82upd7gis.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

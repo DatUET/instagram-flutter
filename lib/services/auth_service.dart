@@ -48,7 +48,7 @@ class AuthService {
       FirebaseUser user = authResult.user;
       if(user != null){
         Provider.of<UserData>(context).currentUserId = user.uid;
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => HomeScreen()));
+        Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (_) => HomeScreen()), (Route<dynamic> route) => false);
         return true;
       }
       return false;

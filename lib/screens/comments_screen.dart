@@ -22,6 +22,7 @@ class CommentsScreen extends StatefulWidget {
 class _CommentsScreenState extends State<CommentsScreen> {
   final TextEditingController _commentController = TextEditingController();
   bool _isCommenting = false;
+  var themeData;
 
   _buildComment(Comment comment) {
     return FutureBuilder(
@@ -39,14 +40,15 @@ class _CommentsScreenState extends State<CommentsScreen> {
                 ? AssetImage('assets/images/user_placeholder.jpg')
                 : CachedNetworkImageProvider(author.profileImageUrl),
           ),
-          title: Text(author.name),
+          title: Text(author.name, style: TextStyle(color: themeData.primaryTextColor),),
           subtitle: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text(comment.content),
+              Text(comment.content, style: TextStyle(color: themeData.primaryTextColor),),
               SizedBox(height: 6.0),
               Text(
                 DateFormat.yMd().add_jm().format(comment.timestamp.toDate()),
+                style: TextStyle(color: themeData.primaryTextColor),
               ),
             ],
           ),
@@ -109,12 +111,14 @@ class _CommentsScreenState extends State<CommentsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    themeData = Provider.of<UserData>(context);
     return Scaffold(
+      backgroundColor: themeData.primaryBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: themeData.primaryBackgroundColor,
         title: Text(
           'Comments',
-          style: TextStyle(color: Colors.black),
+          style: TextStyle(color: themeData.primaryTextColor),
         ),
       ),
       body: Column(
@@ -124,6 +128,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
             child: Text(
               '${widget.likeCount} likes',
               style: TextStyle(
+                color: themeData.primaryTextColor,
                 fontSize: 20.0,
                 fontWeight: FontWeight.w600,
               ),

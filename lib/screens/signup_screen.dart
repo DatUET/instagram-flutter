@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:instagram_v2/animations/fadeanimationdown.dart';
+import 'package:instagram_v2/models/user_data.dart';
 import 'package:instagram_v2/screens/login_screen.dart';
 import 'package:instagram_v2/screens/splash_screen.dart';
 import 'package:instagram_v2/services/auth_service.dart';
+import 'package:provider/provider.dart';
 
 class SignupScreen extends StatefulWidget {
   static final String id = 'signup_screen';
@@ -15,6 +17,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final _formKey = GlobalKey<FormState>();
   String _name, _email, _password;
   bool _isLoading = false, _isSccuess = true;
+  var themeStyle;
 
   _submit() async {
     if (_formKey.currentState.validate()) {
@@ -41,8 +44,9 @@ class _SignupScreenState extends State<SignupScreen> {
   @override
   Widget build(BuildContext context) {
     final _width = MediaQuery.of(context).size.width;
-
+    themeStyle = Provider.of<UserData>(context);
     return Scaffold(
+      backgroundColor: themeStyle.primaryBackgroundColor,
       body: Stack(
         children: <Widget>[
           SingleChildScrollView(
@@ -91,7 +95,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           Text(
                             'Sign Up',
                             style: TextStyle(
-                                color: Color.fromRGBO(49, 39, 79, 1),
+                                color: Color.fromRGBO(195, 129, 239, 1),
                                 fontWeight: FontWeight.bold,
                                 fontSize: 30),
                           )),
@@ -103,7 +107,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           Container(
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(10),
-                                color: Colors.white,
+                                color: themeStyle.typeMessageBoxColor,
                                 boxShadow: [
                                   BoxShadow(
                                     color: Color.fromRGBO(196, 135, 198, .2),
@@ -115,10 +119,6 @@ class _SignupScreenState extends State<SignupScreen> {
                               children: <Widget>[
                                 Container(
                                   padding: EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                      border: Border(
-                                          bottom: BorderSide(
-                                              color: Colors.grey[200]))),
                                   child: Form(
                                       key: _formKey,
                                       child: Column(
@@ -130,8 +130,10 @@ class _SignupScreenState extends State<SignupScreen> {
                                                 vertical: 10.0,
                                               ),
                                               child: TextFormField(
+                                                style: TextStyle(color: themeStyle.primaryTextColor),
                                                 decoration: InputDecoration(
-                                                    labelText: 'Name'),
+                                                    labelText: 'Name',
+                                                labelStyle: TextStyle(color: themeStyle.primaryTextColor)),
                                                 validator: (input) => input
                                                         .trim()
                                                         .isEmpty
@@ -147,8 +149,10 @@ class _SignupScreenState extends State<SignupScreen> {
                                                 vertical: 10.0,
                                               ),
                                               child: TextFormField(
+                                                style: TextStyle(color: themeStyle.primaryTextColor),
                                                 decoration: InputDecoration(
-                                                    labelText: 'Email'),
+                                                    labelText: 'Email',
+                                                labelStyle: TextStyle(color: themeStyle.primaryTextColor)),
                                                 validator: (input) => !input
                                                         .contains('@')
                                                     ? 'Please enter a valid email'
@@ -163,8 +167,10 @@ class _SignupScreenState extends State<SignupScreen> {
                                                 vertical: 10.0,
                                               ),
                                               child: TextFormField(
+                                                style: TextStyle(color: themeStyle.primaryTextColor),
                                                 decoration: InputDecoration(
-                                                    labelText: 'Password'),
+                                                    labelText: 'Password',
+                                                labelStyle: TextStyle(color: themeStyle.primaryTextColor)),
                                                 validator: (input) => input
                                                             .length <
                                                         6
@@ -191,8 +197,8 @@ class _SignupScreenState extends State<SignupScreen> {
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
                               gradient: LinearGradient(colors: [
-                                Color.fromRGBO(49, 39, 79, 1),
-                                Color.fromRGBO(49, 39, 79, .6),
+                                Color.fromRGBO(195, 129, 239, .8),
+                                Color.fromRGBO(195, 129, 239, .4),
                               ]),
                               boxShadow: [
                                 BoxShadow(
@@ -224,8 +230,8 @@ class _SignupScreenState extends State<SignupScreen> {
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
                               gradient: LinearGradient(colors: [
-                                Color.fromRGBO(49, 39, 79, .6),
-                                Color.fromRGBO(49, 39, 79, 1),
+                                Color.fromRGBO(195, 129, 239, .4),
+                                Color.fromRGBO(195, 129, 239, .8),
                               ]),
                               boxShadow: [
                                 BoxShadow(

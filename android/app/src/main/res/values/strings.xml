@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Photo Editor</string>
+    <string name="app_name">Photogram</string>
     <string name="label_brush">Brush</string>
     <string name="label_emoji">Emoji</string>
     <string name="label_sticker">Sticker</string>

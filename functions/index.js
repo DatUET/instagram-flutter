@@ -2,7 +2,7 @@ const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 admin.initializeApp();
 
-exports.onFollowUser = functions.firestore
+exports.onFollowUser = functions.region("asia-northeast1").firestore
   .document('/followers/{userId}/userFollowers/{followerId}')
   .onCreate(async (snapshot, context) => {
     console.log(snapshot.data());
@@ -26,7 +26,7 @@ exports.onFollowUser = functions.firestore
     });
   });
 
-exports.onUnfollowUser = functions.firestore
+exports.onUnfollowUser = functions.region("asia-northeast1").firestore
   .document('/followers/{userId}/userFollowers/{followerId}')
   .onDelete(async (snapshot, context) => {
     const userId = context.params.userId;
@@ -45,7 +45,7 @@ exports.onUnfollowUser = functions.firestore
     });
   });
 
-exports.onUploadPost = functions.firestore
+exports.onUploadPost = functions.region("asia-northeast1").firestore
   .document('/posts/{userId}/userPosts/{postId}')
   .onCreate(async (snapshot, context) => {
     console.log(snapshot.data());
@@ -68,7 +68,7 @@ exports.onUploadPost = functions.firestore
     });
   });
 
-exports.onUpdatePost = functions.firestore
+exports.onUpdatePost = functions.region("asia-northeast1").firestore
   .document('/posts/{userId}/userPosts/{postId}')
   .onUpdate(async (snapshot, context) => {
     const userId = context.params.userId;

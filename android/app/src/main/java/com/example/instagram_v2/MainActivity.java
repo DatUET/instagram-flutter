@@ -50,8 +50,10 @@ public class MainActivity extends FlutterActivity {
         if (requestCode == REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 imagePath = data.getData();
-                Log.d("uri", imagePath.getPath());
-                pendingResult.success(getPathFromRemoteUri(MainActivity.this, imagePath));
+                if (imagePath != null) {
+                    Log.d("uri", imagePath.getPath());
+                    pendingResult.success(getPathFromRemoteUri(MainActivity.this, imagePath));
+                }
             }
         }
     }

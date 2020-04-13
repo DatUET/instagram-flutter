@@ -11,20 +11,6 @@ import 'package:provider/provider.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
-//  Widget _getScreenId() {
-//    return StreamBuilder<FirebaseUser>(
-//      stream: FirebaseAuth.instance.onAuthStateChanged,
-//      builder: (BuildContext context, snapshot) {
-//        if (snapshot.hasData) {
-//          Provider.of<UserData>(context).currentUserId = snapshot.data.uid;
-//          return HomeScreen();
-//        } else {
-//          return LoginScreen();
-//        }
-//      },
-//    );
-//  }
-
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
