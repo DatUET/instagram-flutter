@@ -93,3 +93,80 @@ exports.onUpdatePost = functions.region("asia-northeast1").firestore
       }
     });
   });
+
+exports.sendNotification = functions.region("asia-northeast1").firestore
+  .document('/message/{messageId}')
+  .onCreate(async (snapshot, context) => {
+    const messageData = snapshot.data();
+    const senderUid = messageData['senderUid'];
+    const receiverUid = messageData['receiverUid'];
+    const message = messageData['message'];
+    var senderName;
+    const userRef = admin
+      .firestore()
+      .collection("users");
+    const userDoc = await userRef.doc(senderUid).get();
+    if (userDoc.exists) {
+      senderName = userDoc.get("name");
+      console.log(senderName);
+    }
+    var token;
+    const tokenRef = admin
+      .firestore()
+      .collection("tokens");
+      const tokenDoc = await tokenRef.doc(receiverUid).get();
+    if (tokenDoc.exists) {
+      token = tokenDoc.get(receiverUid);
+      console.log(token);
+    }
+    const payload = {
+      notification: {
+          title: senderName + " sent you a message.",
+          body: message,
+          clickAction: "FLUTTER_NOTIFICATION_CLICK"
+      },
+      data: {
+        senderUid: senderUid,
+          receiverUid: receiverUid
+      }
+  }
+  return admin.messaging().sendToDevice(token, payload);
+  });
+
+exports.sendNotifiActivities = functions.region("asia-northeast1").firestore
+  .document("activities/{userId}/userActivities/{activityId}")
+  .onCreate(async (snapshot, context) => {
+    const userId = context.params.userId;
+    const activity = snapshot.data();
+    const fromUserId = activity["fromUserId"];
+    var fromUserName;
+    const userRef = admin
+      .firestore()
+      .collection("users");
+    const userDoc = await userRef.doc(fromUserId).get();
+    if (userDoc.exists) {
+      fromUserName = userDoc.get("name");
+      console.log(fromUserName);
+    }
+    var token;
+    const tokenRef = admin
+      .firestore()
+      .collection("tokens");
+    const tokenDoc = await tokenRef.doc(userId).get();
+    if (tokenDoc.exists) {
+      token = tokenDoc.get(userId);
+      console.log(token);
+    }
+    var action = activity["comment"] === null ? " like" : " comment";
+    const payload = {
+      notification: {
+          title: fromUserName + action + " your post" ,
+          body: "Click to see",
+          clickAction: "FLUTTER_NOTIFICATION_CLICK"
+      },
+      data: {
+          postId: activity['postId']
+      }
+  }
+  return admin.messaging().sendToDevice(token, payload);
+  });

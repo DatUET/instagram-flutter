@@ -23,6 +23,10 @@ class UserData extends ChangeNotifier {
   Color primaryTextColor;
   Color primaryIconColor;
   Color typeMessageBoxColor;
+  Color primaryMessageBoxColor;
+  Color secondaryMessageBoxColor;
+  Color primaryMessageTextColor;
+  Color secondaryMessageTextColor;
 
 //  Color primaryBackgroundColor = Colors.grey[900];
 //  Color primaryTextColorDark = Colors.grey[100];
@@ -44,6 +48,10 @@ class UserData extends ChangeNotifier {
       primaryTextColor = Colors.grey[800];
       primaryIconColor = Colors.grey[900];
       typeMessageBoxColor = Colors.grey[200];
+      primaryMessageBoxColor = Colors.blue;
+      secondaryMessageBoxColor = Colors.grey[300];
+      primaryMessageTextColor = Colors.white;
+      secondaryMessageTextColor = Colors.grey[800];
     } else {
       primaryBackgroundColor = Colors.grey[900];
       primaryTextColorDark = Colors.grey[100];
@@ -51,6 +59,10 @@ class UserData extends ChangeNotifier {
       primaryTextColor = Colors.grey[300];
       primaryIconColor = Colors.grey[100];
       typeMessageBoxColor = Colors.grey[800];
+      primaryMessageBoxColor = Colors.blue;
+      secondaryMessageBoxColor = Colors.grey[800];
+      primaryMessageTextColor = Colors.white;
+      secondaryMessageTextColor = Colors.white;
     }
   }
 
@@ -64,6 +76,10 @@ class UserData extends ChangeNotifier {
       primaryTextColor = Colors.grey[300];
       primaryIconColor = Colors.grey[100];
       typeMessageBoxColor = Colors.grey[800];
+      primaryMessageBoxColor = Colors.blue;
+      secondaryMessageBoxColor = Colors.grey[800];
+      primaryMessageTextColor = Colors.white;
+      secondaryMessageTextColor = Colors.white;
       mode = 1;
       _updateMode(mode);
     }
@@ -75,6 +91,10 @@ class UserData extends ChangeNotifier {
       primaryTextColor = Colors.grey[800];
       primaryIconColor = Colors.grey[900];
       typeMessageBoxColor = Colors.grey[200];
+      primaryMessageBoxColor = Colors.blue;
+      secondaryMessageBoxColor = Colors.grey[300];
+      primaryMessageTextColor = Colors.white;
+      secondaryMessageTextColor = Colors.grey[800];
       mode = 0;
       _updateMode(mode);
     }

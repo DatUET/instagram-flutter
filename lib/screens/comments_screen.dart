@@ -40,11 +40,17 @@ class _CommentsScreenState extends State<CommentsScreen> {
                 ? AssetImage('assets/images/user_placeholder.jpg')
                 : CachedNetworkImageProvider(author.profileImageUrl),
           ),
-          title: Text(author.name, style: TextStyle(color: themeData.primaryTextColor),),
+          title: Text(
+            author.name,
+            style: TextStyle(color: themeData.primaryTextColor),
+          ),
           subtitle: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text(comment.content, style: TextStyle(color: themeData.primaryTextColor),),
+              Text(
+                comment.content,
+                style: TextStyle(color: themeData.primaryTextColor),
+              ),
               SizedBox(height: 6.0),
               Text(
                 DateFormat.yMd().add_jm().format(comment.timestamp.toDate()),
@@ -75,19 +81,24 @@ class _CommentsScreenState extends State<CommentsScreen> {
               child: TextField(
                 controller: _commentController,
                 textCapitalization: TextCapitalization.sentences,
+                style: TextStyle(color: themeData.primaryTextColor),
                 onChanged: (comment) {
                   setState(() {
                     _isCommenting = comment.length > 0;
                   });
                 },
-                decoration:
-                    InputDecoration.collapsed(hintText: 'Write a comment...'),
+                decoration: InputDecoration.collapsed(
+                    hintText: 'Write a comment...',
+                    hintStyle: TextStyle(color: themeData.primaryTextColor)),
               ),
             ),
             Container(
               margin: EdgeInsets.symmetric(horizontal: 4.0),
               child: IconButton(
-                icon: Icon(Icons.send),
+                icon: Icon(
+                  Icons.send,
+                  color: themeData.primaryIconColor,
+                ),
                 onPressed: () {
                   if (_isCommenting) {
                     DatabaseService.commentOnPost(

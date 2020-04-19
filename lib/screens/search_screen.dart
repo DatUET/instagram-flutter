@@ -25,7 +25,10 @@ class _SearchScreenState extends State<SearchScreen> {
             ? AssetImage('assets/images/user_placeholder.jpg')
             : CachedNetworkImageProvider(user.profileImageUrl),
       ),
-      title: Text(user.name, style: TextStyle(color: themeStyle.primaryTextColor),),
+      title: Text(
+        user.name,
+        style: TextStyle(color: themeStyle.primaryTextColor),
+      ),
       onTap: () => Navigator.push(
         context,
         MaterialPageRoute(
@@ -87,7 +90,10 @@ class _SearchScreenState extends State<SearchScreen> {
       ),
       body: _users == null
           ? Center(
-              child: Text('Search for a user', style: TextStyle(color: themeStyle.primaryTextColor),),
+              child: Text(
+                'Search for a user',
+                style: TextStyle(color: themeStyle.primaryTextColor),
+              ),
             )
           : FutureBuilder(
               future: _users,

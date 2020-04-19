@@ -47,6 +47,10 @@ dependencies:
   camera: ^0.5.7+4
   pull_to_refresh: ^1.5.7
   shared_preferences: ^0.5.6+3
+  dio: ^3.0.9
+  fluttertoast: ^4.0.1
+  firebase_messaging: ^6.0.13
+  flutter_local_notifications: ^1.4.1
 
 dev_dependencies:
   flutter_test:

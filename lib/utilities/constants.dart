@@ -11,3 +11,6 @@ final feedsRef = _firestore.collection('feeds');
 final likesRef = _firestore.collection('likes');
 final commentsRef = _firestore.collection('comments');
 final activitiesRef = _firestore.collection('activities');
+final messageRef = _firestore.collection('message');
+final recentChatRef = _firestore.collection('recentChat');
+final tokenRef = _firestore.collection('tokens');

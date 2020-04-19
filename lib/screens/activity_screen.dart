@@ -21,7 +21,8 @@ class ActivityScreen extends StatefulWidget {
 
 class _ActivityScreenState extends State<ActivityScreen> {
   List<Activity> _activities = [];
-  RefreshController _refreshController = RefreshController(initialRefresh: false);
+  RefreshController _refreshController =
+      RefreshController(initialRefresh: false);
   var themeStyle;
 
   @override
@@ -47,7 +48,8 @@ class _ActivityScreenState extends State<ActivityScreen> {
       future: DatabaseService.getUserWithId(activity.fromUserId),
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         if (!snapshot.hasData) {
-          return Center(child: Padding(
+          return Center(
+              child: Padding(
             padding: const EdgeInsets.all(20.0),
             child: CircularProgressIndicator(),
           ));
@@ -64,12 +66,21 @@ class _ActivityScreenState extends State<ActivityScreen> {
                   : CachedNetworkImageProvider(user.profileImageUrl),
             ),
             title: activity.comment != null
-                ? Text('${user.name} commented: "${activity.comment}"', style: TextStyle(color: themeStyle.primaryTextColor,))
-                : Text('${user.name} liked your post', style: TextStyle(color: themeStyle.primaryTextColor,)),
+                ? Text('${user.name} commented: "${activity.comment}"',
+                    style: TextStyle(
+                      color: themeStyle.primaryTextColor,
+                    ))
+                : Text('${user.name} liked your post',
+                    style: TextStyle(
+                      color: themeStyle.primaryTextColor,
+                    )),
             subtitle: Text(
-              DateFormat.yMd().add_jm().format(activity.timestamp.toDate(),),
-                style: TextStyle(color: themeStyle.primaryTextColor,)
-            ),
+                DateFormat.yMd().add_jm().format(
+                      activity.timestamp.toDate(),
+                    ),
+                style: TextStyle(
+                  color: themeStyle.primaryTextColor,
+                )),
             trailing: CachedNetworkImage(
               imageUrl: activity.postImageUrl,
               height: 40.0,
@@ -77,7 +88,8 @@ class _ActivityScreenState extends State<ActivityScreen> {
               fit: BoxFit.cover,
             ),
             onTap: () async {
-              String currentUserId = Provider.of<UserData>(context).currentUserId;
+              String currentUserId =
+                  Provider.of<UserData>(context).currentUserId;
               Post post = await DatabaseService.getUserPost(
                 currentUserId,
                 activity.postId,
@@ -103,14 +115,14 @@ class _ActivityScreenState extends State<ActivityScreen> {
     themeStyle = Provider.of<UserData>(context);
     return SmartRefresher(
       controller: _refreshController,
-        onRefresh: () => _setupActivities(),
-        child: ListView.builder(
-          itemCount: _activities.length,
-          itemBuilder: (BuildContext context, int index) {
-            Activity activity = _activities[index];
-            return _buildActivity(activity);
-          },
-        ),
-      );
+      onRefresh: () => _setupActivities(),
+      child: ListView.builder(
+        itemCount: _activities.length,
+        itemBuilder: (BuildContext context, int index) {
+          Activity activity = _activities[index];
+          return _buildActivity(activity);
+        },
+      ),
+    );
   }
 }

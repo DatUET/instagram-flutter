@@ -1,9 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram_v2/animations/fadeanimationup.dart';
 import 'package:instagram_v2/models/post_model.dart';
 import 'package:instagram_v2/models/user_data.dart';
 import 'package:instagram_v2/models/user_model.dart';
+import 'package:instagram_v2/screens/chat_screen.dart';
 import 'package:instagram_v2/screens/edit_profile_screen.dart';
 import 'package:instagram_v2/screens/login_screen.dart';
 import 'package:instagram_v2/services/auth_service.dart';
@@ -146,6 +148,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
           );
   }
 
+  _buildButtonChat(User user) {
+    return user.id == Provider.of<UserData>(context).currentUserId
+        ? Container()
+        : Container(
+      width: 145,
+      height: 40,
+      decoration: BoxDecoration(
+          color: themeStyle.primaryBackgroundColor,
+        borderRadius: BorderRadius.all(Radius.circular(8.0)),
+        border: Border.all(color: Colors.grey)
+      ),
+      child: FlatButton(
+        onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ChatScreen(currentUserId: themeStyle.currentUserId, chatWithUser: user,))),
+        child: Row(
+          children: <Widget>[
+            Text('Send Message', style: TextStyle(color: themeStyle.primaryTextColor, fontSize: 12),),
+            SizedBox(width: 10,),
+            Icon(Icons.send, color: themeStyle.primaryIconColor, size: 20,)
+          ],
+        ),
+      ),
+    );
+  }
+
   _buildProfileInfo(User user) {
     return Column(
       children: <Widget>[
@@ -153,7 +179,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           padding: EdgeInsets.fromLTRB(30.0, 30.0, 30.0, 0.0),
           child: Row(
             children: <Widget>[
-              FadeAnimationUp(0.2, CircleAvatar(
+              FadeAnimationUp(
+                0.2,
+                CircleAvatar(
                   radius: 50.0,
                   backgroundColor: Colors.grey,
                   backgroundImage: user.profileImageUrl.isEmpty
@@ -167,7 +195,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: <Widget>[
-                        FadeAnimationUp(0.4, Column(
+                        FadeAnimationUp(
+                          0.4,
+                          Column(
                             children: <Widget>[
                               Text(
                                 _posts.length.toString(),
@@ -179,12 +209,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ),
                               Text(
                                 'posts',
-                                style: TextStyle(color: themeStyle.primaryTextColor),
+                                style: TextStyle(
+                                    color: themeStyle.primaryTextColor),
                               ),
                             ],
                           ),
                         ),
-                        FadeAnimationUp(0.6, Column(
+                        FadeAnimationUp(
+                          0.6,
+                          Column(
                             children: <Widget>[
                               Text(
                                 _followerCount.toString(),
@@ -196,12 +229,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ),
                               Text(
                                 'followers',
-                                style: TextStyle(color: themeStyle.primaryTextColor),
+                                style: TextStyle(
+                                    color: themeStyle.primaryTextColor),
                               ),
                             ],
                           ),
                         ),
-                        FadeAnimationUp(0.8, Column(
+                        FadeAnimationUp(
+                          0.8,
+                          Column(
                             children: <Widget>[
                               Text(
                                 _followingCount.toString(),
@@ -213,7 +249,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ),
                               Text(
                                 'following',
-                                style: TextStyle(color: themeStyle.primaryTextColor),
+                                style: TextStyle(
+                                    color: themeStyle.primaryTextColor),
                               ),
                             ],
                           ),
@@ -232,7 +269,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              FadeAnimationUp(1.2, Text(
+              FadeAnimationUp(
+                1.2,
+                Text(
                   user.name,
                   style: TextStyle(
                     color: themeStyle.primaryTextColor,
@@ -244,13 +283,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
               SizedBox(height: 5.0),
               Container(
                 height: 30.0,
-                child: FadeAnimationUp(1.4, Text(
+                child: FadeAnimationUp(
+                  1.4,
+                  Text(
                     user.bio,
-                    style: TextStyle(color: themeStyle.primaryTextColor, fontSize: 15.0),
+                    style: TextStyle(
+                        color: themeStyle.primaryTextColor, fontSize: 15.0),
                   ),
                 ),
               ),
-              Divider(color: themeStyle.primaryTextColorLight,),
+              FadeAnimationUp(1.6, _buildButtonChat(user)),
+              Divider(
+                color: themeStyle.primaryTextColorLight,
+              ),
             ],
           ),
         ),
@@ -288,7 +333,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   _buildTilePost(Post post, int index) {
     return GridTile(
-      child: FadeAnimationUp((index*2) / 10.0, GestureDetector(
+      child: FadeAnimationUp(
+        (index * 2) / 10.0,
+        GestureDetector(
           onTap: () => Navigator.push(
             context,
             MaterialPageRoute(
@@ -311,10 +358,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (_displayPosts == 0) {
       // Grid
       List<GridTile> tiles = [];
-     for(int i=0; i<_posts.length; i++){
-       Post post = _posts[i];
-       tiles.add(_buildTilePost(post, i));
-     }
+      for (int i = 0; i < _posts.length; i++) {
+        Post post = _posts[i];
+        tiles.add(_buildTilePost(post, i));
+      }
       return GridView.count(
         crossAxisCount: 3,
         childAspectRatio: 1.0,
@@ -327,7 +374,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     } else {
       // Column
       List<PostView> postViews = [];
-      for(int i=0; i<_posts.length; i++){
+      for (int i = 0; i < _posts.length; i++) {
         postViews.add(
           PostView(
             currentUserId: widget.currentUserId,
@@ -348,7 +395,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       appBar: AppBar(
         backgroundColor: themeStyle.primaryBackgroundColor,
         title: Text(
-          'Instagram',
+          'Photogram',
           style: TextStyle(
             color: themeStyle.primaryTextColor,
             fontFamily: 'Billabong',
@@ -357,10 +404,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.exit_to_app, color: themeStyle.primaryIconColor,),
+            icon: Icon(
+              Icons.exit_to_app,
+              color: themeStyle.primaryIconColor,
+            ),
             onPressed: () {
               AuthService.logout();
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => LoginScreen()));},
+              Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (BuildContext context) => LoginScreen()));
+            },
           ),
         ],
       ),

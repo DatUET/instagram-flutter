@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:instagram_v2/models/user_data.dart';
 import 'package:instagram_v2/models/user_model.dart';
 import 'package:instagram_v2/screens/activity_screen.dart';
+import 'package:instagram_v2/screens/chat_list_screen.dart';
 import 'package:instagram_v2/screens/create_post_screen.dart';
 import 'package:instagram_v2/screens/feed_screen.dart';
 import 'package:instagram_v2/screens/home_screen.dart';
@@ -18,7 +19,8 @@ class SocialScreen extends StatefulWidget {
   _SocialScreenState createState() => _SocialScreenState();
 }
 
-class _SocialScreenState extends State<SocialScreen> with SingleTickerProviderStateMixin {
+class _SocialScreenState extends State<SocialScreen>
+    with SingleTickerProviderStateMixin {
   ScrollController _scrollViewController;
   TabController _tabController;
 
@@ -43,13 +45,13 @@ class _SocialScreenState extends State<SocialScreen> with SingleTickerProviderSt
       backgroundColor: themeStyle.primaryBackgroundColor,
       body: NestedScrollView(
         controller: _scrollViewController,
-        headerSliverBuilder: (BuildContext context,
-            bool innerBoxIsScrolled) { //<-- headerSliverBuilder
+        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+          //<-- headerSliverBuilder
           return <Widget>[
             new SliverAppBar(
               backgroundColor: themeStyle.primaryBackgroundColor,
               title: Text(
-                'Instagram',
+                'Photogram',
                 style: TextStyle(
                   color: themeStyle.primaryTextColor,
                   fontFamily: 'Billabong',
@@ -58,9 +60,23 @@ class _SocialScreenState extends State<SocialScreen> with SingleTickerProviderSt
               ),
               actions: <Widget>[
                 IconButton(
-                    icon: Icon(Icons.search, color: themeStyle.primaryIconColor,),
+                    icon: Icon(
+                      Icons.search,
+                      color: themeStyle.primaryIconColor,
+                    ),
                     onPressed: () => Navigator.push(context,
                         MaterialPageRoute(builder: (_) => SearchScreen()))),
+                IconButton(
+                    icon: Icon(
+                      Icons.send,
+                      color: themeStyle.primaryIconColor,
+                    ),
+                    onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => ChatListScreen(
+                                  currentUserId: widget.currentUserId,
+                                )))),
                 FutureBuilder(
                     future: usersRef.document(widget.currentUserId).get(),
                     builder: (context, snapshot) {
@@ -91,9 +107,9 @@ class _SocialScreenState extends State<SocialScreen> with SingleTickerProviderSt
                                 context,
                                 MaterialPageRoute(
                                     builder: (_) => ProfileScreen(
-                                      currentUserId: widget.currentUserId,
-                                      userId: widget.currentUserId,
-                                    )));
+                                          currentUserId: widget.currentUserId,
+                                          userId: widget.currentUserId,
+                                        )));
                           },
                         );
                       }
@@ -109,9 +125,9 @@ class _SocialScreenState extends State<SocialScreen> with SingleTickerProviderSt
                               image: DecorationImage(
                                   image: user.profileImageUrl.isEmpty
                                       ? AssetImage(
-                                      'assets/images/user_placeholder.jpg')
+                                          'assets/images/user_placeholder.jpg')
                                       : CachedNetworkImageProvider(
-                                      user.profileImageUrl),
+                                          user.profileImageUrl),
                                   fit: BoxFit.cover),
                               boxShadow: [
                                 BoxShadow(
@@ -127,9 +143,9 @@ class _SocialScreenState extends State<SocialScreen> with SingleTickerProviderSt
                               context,
                               MaterialPageRoute(
                                   builder: (_) => ProfileScreen(
-                                    currentUserId: widget.currentUserId,
-                                    userId: widget.currentUserId,
-                                  )));
+                                        currentUserId: widget.currentUserId,
+                                        userId: widget.currentUserId,
+                                      )));
                         },
                       );
                     }),
@@ -140,13 +156,22 @@ class _SocialScreenState extends State<SocialScreen> with SingleTickerProviderSt
               bottom: new TabBar(
                 tabs: <Tab>[
                   new Tab(
-                    icon: new Icon(Icons.public, color: themeStyle.primaryIconColor,),
+                    icon: new Icon(
+                      Icons.public,
+                      color: themeStyle.primaryIconColor,
+                    ),
                   ),
                   new Tab(
-                    icon: new Icon(Icons.add_circle_outline, color: themeStyle.primaryIconColor,),
+                    icon: new Icon(
+                      Icons.add_circle_outline,
+                      color: themeStyle.primaryIconColor,
+                    ),
                   ),
                   new Tab(
-                    icon: new Icon(Icons.notifications_none, color: themeStyle.primaryIconColor,),
+                    icon: new Icon(
+                      Icons.notifications_none,
+                      color: themeStyle.primaryIconColor,
+                    ),
                   ),
                 ],
                 controller: _tabController,
@@ -156,9 +181,13 @@ class _SocialScreenState extends State<SocialScreen> with SingleTickerProviderSt
         },
         body: new TabBarView(
           children: <Widget>[
-            new FeedScreen(currentUserId: widget.currentUserId,),
+            new FeedScreen(
+              currentUserId: widget.currentUserId,
+            ),
             new CreatePostScreen(),
-            new ActivityScreen(currentUserId: widget.currentUserId,)
+            new ActivityScreen(
+              currentUserId: widget.currentUserId,
+            )
           ],
           controller: _tabController,
         ),

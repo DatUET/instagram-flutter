@@ -9,7 +9,6 @@ import 'dart:async';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 class SplashScreen extends StatefulWidget {
   @override
   _SplashScreenState createState() => _SplashScreenState();
@@ -17,18 +16,16 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   @override
-  void initState(){
+  void initState() {
     super.initState();
     _getBackgroundColor();
-    _mockCheckForSession().then(
-            (status) {
-          if (status) {
-            _navigateToHome();
-          } else {
-            _navigateToLogin();
-          }
-        }
-    );
+    _mockCheckForSession().then((status) {
+      if (status) {
+        _navigateToHome();
+      } else {
+        _navigateToLogin();
+      }
+    });
   }
 
   Future<Color> _getBackgroundColor() async {
@@ -46,48 +43,42 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<bool> _mockCheckForSession() async {
     await Future.delayed(Duration(milliseconds: 3300), () {});
     FirebaseUser user = await FirebaseAuth.instance.currentUser();
-    if(user != null){
+    if (user != null) {
       Provider.of<UserData>(context).currentUserId = user.uid.toString();
       return true;
-    }
-    else{
+    } else {
       return false;
     }
   }
-  void _navigateToHome(){
+
+  void _navigateToHome() {
     Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(
-            builder: (BuildContext context) => HomeScreen()
-        ), (Route<dynamic> route) => false
-    );
+        MaterialPageRoute(builder: (BuildContext context) => HomeScreen()),
+        (Route<dynamic> route) => false);
   }
 
-  void _navigateToLogin(){
+  void _navigateToLogin() {
     Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-            builder: (BuildContext context) => LoginScreen()
-        )
-    );
+        MaterialPageRoute(builder: (BuildContext context) => LoginScreen()));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: FutureBuilder(
-        future: _getBackgroundColor(),
-        builder: (context, snapshot) {
-          return Container(
-                color: snapshot.data,
-                width: double.infinity,
-                height: double.infinity,
-                child: FlareActor('assets/flares/test_1.flr',
+          future: _getBackgroundColor(),
+          builder: (context, snapshot) {
+            return Container(
+              color: snapshot.data,
+              width: double.infinity,
+              height: double.infinity,
+              child: FlareActor(
+                'assets/flares/test_1.flr',
                 alignment: Alignment.center,
-                animation: 'intro',),
-              );
-        }
-      ),
+                animation: 'intro',
+              ),
+            );
+          }),
     );
   }
-
-
 }

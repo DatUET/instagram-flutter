@@ -3,14 +3,12 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:instagram_v2/models/post_model.dart';
 import 'package:instagram_v2/models/user_data.dart';
 import 'package:instagram_v2/services/database_service.dart';
-import 'package:instagram_v2/services/edit_photo.dart';
 import 'package:instagram_v2/services/location.dart';
 import 'package:instagram_v2/services/storage_service.dart';
 import 'package:provider/provider.dart';
@@ -71,14 +69,23 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
       builder: (BuildContext context) {
         return SimpleDialog(
           backgroundColor: themeStyle.primaryBackgroundColor,
-          title: Text('Add Photo', style: TextStyle(color: themeStyle.primaryTextColor),),
+          title: Text(
+            'Add Photo',
+            style: TextStyle(color: themeStyle.primaryTextColor),
+          ),
           children: <Widget>[
             SimpleDialogOption(
-              child: Text('Take Photo', style: TextStyle(color: themeStyle.primaryTextColor),),
+              child: Text(
+                'Take Photo',
+                style: TextStyle(color: themeStyle.primaryTextColor),
+              ),
               onPressed: () => _handleImage(ImageSource.camera),
             ),
             SimpleDialogOption(
-              child: Text('Choose From Gallery', style: TextStyle(color: themeStyle.primaryTextColor),),
+              child: Text(
+                'Choose From Gallery',
+                style: TextStyle(color: themeStyle.primaryTextColor),
+              ),
               onPressed: () => _handleImage(ImageSource.gallery),
             ),
             SimpleDialogOption(
@@ -211,14 +218,14 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                       color: themeStyle.typeMessageBoxColor,
                       child: _image == null
                           ? Icon(
-                        Icons.add_a_photo,
-                        color: themeStyle.primaryIconColor,
-                        size: 150.0,
-                      )
+                              Icons.add_a_photo,
+                              color: themeStyle.primaryIconColor,
+                              size: 150.0,
+                            )
                           : Image(
-                        image: FileImage(_image),
-                        fit: BoxFit.cover,
-                      ),
+                              image: FileImage(_image),
+                              fit: BoxFit.cover,
+                            ),
                     ),
                   ),
                   SizedBox(height: 20.0),
@@ -226,52 +233,64 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                     padding: EdgeInsets.symmetric(horizontal: 30.0),
                     child: TextField(
                       controller: _captionController,
-                      style: TextStyle(fontSize: 18.0, color: themeStyle.primaryTextColor),
+                      style: TextStyle(
+                          fontSize: 18.0, color: themeStyle.primaryTextColor),
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: themeStyle.primaryBackgroundColor,
                         labelText: 'Caption',
-                        labelStyle: TextStyle(color: themeStyle.primaryTextColor),
+                        labelStyle:
+                            TextStyle(color: themeStyle.primaryTextColor),
                       ),
                       onChanged: (input) => _caption = input,
                     ),
                   ),
-                  SizedBox(height: 20,),
+                  SizedBox(
+                    height: 20,
+                  ),
                   ListTile(
-                    leading: Icon(Icons.pin_drop, color: themeStyle.primaryIconColor,),
+                    leading: Icon(
+                      Icons.pin_drop,
+                      color: themeStyle.primaryIconColor,
+                    ),
                     title: Container(
                       width: 250.0,
                       child: TextField(
                         controller: _locationController,
                         style: TextStyle(color: themeStyle.primaryTextColor),
                         decoration: InputDecoration(
-                          filled: true,
+                            filled: true,
                             fillColor: themeStyle.primaryBackgroundColor,
                             hintText: "Where was this photo taken?",
-                            hintStyle: TextStyle(color: themeStyle.primaryTextColor),
+                            hintStyle:
+                                TextStyle(color: themeStyle.primaryTextColor),
                             border: InputBorder.none),
                       ),
                     ),
                   ),
-                  SizedBox(height: 10,),
+                  SizedBox(
+                    height: 10,
+                  ),
                   (_address == null)
                       ? Container()
                       : SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    padding: EdgeInsets.only(right: 5.0, left: 5.0),
-                    child: Row(
-                      children: <Widget>[
-                        buildLocationButton(_address.featureName),
-                        buildLocationButton(_address.subLocality),
-                        buildLocationButton(_address.locality),
-                        buildLocationButton(_address.subAdminArea),
-                        buildLocationButton(_address.adminArea),
-                        buildLocationButton(_address.countryName),
-                      ],
-                    ),
-                  ),
+                          scrollDirection: Axis.horizontal,
+                          padding: EdgeInsets.only(right: 5.0, left: 5.0),
+                          child: Row(
+                            children: <Widget>[
+                              buildLocationButton(_address.featureName),
+                              buildLocationButton(_address.subLocality),
+                              buildLocationButton(_address.locality),
+                              buildLocationButton(_address.subAdminArea),
+                              buildLocationButton(_address.adminArea),
+                              buildLocationButton(_address.countryName),
+                            ],
+                          ),
+                        ),
                   (_address == null) ? Container() : Divider(),
-                  SizedBox(height: 30,),
+                  SizedBox(
+                    height: 30,
+                  ),
                   Container(
                       margin: EdgeInsets.symmetric(horizontal: 60),
                       height: 50,
@@ -297,47 +316,52 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                                 fontWeight: FontWeight.bold),
                           ),
                         ),
-                      ))],
+                      ))
+                ],
               ),
             ),
           ),
           _isLoading
               ? Container(
-            width: double.infinity,
-            height: double.infinity,
-            decoration: BoxDecoration(
-              color: Colors.grey.withOpacity(.5),
-            ),
-            child: Center(
-              child: Container(
-                height: 180,
-                width: 180,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    color: themeStyle.primaryBackgroundColor,),
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 20.0, right: 20, bottom: 15, top: 15),
-                  child: Column(
-                    children: <Widget>[
-                      SizedBox(
-                        height: 20,
-                      ),
-                      CircularProgressIndicator(),
-                      SizedBox(
-                        height: 35,
-                      ),
-                      Center(
-                          child: Text(
-                            'Uploading!\n Please wait....',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 20, color: themeStyle.primaryTextColor),
-                          ))
-                    ],
+                  width: double.infinity,
+                  height: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withOpacity(.5),
                   ),
-                ),
-              ),
-            ),
-          )
+                  child: Center(
+                    child: Container(
+                      height: 180,
+                      width: 180,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: themeStyle.primaryBackgroundColor,
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                            left: 20.0, right: 20, bottom: 15, top: 15),
+                        child: Column(
+                          children: <Widget>[
+                            SizedBox(
+                              height: 20,
+                            ),
+                            CircularProgressIndicator(),
+                            SizedBox(
+                              height: 35,
+                            ),
+                            Center(
+                                child: Text(
+                              'Uploading!\n Please wait....',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  fontSize: 20,
+                                  color: themeStyle.primaryTextColor),
+                            ))
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                )
               : Container(),
         ],
       ),
@@ -351,12 +375,16 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     themeStyle = Provider.of<UserData>(context);
     return widget.imagePost != null
         ? Scaffold(
-      backgroundColor: themeStyle.primaryBackgroundColor,
-      appBar: AppBar(
-        title: Text('Create New Post', style: TextStyle(color: themeStyle.primaryTextColor),),
-        backgroundColor: themeStyle.primaryBackgroundColor,
-      ),
-      body: _buildBodyScreen(height, width),)
+            backgroundColor: themeStyle.primaryBackgroundColor,
+            appBar: AppBar(
+              title: Text(
+                'Create New Post',
+                style: TextStyle(color: themeStyle.primaryTextColor),
+              ),
+              backgroundColor: themeStyle.primaryBackgroundColor,
+            ),
+            body: _buildBodyScreen(height, width),
+          )
         : _buildBodyScreen(height, width);
   }
 }

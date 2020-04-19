@@ -23,8 +23,8 @@ getUserLocation() async {
     }
     currentLocation = null;
   }
-  final coordinates = Coordinates(
-      currentLocation.latitude, currentLocation.longitude);
+  final coordinates =
+      Coordinates(currentLocation.latitude, currentLocation.longitude);
   var addresses =
       await Geocoder.local.findAddressesFromCoordinates(coordinates);
   var first = addresses.first;

@@ -15,7 +15,8 @@ class GalleyScreen extends StatefulWidget {
   _GalleyScreenState createState() => _GalleyScreenState();
 }
 
-class _GalleyScreenState extends State<GalleyScreen> with AutomaticKeepAliveClientMixin {
+class _GalleyScreenState extends State<GalleyScreen>
+    with AutomaticKeepAliveClientMixin {
   List _allUri = [];
   var _dir;
   var themeStyle;
@@ -28,7 +29,6 @@ class _GalleyScreenState extends State<GalleyScreen> with AutomaticKeepAliveClie
       _allUri = allImage["URIList"] as List;
       _allUri = _allUri.reversed.toList();
       _dir = dir;
-
     });
   }
 
@@ -47,7 +47,7 @@ class _GalleyScreenState extends State<GalleyScreen> with AutomaticKeepAliveClie
       appBar: AppBar(
         backgroundColor: themeStyle.primaryBackgroundColor,
         title: Text(
-          'Instagram',
+          'Photogram',
           style: TextStyle(
             color: themeStyle.primaryTextColor,
             fontFamily: 'Billabong',
@@ -55,13 +55,12 @@ class _GalleyScreenState extends State<GalleyScreen> with AutomaticKeepAliveClie
           ),
         ),
       ),
-      body: RefreshIndicator(child: _buildGridTile(), onRefresh: () => _getImagePath()),
+      body: RefreshIndicator(
+          child: _buildGridTile(), onRefresh: () => _getImagePath()),
     );
   }
 
-  Future<void> _buildGridTileList() async {
-
-  }
+  Future<void> _buildGridTileList() async {}
 
   _buildGridTile() {
     if (themeStyle.gridTileImage.length > 0) {
@@ -104,18 +103,24 @@ class _GalleyScreenState extends State<GalleyScreen> with AutomaticKeepAliveClie
           builder: (context, snapshot) {
             return snapshot.hasData
                 ? InkWell(
-                  child: Hero(
-                    tag: "image$i",
-                    child: ClipRRect(
+                    child: Hero(
+                      tag: "image$i",
+                      child: ClipRRect(
                         borderRadius: BorderRadius.all(Radius.circular(8.0)),
                         child: Image.file(
                           snapshot.data,
                           fit: BoxFit.cover,
                         ),
                       ),
-                  ),
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => PreviewPhotoScreen(fileImage: snapshot.data, tag: "image$i",))),
-                )
+                    ),
+                    onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => PreviewPhotoScreen(
+                                  fileImage: snapshot.data,
+                                  tag: "image$i",
+                                ))),
+                  )
                 : Container();
           }),
     );
@@ -128,6 +133,7 @@ class _GalleyScreenState extends State<GalleyScreen> with AutomaticKeepAliveClie
       quality: 20,
       rotate: 0,
     );
+    print(result.lengthSync());
     return result;
   }
 

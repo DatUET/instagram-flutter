@@ -136,16 +136,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     TextFormField(
                       initialValue: _name,
-                      style: TextStyle(fontSize: 18.0, color: themeStyle.primaryTextColor),
+                      style: TextStyle(
+                          fontSize: 18.0, color: themeStyle.primaryTextColor),
                       decoration: InputDecoration(
-                        icon: Icon(
-                          Icons.person,
-                          size: 30.0,
-                          color: themeStyle.primaryIconColor,
-                        ),
-                        labelText: 'Name',
-                        labelStyle: TextStyle(color: themeStyle.primaryTextColor)
-                      ),
+                          icon: Icon(
+                            Icons.person,
+                            size: 30.0,
+                            color: themeStyle.primaryIconColor,
+                          ),
+                          labelText: 'Name',
+                          labelStyle:
+                              TextStyle(color: themeStyle.primaryTextColor)),
                       validator: (input) => input.trim().length < 1
                           ? 'Please enter a valid name'
                           : null,
@@ -153,16 +154,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     TextFormField(
                       initialValue: _bio,
-                      style: TextStyle(fontSize: 18.0, color: themeStyle.primaryTextColor),
+                      style: TextStyle(
+                          fontSize: 18.0, color: themeStyle.primaryTextColor),
                       decoration: InputDecoration(
-                        icon: Icon(
-                          Icons.book,
-                          size: 30.0,
-                          color: themeStyle.primaryIconColor,
-                        ),
-                        labelText: 'Bio',
-                        labelStyle: TextStyle(color: themeStyle.primaryTextColor)
-                      ),
+                          icon: Icon(
+                            Icons.book,
+                            size: 30.0,
+                            color: themeStyle.primaryIconColor,
+                          ),
+                          labelText: 'Bio',
+                          labelStyle:
+                              TextStyle(color: themeStyle.primaryTextColor)),
                       validator: (input) => input.trim().length > 150
                           ? 'Please enter a bio less than 150 characters'
                           : null,
@@ -186,16 +188,24 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ),
               ),
             ),
-            Divider(color: themeStyle.primaryTextColorLight,),
+            Divider(
+              color: themeStyle.primaryTextColorLight,
+            ),
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  Text('Dark Theme', style: TextStyle(color: themeStyle.primaryTextColor, fontSize: 18.0),),
-                  Switch(value: themeStyle.mode == 1, onChanged: (value) {
-                    themeStyle.switchMode();
-                  })
+                  Text(
+                    'Dark Theme',
+                    style: TextStyle(
+                        color: themeStyle.primaryTextColor, fontSize: 18.0),
+                  ),
+                  Switch(
+                      value: themeStyle.mode == 1,
+                      onChanged: (value) {
+                        themeStyle.switchMode();
+                      })
                 ],
               ),
             )

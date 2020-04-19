@@ -24,7 +24,7 @@ class _CameraScreenState extends State {
 
   List _allUri = [];
   var _dir;
-  File  _lastImageFile;
+  File _lastImageFile;
 
   Future<void> _getImagePath() async {
     _dir = await getTemporaryDirectory();
@@ -147,41 +147,39 @@ class _CameraScreenState extends State {
   }
 
   _buildGalleryIcon(File file) {
-
     return Container(
       child: FutureBuilder(
-        future: _compressAndGetFile(file, _allUri.length - 1),
-        builder: (context, snapshot) {
-          return InkWell(
-            child: Padding(
-              padding: EdgeInsets.all(10),
-              child: Container(
-                height: 35,
-                width: 35,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Colors.grey[500]),
-                  image: DecorationImage(
-                      image: !snapshot.hasData
-                      ? AssetImage(
-                          'assets/images/user_placeholder.jpg')
-                      : FileImage(snapshot.data),
-                      fit: BoxFit.cover),
-                  boxShadow: [
-                    BoxShadow(
-                        blurRadius: 10,
-                        color: Colors.grey,
-                        offset: Offset(2, 2))
-                  ],
+          future: _compressAndGetFile(file, _allUri.length - 1),
+          builder: (context, snapshot) {
+            return InkWell(
+              child: Padding(
+                padding: EdgeInsets.all(10),
+                child: Container(
+                  height: 35,
+                  width: 35,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.grey[500]),
+                    image: DecorationImage(
+                        image: !snapshot.hasData
+                            ? AssetImage('assets/images/user_placeholder.jpg')
+                            : FileImage(snapshot.data),
+                        fit: BoxFit.cover),
+                    boxShadow: [
+                      BoxShadow(
+                          blurRadius: 10,
+                          color: Colors.grey,
+                          offset: Offset(2, 2))
+                    ],
+                  ),
                 ),
               ),
-            ),
-            onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (_) => GalleyScreen()));
-            },
-          );
-        }
-      ),
+              onTap: () {
+                Navigator.push(
+                    context, MaterialPageRoute(builder: (_) => GalleyScreen()));
+              },
+            );
+          }),
     );
   }
 
@@ -252,8 +250,8 @@ class _CameraScreenState extends State {
         context,
         MaterialPageRoute(
             builder: (context) => PreviewPhotoScreen(
-              fileImage: File(filePath),
-            )),
+                  fileImage: File(filePath),
+                )),
       );
     } catch (e) {
       _showCameraException(e);
@@ -262,7 +260,7 @@ class _CameraScreenState extends State {
 
   void _onSwitchCamera() {
     selectedCameraIndex =
-    selectedCameraIndex < cameras.length - 1 ? selectedCameraIndex + 1 : 0;
+        selectedCameraIndex < cameras.length - 1 ? selectedCameraIndex + 1 : 0;
     CameraDescription selectedCamera = cameras[selectedCameraIndex];
     _initCameraController(selectedCamera);
   }

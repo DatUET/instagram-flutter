@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:instagram_v2/models/activity_model.dart';
+import 'package:instagram_v2/models/message_model.dart';
 import 'package:instagram_v2/models/post_model.dart';
 import 'package:instagram_v2/models/user_model.dart';
 import 'package:instagram_v2/utilities/constants.dart';
@@ -29,7 +30,6 @@ class DatabaseService {
       'location': post.location,
     });
   }
-
 
   static void followUser({String currentUserId, String userId}) {
     // Add user to current user's following collection
@@ -174,8 +174,7 @@ class DatabaseService {
     return userDoc.exists;
   }
 
-  static void commentOnPost(
-      {String currentUserId, Post post, String comment}) {
+  static void commentOnPost({String currentUserId, Post post, String comment}) {
     commentsRef.document(post.id).collection('postComments').add({
       'content': comment,
       'authorId': currentUserId,
@@ -206,6 +205,7 @@ class DatabaseService {
     List<Activity> activity = userActivitiesSnapshot.documents
         .map((doc) => Activity.fromDoc(doc))
         .toList();
+    print('${userActivitiesSnapshot.documents[0].data} - $userId');
     return activity;
   }
 
@@ -218,4 +218,129 @@ class DatabaseService {
     return Post.fromDoc(postDocSnapshot);
   }
 
+  static Stream<List<Message>> getAllMessage(
+      String fromUserId, String toUserId) async* {
+    await for (QuerySnapshot snap in messageRef
+        .where("groupId",
+            isEqualTo: getUniqueId(
+              fromUserId,
+              toUserId,
+            ))
+        .orderBy('timestamp', descending: true)
+        .snapshots()) {
+      try {
+        List<Message> chats =
+            snap.documents.map((doc) => Message.fromMap(doc)).toList();
+        yield chats;
+      } catch (e) {
+        print(e);
+      }
+    }
+  }
+
+  static Future<bool> sendMessage(Message message) async {
+    try {
+      String id = getUniqueId(message.senderUid, message.receiverUid);
+      message.groupId = id;
+      messageRef.add(message.toMap());
+      await saveRecentChat(message);
+      return true;
+    } catch (e) {
+      print("Exception $e");
+      return false;
+    }
+  }
+
+  static Future saveRecentChat(Message message) async {
+    List<String> ids = [message.senderUid, message.receiverUid];
+    for (String id in ids) {
+      Query query = recentChatRef.document(id).collection("history").where(
+          "groupId",
+          isEqualTo: getUniqueId(message.senderUid, message.receiverUid));
+      QuerySnapshot documents = await query.getDocuments();
+      if (documents.documents.length != 0) {
+        DocumentSnapshot documentSnapshot = documents.documents[0];
+        documentSnapshot.reference.setData(message.toMap());
+      } else {
+        recentChatRef.document(id).collection("history").add(message.toMap());
+      }
+    }
+  }
+
+  static Stream<List<Message>> getAllRecentChat(String userId) async* {
+    await for(QuerySnapshot snap in recentChatRef.document(userId).collection("history").orderBy('timestamp', descending: true).snapshots()) {
+      try {
+        List<Message> recentChats = snap.documents.map((doc)=>Message.fromMap(doc)).toList();
+        yield recentChats;
+      } catch (e) {
+        print(e);
+      }
+    }
+  }
+
+  static Future<void> updateIsSeen(
+      String currentUserId, String chatWithUserId) async {
+    QuerySnapshot recentChatQuery = await recentChatRef
+        .document(currentUserId)
+        .collection('history')
+        .where('groupId', isEqualTo: getUniqueId(currentUserId, chatWithUserId))
+        .getDocuments();
+    if (recentChatQuery.documents.length != 0) {
+      String docId = recentChatQuery.documents[0].documentID;
+      await recentChatRef
+          .document(currentUserId)
+          .collection('history')
+          .document(docId)
+          .updateData({'isSeen': true});
+    }
+  }
+
+  static Future<void> deleteMessage(String messageId, String currentUserId, String chatWithUserId) async {
+    QuerySnapshot deleteMessageSnapshot = await messageRef
+        .where('id', isEqualTo: messageId)
+        .getDocuments();
+    if (deleteMessageSnapshot.documents.isNotEmpty) {
+      String docId = deleteMessageSnapshot.documents[0].documentID;
+      await messageRef.document(docId).updateData({
+        'message': 'This message was deleted',
+        'type': 'delete',
+        'photoUrl': ''
+      });
+    }
+    deleteRecentChat(messageId, currentUserId, chatWithUserId);
+  }
+
+  static Future<void> deleteRecentChat(String messageId, String currentUserId, String chatWithUserId) async {
+    List<String> ids = [currentUserId, chatWithUserId];
+    for (String id in ids) {
+      QuerySnapshot recentChatQuery = await recentChatRef
+          .document(id)
+          .collection('history')
+          .where('id', isEqualTo: messageId)
+          .getDocuments();
+      if (recentChatQuery.documents.length != 0) {
+        String docId = recentChatQuery.documents[0].documentID;
+        await recentChatRef
+            .document(id)
+            .collection('history')
+            .document(docId)
+            .updateData({
+          'message': 'This message was deleted',
+          'type': 'delete',
+          'photoUrl': ''});
+      }
+    }
+  }
+
+  static String getUniqueId(String i1, String i2) {
+    if (i1.compareTo(i2) <= -1) {
+      return i1 + i2;
+    } else {
+      return i2 + i1;
+    }
+  }
+
+  static Future<void> updateToken(String currentUserId, String token) async {
+    await tokenRef.document(currentUserId).setData({currentUserId : token});
+  }
 }

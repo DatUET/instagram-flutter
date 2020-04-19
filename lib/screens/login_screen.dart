@@ -26,7 +26,7 @@ class _LoginScreenState extends State<LoginScreen> {
         _isLoading = true;
       });
       bool isSccuess = await AuthService.login(_email, _password, context);
-      if(!isSccuess){
+      if (!isSccuess) {
         setState(() {
           _isSccuess = isSccuess;
         });
@@ -34,7 +34,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  _okError(){
+  _okError() {
     setState(() {
       _isLoading = false;
       _isSccuess = true;
@@ -155,10 +155,14 @@ class _LoginScreenState extends State<LoginScreen> {
                                               vertical: 10.0,
                                             ),
                                             child: TextFormField(
-                                              style: TextStyle(color: themeStyle.primaryTextColor),
+                                              style: TextStyle(
+                                                  color: themeStyle
+                                                      .primaryTextColor),
                                               decoration: InputDecoration(
                                                   labelText: 'Email',
-                                              labelStyle: TextStyle(color: themeStyle.primaryTextColor)),
+                                                  labelStyle: TextStyle(
+                                                      color: themeStyle
+                                                          .primaryTextColor)),
                                               validator: (input) => !input
                                                       .contains('@')
                                                   ? 'Please enter a valid email'
@@ -173,11 +177,15 @@ class _LoginScreenState extends State<LoginScreen> {
                                               vertical: 10.0,
                                             ),
                                             child: TextFormField(
-                                              style: TextStyle(color: themeStyle.primaryTextColor),
+                                              style: TextStyle(
+                                                  color: themeStyle
+                                                      .primaryTextColor),
                                               decoration: InputDecoration(
-                                                  labelText: 'Password',
-                                                  labelStyle: TextStyle(color: themeStyle.primaryTextColor),
-                                            ),
+                                                labelText: 'Password',
+                                                labelStyle: TextStyle(
+                                                    color: themeStyle
+                                                        .primaryTextColor),
+                                              ),
                                               validator: (input) => input
                                                           .length <
                                                       6
@@ -280,7 +288,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
           ),
-         _isLoading
+          _isLoading
               ? Container(
                   width: double.infinity,
                   height: double.infinity,
@@ -295,66 +303,81 @@ class _LoginScreenState extends State<LoginScreen> {
                           borderRadius: BorderRadius.circular(20),
                           color: themeStyle.primaryBackgroundColor),
                       child: Padding(
-                        padding: const EdgeInsets.only(left: 20.0, right: 20, bottom: 15, top: 15),
-                        child: _isSccuess ? Column(
-                          children: <Widget>[
-                            SizedBox(
-                              height: 20,
-                            ),
-                            CircularProgressIndicator(),
-                            SizedBox(
-                              height: 35,
-                            ),
-                            Center(
-                                child: Text(
-                              'Logging in!\n Please wait....',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(color: themeStyle.primaryTextColor, fontSize: 20),
-                            ))
-                          ],
-                        ) :
-                        Column(
-                          children: <Widget>[
-                            Icon(Icons.error_outline, color: Colors.red, size: 40,),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Center(
-                                child: Text(
-                                  'Email or Password is not match',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(color: themeStyle.primaryTextColor, fontSize: 17),
-                                )),
-                            SizedBox(height: 10,),
-                            Center(
-                              child: Container(
-                                height: 30,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    gradient: LinearGradient(colors: [
-                                      Color.fromRGBO(143, 148, 251, 1),
-                                      Color.fromRGBO(143, 148, 251, .6),
-                                    ]),
-                                    boxShadow: [
-                                      BoxShadow(
-                                          color: Color.fromRGBO(143, 148, 251, .4),
-                                          blurRadius: 20,
-                                          offset: Offset(0, 10))
-                                    ]),
-                                child: FlatButton(
-                                  onPressed: () => _okError(),
-                                  child: Center(
-                                    child: Text(
-                                      'OK',
-                                      style: TextStyle(
-                                          color: Colors.white,),
-                                    ),
+                        padding: const EdgeInsets.only(
+                            left: 20.0, right: 20, bottom: 15, top: 15),
+                        child: _isSccuess
+                            ? Column(
+                                children: <Widget>[
+                                  SizedBox(
+                                    height: 20,
                                   ),
-                                ),
+                                  CircularProgressIndicator(),
+                                  SizedBox(
+                                    height: 35,
+                                  ),
+                                  Center(
+                                      child: Text(
+                                    'Logging in!\n Please wait....',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        color: themeStyle.primaryTextColor,
+                                        fontSize: 20),
+                                  ))
+                                ],
+                              )
+                            : Column(
+                                children: <Widget>[
+                                  Icon(
+                                    Icons.error_outline,
+                                    color: Colors.red,
+                                    size: 40,
+                                  ),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                  Center(
+                                      child: Text(
+                                    'Email or Password is not match',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        color: themeStyle.primaryTextColor,
+                                        fontSize: 17),
+                                  )),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                  Center(
+                                    child: Container(
+                                      height: 30,
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          gradient: LinearGradient(colors: [
+                                            Color.fromRGBO(143, 148, 251, 1),
+                                            Color.fromRGBO(143, 148, 251, .6),
+                                          ]),
+                                          boxShadow: [
+                                            BoxShadow(
+                                                color: Color.fromRGBO(
+                                                    143, 148, 251, .4),
+                                                blurRadius: 20,
+                                                offset: Offset(0, 10))
+                                          ]),
+                                      child: FlatButton(
+                                        onPressed: () => _okError(),
+                                        child: Center(
+                                          child: Text(
+                                            'OK',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                ],
                               ),
-                            )
-                          ],
-                        ),
                       ),
                     ),
                   ),

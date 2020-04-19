@@ -9,6 +9,7 @@ import 'package:instagram_v2/models/user_model.dart';
 import 'package:instagram_v2/screens/comments_screen.dart';
 import 'package:instagram_v2/screens/profile_screen.dart';
 import 'package:instagram_v2/services/database_service.dart';
+import 'package:instagram_v2/services/photo_service.dart';
 import 'package:provider/provider.dart';
 
 class PostView extends StatefulWidget {
@@ -22,7 +23,8 @@ class PostView extends StatefulWidget {
   _PostViewState createState() => _PostViewState();
 }
 
-class _PostViewState extends State<PostView> with AutomaticKeepAliveClientMixin<PostView> {
+class _PostViewState extends State<PostView>
+    with AutomaticKeepAliveClientMixin<PostView> {
   int _likeCount = 0;
   bool _isLiked = false;
   bool _heartAnim = false;
@@ -109,7 +111,7 @@ class _PostViewState extends State<PostView> with AutomaticKeepAliveClientMixin<
                   backgroundImage: widget.author.profileImageUrl.isEmpty
                       ? AssetImage('assets/images/user_placeholder.jpg')
                       : CachedNetworkImageProvider(
-                      widget.author.profileImageUrl),
+                          widget.author.profileImageUrl),
                 ),
                 SizedBox(width: 8.0),
                 Column(
@@ -125,14 +127,14 @@ class _PostViewState extends State<PostView> with AutomaticKeepAliveClientMixin<
                     widget.post.location.isEmpty
                         ? Container()
                         : Text(
-                      widget.post.location,
-                      style: TextStyle(
-                        color: themeStyle.primaryTextColor,
-                        fontSize: 13.0,
-                      ),
-                    ),
+                            widget.post.location,
+                            style: TextStyle(
+                              color: themeStyle.primaryTextColor,
+                              fontSize: 13.0,
+                            ),
+                          ),
                   ],
-                )
+                ),
               ],
             ),
           ),
@@ -153,18 +155,18 @@ class _PostViewState extends State<PostView> with AutomaticKeepAliveClientMixin<
               ),
               _heartAnim
                   ? Animator(
-                duration: Duration(milliseconds: 300),
-                tween: Tween(begin: 0.5, end: 1.4),
-                curve: Curves.elasticOut,
-                builder: (anim) => Transform.scale(
-                  scale: anim.value,
-                  child: Icon(
-                    Icons.favorite,
-                    size: 100.0,
-                    color: Colors.red[400],
-                  ),
-                ),
-              )
+                      duration: Duration(milliseconds: 300),
+                      tween: Tween(begin: 0.5, end: 1.4),
+                      curve: Curves.elasticOut,
+                      builder: (anim) => Transform.scale(
+                        scale: anim.value,
+                        child: Icon(
+                          Icons.favorite,
+                          size: 100.0,
+                          color: Colors.red[400],
+                        ),
+                      ),
+                    )
                   : SizedBox.shrink(),
             ],
           ),
@@ -179,15 +181,21 @@ class _PostViewState extends State<PostView> with AutomaticKeepAliveClientMixin<
                   IconButton(
                     icon: _isLiked
                         ? Icon(
-                      Icons.favorite,
-                      color: Colors.red,
-                    )
-                        : Icon(Icons.favorite_border, color: themeStyle.primaryIconColor,),
+                            Icons.favorite,
+                            color: Colors.red,
+                          )
+                        : Icon(
+                            Icons.favorite_border,
+                            color: themeStyle.primaryIconColor,
+                          ),
                     iconSize: 30.0,
                     onPressed: _likePost,
                   ),
                   IconButton(
-                    icon: Icon(Icons.comment, color: themeStyle.primaryIconColor,),
+                    icon: Icon(
+                      Icons.comment,
+                      color: themeStyle.primaryIconColor,
+                    ),
                     iconSize: 30.0,
                     onPressed: () => Navigator.push(
                       context,
@@ -199,6 +207,14 @@ class _PostViewState extends State<PostView> with AutomaticKeepAliveClientMixin<
                       ),
                     ),
                   ),
+                  IconButton(
+                      icon: Icon(
+                        Icons.file_download,
+                        color: themeStyle.primaryIconColor,
+                      ),
+                      iconSize: 30.0,
+                      onPressed: () => PhotoService.downloadImage(
+                          widget.post.imageUrl, false))
                 ],
               ),
               Padding(

@@ -24,7 +24,8 @@ class FeedScreen extends StatefulWidget {
 class _FeedScreenState extends State<FeedScreen> {
   List<Post> _posts = [];
   bool _isLoading = true;
-  RefreshController _refreshController = RefreshController(initialRefresh: false);
+  RefreshController _refreshController =
+      RefreshController(initialRefresh: false);
   var themeStyle;
 
   @override
@@ -55,7 +56,8 @@ class _FeedScreenState extends State<FeedScreen> {
               ? Center(
                   child: Text(
                     'Data is empty',
-                    style: TextStyle(fontSize: 30, color: themeStyle.primaryTextColor),
+                    style: TextStyle(
+                        fontSize: 30, color: themeStyle.primaryTextColor),
                   ),
                 )
               : ListView.builder(
@@ -64,8 +66,7 @@ class _FeedScreenState extends State<FeedScreen> {
                     Post post = _posts[index];
                     return FutureBuilder(
                       future: DatabaseService.getUserWithId(post.authorId),
-                      builder:
-                          (BuildContext context, AsyncSnapshot snapshot) {
+                      builder: (BuildContext context, AsyncSnapshot snapshot) {
                         if (!snapshot.hasData) {
                           return SizedBox.shrink();
                         }

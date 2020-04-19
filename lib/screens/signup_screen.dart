@@ -26,8 +26,9 @@ class _SignupScreenState extends State<SignupScreen> {
       });
       _formKey.currentState.save();
       // Logging in the user w/ Firebase
-      bool isSccuess = await AuthService.signUpUser(context, _name, _email, _password);
-      if(!isSccuess){
+      bool isSccuess =
+          await AuthService.signUpUser(context, _name, _email, _password);
+      if (!isSccuess) {
         setState(() {
           _isSccuess = isSccuess;
         });
@@ -35,7 +36,7 @@ class _SignupScreenState extends State<SignupScreen> {
     }
   }
 
-  _okError(){
+  _okError() {
     setState(() {
       _isLoading = false;
     });
@@ -130,10 +131,14 @@ class _SignupScreenState extends State<SignupScreen> {
                                                 vertical: 10.0,
                                               ),
                                               child: TextFormField(
-                                                style: TextStyle(color: themeStyle.primaryTextColor),
+                                                style: TextStyle(
+                                                    color: themeStyle
+                                                        .primaryTextColor),
                                                 decoration: InputDecoration(
                                                     labelText: 'Name',
-                                                labelStyle: TextStyle(color: themeStyle.primaryTextColor)),
+                                                    labelStyle: TextStyle(
+                                                        color: themeStyle
+                                                            .primaryTextColor)),
                                                 validator: (input) => input
                                                         .trim()
                                                         .isEmpty
@@ -149,10 +154,14 @@ class _SignupScreenState extends State<SignupScreen> {
                                                 vertical: 10.0,
                                               ),
                                               child: TextFormField(
-                                                style: TextStyle(color: themeStyle.primaryTextColor),
+                                                style: TextStyle(
+                                                    color: themeStyle
+                                                        .primaryTextColor),
                                                 decoration: InputDecoration(
                                                     labelText: 'Email',
-                                                labelStyle: TextStyle(color: themeStyle.primaryTextColor)),
+                                                    labelStyle: TextStyle(
+                                                        color: themeStyle
+                                                            .primaryTextColor)),
                                                 validator: (input) => !input
                                                         .contains('@')
                                                     ? 'Please enter a valid email'
@@ -167,10 +176,14 @@ class _SignupScreenState extends State<SignupScreen> {
                                                 vertical: 10.0,
                                               ),
                                               child: TextFormField(
-                                                style: TextStyle(color: themeStyle.primaryTextColor),
+                                                style: TextStyle(
+                                                    color: themeStyle
+                                                        .primaryTextColor),
                                                 decoration: InputDecoration(
                                                     labelText: 'Password',
-                                                labelStyle: TextStyle(color: themeStyle.primaryTextColor)),
+                                                    labelStyle: TextStyle(
+                                                        color: themeStyle
+                                                            .primaryTextColor)),
                                                 validator: (input) => input
                                                             .length <
                                                         6
@@ -264,85 +277,97 @@ class _SignupScreenState extends State<SignupScreen> {
               ],
             ),
           ),
-          _isLoading ? Container(
-            width: double.infinity,
-            height: double.infinity,
-            decoration: BoxDecoration(
-              color: Colors.grey.withOpacity(.5),
-            ),
-            child: Center(
-              child: Container(
-                height: 180,
-                width: 180,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    color: Colors.white
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 20.0, right: 20, bottom: 15, top: 15),
-                  child: _isSccuess ? Column(
-                    children: <Widget>[
-                      SizedBox(
-                        height: 20,
-                      ),
-                      CircularProgressIndicator(),
-                      SizedBox(
-                        height: 35,
-                      ),
-                      Center(
-                          child: Text(
-                            'Registing!\n Please wait...',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 20),
-                          ))
-                    ],
-                  ) :
-                  Column(
-                    children: <Widget>[
-                      Icon(Icons.error_outline, color: Colors.red, size: 40,),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Center(
-                          child: Text(
-                            'Sorry!\nAn error occurred',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 17),
-                          )),
-                      SizedBox(height: 10,),
-                      Center(
-                        child: Container(
-                          height: 30,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              gradient: LinearGradient(colors: [
-                                Color.fromRGBO(143, 148, 251, 1),
-                                Color.fromRGBO(143, 148, 251, .6),
-                              ]),
-                              boxShadow: [
-                                BoxShadow(
-                                    color: Color.fromRGBO(143, 148, 251, .4),
-                                    blurRadius: 20,
-                                    offset: Offset(0, 10))
-                              ]),
-                          child: FlatButton(
-                            onPressed: () => _okError(),
-                            child: Center(
-                              child: Text(
-                                'OK',
-                                style: TextStyle(
-                                  color: Colors.white,),
-                              ),
-                            ),
-                          ),
-                        ),
-                      )
-                    ],
+          _isLoading
+              ? Container(
+                  width: double.infinity,
+                  height: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withOpacity(.5),
                   ),
-                ),
-              ),
-            ),
-          ) : Container(),
+                  child: Center(
+                    child: Container(
+                      height: 180,
+                      width: 180,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          color: Colors.white),
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                            left: 20.0, right: 20, bottom: 15, top: 15),
+                        child: _isSccuess
+                            ? Column(
+                                children: <Widget>[
+                                  SizedBox(
+                                    height: 20,
+                                  ),
+                                  CircularProgressIndicator(),
+                                  SizedBox(
+                                    height: 35,
+                                  ),
+                                  Center(
+                                      child: Text(
+                                    'Registing!\n Please wait...',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(fontSize: 20),
+                                  ))
+                                ],
+                              )
+                            : Column(
+                                children: <Widget>[
+                                  Icon(
+                                    Icons.error_outline,
+                                    color: Colors.red,
+                                    size: 40,
+                                  ),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                  Center(
+                                      child: Text(
+                                    'Sorry!\nAn error occurred',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(fontSize: 17),
+                                  )),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                  Center(
+                                    child: Container(
+                                      height: 30,
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          gradient: LinearGradient(colors: [
+                                            Color.fromRGBO(143, 148, 251, 1),
+                                            Color.fromRGBO(143, 148, 251, .6),
+                                          ]),
+                                          boxShadow: [
+                                            BoxShadow(
+                                                color: Color.fromRGBO(
+                                                    143, 148, 251, .4),
+                                                blurRadius: 20,
+                                                offset: Offset(0, 10))
+                                          ]),
+                                      child: FlatButton(
+                                        onPressed: () => _okError(),
+                                        child: Center(
+                                          child: Text(
+                                            'OK',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                      ),
+                    ),
+                  ),
+                )
+              : Container(),
         ],
       ),
     );

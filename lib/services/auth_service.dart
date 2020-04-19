@@ -27,8 +27,12 @@ class AuthService {
           'profileImageUrl': '',
         });
         Provider.of<UserData>(context).currentUserId = signedInUser.uid;
-        DatabaseService.followUser(currentUserId: signedInUser.uid, userId: signedInUser.uid);
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => SplashScreen()));
+        DatabaseService.followUser(
+            currentUserId: signedInUser.uid, userId: signedInUser.uid);
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (BuildContext context) => SplashScreen()));
         return true;
       }
       return false;
@@ -42,13 +46,17 @@ class AuthService {
     _auth.signOut();
   }
 
-  static Future<bool> login(String email, String password, BuildContext context) async {
+  static Future<bool> login(
+      String email, String password, BuildContext context) async {
     try {
-      AuthResult authResult = await _auth.signInWithEmailAndPassword(email: email, password: password);
+      AuthResult authResult = await _auth.signInWithEmailAndPassword(
+          email: email, password: password);
       FirebaseUser user = authResult.user;
-      if(user != null){
+      if (user != null) {
         Provider.of<UserData>(context).currentUserId = user.uid;
-        Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (_) => HomeScreen()), (Route<dynamic> route) => false);
+        Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (_) => HomeScreen()),
+            (Route<dynamic> route) => false);
         return true;
       }
       return false;
