@@ -15,6 +15,7 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  String currentUserId;
   @override
   void initState() {
     super.initState();
@@ -45,6 +46,7 @@ class _SplashScreenState extends State<SplashScreen> {
     FirebaseUser user = await FirebaseAuth.instance.currentUser();
     if (user != null) {
       Provider.of<UserData>(context).currentUserId = user.uid.toString();
+      currentUserId = user.uid.toString();
       return true;
     } else {
       return false;
@@ -53,7 +55,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   void _navigateToHome() {
     Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (BuildContext context) => HomeScreen()),
+        MaterialPageRoute(builder: (BuildContext context) => HomeScreen(currentUserId)),
         (Route<dynamic> route) => false);
   }
 

@@ -123,14 +123,17 @@ exports.sendNotification = functions.region("asia-northeast1").firestore
       notification: {
           title: senderName + " sent you a message.",
           body: message,
-          clickAction: "FLUTTER_NOTIFICATION_CLICK"
+          clickAction: "FLUTTER_NOTIFICATION_CLICK",
       },
       data: {
         senderUid: senderUid,
           receiverUid: receiverUid
       }
   }
-  return admin.messaging().sendToDevice(token, payload);
+  if (token !== '') {
+    return admin.messaging().sendToDevice(token, payload);
+  }
+  return;
   });
 
 exports.sendNotifiActivities = functions.region("asia-northeast1").firestore
@@ -168,5 +171,8 @@ exports.sendNotifiActivities = functions.region("asia-northeast1").firestore
           postId: activity['postId']
       }
   }
-  return admin.messaging().sendToDevice(token, payload);
+  if (token !== '') {
+    return admin.messaging().sendToDevice(token, payload);
+  }
+  return;
   });

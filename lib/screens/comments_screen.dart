@@ -33,12 +33,18 @@ class _CommentsScreenState extends State<CommentsScreen> {
         }
         User author = snapshot.data;
         return ListTile(
-          leading: CircleAvatar(
-            radius: 25.0,
-            backgroundColor: Colors.grey,
-            backgroundImage: author.profileImageUrl.isEmpty
-                ? AssetImage('assets/images/user_placeholder.jpg')
-                : CachedNetworkImageProvider(author.profileImageUrl),
+          leading: Container(
+            width: 50,
+            height: 50,
+            decoration: BoxDecoration(
+                color: Colors.grey,
+                borderRadius: BorderRadius.all(Radius.circular(15)),
+                border: Border.all(width: 1.5, color: author.isActive ? Color(0xFFFE8057) : Colors.grey),
+                image: DecorationImage(image: author.profileImageUrl.isEmpty
+                    ? AssetImage('assets/images/user_placeholder.jpg')
+                    : CachedNetworkImageProvider(
+                  author.profileImageUrl,),fit: BoxFit.cover)
+            ),
           ),
           title: Text(
             author.name,
@@ -162,7 +168,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
                   itemCount: snapshot.data.documents.length,
                   itemBuilder: (BuildContext context, int index) {
                     Comment comment =
-                        Comment.fromDoc(snapshot.data.documents[index]);
+                    Comment.fromDoc(snapshot.data.documents[index]);
                     return _buildComment(comment);
                   },
                 ),

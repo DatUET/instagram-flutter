@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:instagram_v2/models/user_data.dart';
 import 'package:instagram_v2/screens/home_screen.dart';
 import 'package:instagram_v2/screens/login_screen.dart';
@@ -11,6 +12,7 @@ import 'package:provider/provider.dart';
 class AuthService {
   static final _auth = FirebaseAuth.instance;
   static final _firestore = Firestore.instance;
+  static final _googleSignIn = GoogleSignIn();
 
   static Future<bool> signUpUser(
       BuildContext context, String name, String email, String password) async {
@@ -25,6 +27,7 @@ class AuthService {
           'name': name,
           'email': email,
           'profileImageUrl': '',
+          'isActive': true
         });
         Provider.of<UserData>(context).currentUserId = signedInUser.uid;
         DatabaseService.followUser(
@@ -44,6 +47,9 @@ class AuthService {
 
   static void logout() {
     _auth.signOut();
+    if (_googleSignIn.currentUser != null) {
+      _googleSignIn.signOut();
+    }
   }
 
   static Future<bool> login(
@@ -55,7 +61,7 @@ class AuthService {
       if (user != null) {
         Provider.of<UserData>(context).currentUserId = user.uid;
         Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (_) => HomeScreen()),
+            MaterialPageRoute(builder: (_) => HomeScreen(user.uid)),
             (Route<dynamic> route) => false);
         return true;
       }
@@ -64,5 +70,33 @@ class AuthService {
       print(e);
     }
     return false;
+  }
+
+  static Future<void> loginGoogle(BuildContext context) async {
+    try {
+      GoogleSignInAccount googleUser = await _googleSignIn.signIn();
+      GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      AuthCredential authCredential = GoogleAuthProvider.getCredential(
+          idToken: googleAuth.idToken, accessToken: googleAuth.accessToken);
+      AuthResult authResult = await _auth.signInWithCredential(authCredential);
+      FirebaseUser user = authResult.user;
+      if (user != null) {
+        if (authResult.additionalUserInfo.isNewUser) {
+          await _firestore.collection('/users').document(user.uid).setData({
+            'name': user.displayName,
+            'email': user.email,
+            'profileImageUrl': user.photoUrl,
+            'isActive': true
+          });
+          DatabaseService.followUser(currentUserId: user.uid, userId: user.uid);
+        }
+        Provider.of<UserData>(context).currentUserId = user.uid;
+        Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (_) => HomeScreen(user.uid)),
+            (Route<dynamic> route) => false);
+      }
+    } catch (e) {
+      print(e);
+    }
   }
 }

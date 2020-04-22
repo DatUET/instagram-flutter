@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:instagram_v2/models/activity_model.dart';
+import 'package:instagram_v2/models/comment_model.dart';
 import 'package:instagram_v2/models/message_model.dart';
 import 'package:instagram_v2/models/post_model.dart';
 import 'package:instagram_v2/models/user_model.dart';
@@ -342,5 +343,22 @@ class DatabaseService {
 
   static Future<void> updateToken(String currentUserId, String token) async {
     await tokenRef.document(currentUserId).setData({currentUserId : token});
+  }
+
+  static void updateActive(String userId, bool isActive) {
+    usersRef.document(userId).updateData({
+      'isActive': isActive,
+    });
+  }
+
+  static Future<bool> checkIsSeenAll(String userId) async {
+    QuerySnapshot checkIsSeenAllSnapshot = await recentChatRef
+        .document(userId)
+        .collection('history')
+        .where('isSeen', isEqualTo: false)
+        .where('receiverUid', isEqualTo: userId)
+        .getDocuments();
+    print(checkIsSeenAllSnapshot.documents.isEmpty);
+    return checkIsSeenAllSnapshot.documents.isNotEmpty;
   }
 }

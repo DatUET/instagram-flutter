@@ -290,7 +290,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       width: 180,
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(20),
-                          color: Colors.white),
+                          color: themeStyle.primaryBackgroundColor),
                       child: Padding(
                         padding: const EdgeInsets.only(
                             left: 20.0, right: 20, bottom: 15, top: 15),
@@ -308,7 +308,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                       child: Text(
                                     'Registing!\n Please wait...',
                                     textAlign: TextAlign.center,
-                                    style: TextStyle(fontSize: 20),
+                                    style: TextStyle(fontSize: 20, color: themeStyle.primaryTextColor),
                                   ))
                                 ],
                               )

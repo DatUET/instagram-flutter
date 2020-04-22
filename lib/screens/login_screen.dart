@@ -53,7 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 children: <Widget>[
                   Container(
-                    height: 350,
+                    height: 330,
                     decoration: BoxDecoration(
                         image: DecorationImage(
                             image: AssetImage('assets/images/background.png'),
@@ -124,7 +124,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   Padding(
                     padding: EdgeInsets.only(
-                        left: 30, right: 30, bottom: 30, top: 10),
+                        left: 30, right: 30, bottom: 30, top: 0),
                     child: Column(
                       children: <Widget>[
                         FadeAnimation(
@@ -204,10 +204,24 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         SizedBox(
-                          height: 40,
+                          height: 10,
                         ),
                         FadeAnimation(
-                          2,
+                            2,
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: Text(
+                                'Forgot Password?',
+                                style: TextStyle(
+                                    color: Color.fromRGBO(143, 148, 251, 1),
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            )),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        FadeAnimation(
+                          2.2,
                           Container(
                             margin: EdgeInsets.symmetric(horizontal: 60),
                             height: 50,
@@ -240,7 +254,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           height: 20,
                         ),
                         FadeAnimation(
-                          2.2,
+                          2.4,
                           Container(
                             margin: EdgeInsets.symmetric(horizontal: 60),
                             height: 50,
@@ -271,16 +285,51 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         SizedBox(
-                          height: 40,
+                          height: 10,
+                        ),
+                        Text(
+                          'Or',
+                          style: TextStyle(color: themeStyle.primaryTextColor),
+                        ),
+                        SizedBox(
+                          height: 10,
                         ),
                         FadeAnimation(
-                            1.5,
-                            Text(
-                              'Forgot Password?',
-                              style: TextStyle(
-                                  color: Color.fromRGBO(143, 148, 251, 1),
-                                  fontWeight: FontWeight.bold),
-                            )),
+                          2.6,
+                          Container(
+                            margin: EdgeInsets.symmetric(horizontal: 60),
+                            height: 50,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(color: Colors.grey)),
+                            child: FlatButton(
+                              onPressed: () => AuthService.loginGoogle(context),
+                              child: Row(
+                                children: <Widget>[
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Container(
+                                      height: 50,
+                                      width: 50,
+                                      decoration: BoxDecoration(
+                                          image: DecorationImage(
+                                              image: AssetImage(
+                                                  'assets/images/google.png'))),
+                                    ),
+                                  ),
+                                  Center(
+                                    child: Text(
+                                      'Sign In Google',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   )

@@ -61,6 +61,7 @@ class _FeedScreenState extends State<FeedScreen> {
                   ),
                 )
               : ListView.builder(
+                  addAutomaticKeepAlives: true,
                   itemCount: _posts.length,
                   itemBuilder: (context, index) {
                     Post post = _posts[index];

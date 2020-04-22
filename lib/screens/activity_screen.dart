@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:instagram_v2/animations/bouncy_page_route.dart';
 import 'package:instagram_v2/models/activity_model.dart';
 import 'package:instagram_v2/models/post_model.dart';
 import 'package:instagram_v2/models/user_data.dart';
@@ -58,13 +59,22 @@ class _ActivityScreenState extends State<ActivityScreen> {
         return Container(
           color: themeStyle.primaryBackgroundColor,
           child: ListTile(
-            leading: CircleAvatar(
-              radius: 20.0,
-              backgroundColor: Colors.grey,
-              backgroundImage: user.profileImageUrl.isEmpty
-                  ? AssetImage('assets/images/user_placeholder.jpg')
-                  : CachedNetworkImageProvider(user.profileImageUrl),
+            leading: Container(
+              height: 40,
+              width: 40,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                    color: user.isActive ? Color(0xFFFE8057) : Colors.grey, width: 1.5),
+                image: DecorationImage(
+                    image: user.profileImageUrl.isEmpty
+                        ? AssetImage(
+                        'assets/images/user_placeholder.jpg')
+                        : CachedNetworkImageProvider(
+                        user.profileImageUrl),
+                    fit: BoxFit.cover),
             ),
+          ),
             title: activity.comment != null
                 ? Text('${user.name} commented: "${activity.comment}"',
                     style: TextStyle(
@@ -96,8 +106,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
               );
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (_) => CommentsScreen(
+                BouncyPageRoute(widget: CommentsScreen(
                     post: post,
                     likeCount: post.likeCount,
                   ),

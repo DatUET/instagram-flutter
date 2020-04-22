@@ -84,6 +84,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         name: _name,
         profileImageUrl: _profileImageUrl,
         bio: _bio,
+        isActive: widget.user.isActive,
       );
       // Database update
       DatabaseService.updateUser(user);
@@ -120,10 +121,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 key: _formKey,
                 child: Column(
                   children: <Widget>[
-                    CircleAvatar(
-                      radius: 60.0,
-                      backgroundColor: Colors.grey,
-                      backgroundImage: _displayProfileImage(),
+                    Container(
+                      width: 120.0,
+                      height: 120.0,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(30)),
+                        border: Border.all(color: Color(0xFFFE8057), width: 2),
+                        image: DecorationImage(image: _displayProfileImage(), fit: BoxFit.cover)
+                      ),
                     ),
                     FlatButton(
                       onPressed: _handleImageFromGallery,

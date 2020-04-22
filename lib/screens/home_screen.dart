@@ -14,15 +14,20 @@ import 'package:instagram_v2/services/database_service.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
+  final String currentUserId;
+
+  HomeScreen(this.currentUserId);
+
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   int _currentTab = 0;
   PageController _pageController;
   FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
-  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
 
   _setUpFCM() {
     _firebaseMessaging.requestNotificationPermissions();
@@ -31,16 +36,15 @@ class _HomeScreenState extends State<HomeScreen> {
         print('onLauch ${message.toString()}');
         return;
       },
-      onMessage: (message) async{
+      onMessage: (message) async {
         print('onMessage ${message.toString()}');
         showNotification(message);
         return;
       },
-      onResume: (message) async{
+      onResume: (message) async {
         print('onResume ${message.toString()}');
         return;
       },
-
     );
 
     _firebaseMessaging.getToken().then((token) async {
@@ -53,47 +57,67 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    DatabaseService.updateActive(widget.currentUserId, true);
     _pageController = PageController();
     _setUpFCM();
     configLocalNotification();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      print('Pause');
+      DatabaseService.updateActive(widget.currentUserId, false);
+    } else if (state == AppLifecycleState.resumed) {
+      print('Resumed');
+      DatabaseService.updateActive(widget.currentUserId, true);
+    }
   }
 
   Future<void> showNotification(message) async {
     var androidPlatformChannelSpecifics = new AndroidNotificationDetails(
-      'com.example.photogram',
-      'Photogram',
-      'channel for photogram',
-      playSound: true,
-      //enableVibration: true,
-      importance: Importance.Max,
-      priority: Priority.High,
-        ticker: 'ticker'
-    );
+        'com.example.photogram', 'Photogram', 'channel for photogram',
+        playSound: true,
+        enableVibration: true,
+        importance: Importance.Max,
+        priority: Priority.High,
+        ticker: 'ticker');
     var iOSPlatformChannelSpecifics = new IOSNotificationDetails();
-    var platformChannelSpecifics =
-    new NotificationDetails(androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+    var platformChannelSpecifics = new NotificationDetails(
+        androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
     await flutterLocalNotificationsPlugin.show(
-        0, message['notification']['title'].toString(), message['notification']['body'].toString(), platformChannelSpecifics,
-        );
+      0,
+      message['notification']['title'].toString(),
+      message['notification']['body'].toString(),
+      platformChannelSpecifics,
+    );
   }
 
   void configLocalNotification() {
-    var initializationSettingsAndroid = new AndroidInitializationSettings('@mipmap/ic_launcher');
+    var initializationSettingsAndroid =
+        new AndroidInitializationSettings('@mipmap/ic_launcher');
     var initializationSettingsIOS = new IOSInitializationSettings();
-    var initializationSettings = new InitializationSettings(initializationSettingsAndroid, initializationSettingsIOS);
+    var initializationSettings = new InitializationSettings(
+        initializationSettingsAndroid, initializationSettingsIOS);
     flutterLocalNotificationsPlugin.initialize(initializationSettings);
   }
 
   @override
   Widget build(BuildContext context) {
-    final String currentUserId = Provider.of<UserData>(context).currentUserId;
     final themeStyle = Provider.of<UserData>(context);
     return Scaffold(
       body: PageView(
         controller: _pageController,
         children: <Widget>[
           SocialScreen(
-            currentUserId: currentUserId,
+            currentUserId: themeStyle.currentUserId,
           ),
           GalleyScreen(),
           CameraScreen()
@@ -123,24 +147,27 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: Icon(
               Icons.home,
               size: 32.0,
-              color:
-                  _currentTab == 0 ? Colors.blue : themeStyle.primaryIconColor,
+              color: _currentTab == 0
+                  ? Color(0xFFFE8057)
+                  : themeStyle.primaryIconColor,
             ),
           ),
           BottomNavigationBarItem(
             icon: Icon(
               Icons.photo_library,
               size: 32.0,
-              color:
-                  _currentTab == 1 ? Colors.blue : themeStyle.primaryIconColor,
+              color: _currentTab == 1
+                  ? Color(0xFFFE8057)
+                  : themeStyle.primaryIconColor,
             ),
           ),
           BottomNavigationBarItem(
             icon: Icon(
               Icons.camera,
               size: 32.0,
-              color:
-                  _currentTab == 2 ? Colors.blue : themeStyle.primaryIconColor,
+              color: _currentTab == 2
+                  ? Color(0xFFFE8057)
+                  : themeStyle.primaryIconColor,
             ),
           ),
         ],

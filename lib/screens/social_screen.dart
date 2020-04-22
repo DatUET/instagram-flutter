@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:instagram_v2/animations/bouncy_page_route.dart';
 import 'package:instagram_v2/models/user_data.dart';
 import 'package:instagram_v2/models/user_model.dart';
 import 'package:instagram_v2/screens/activity_screen.dart';
@@ -9,6 +10,7 @@ import 'package:instagram_v2/screens/feed_screen.dart';
 import 'package:instagram_v2/screens/home_screen.dart';
 import 'package:instagram_v2/screens/profile_screen.dart';
 import 'package:instagram_v2/screens/search_screen.dart';
+import 'package:instagram_v2/services/database_service.dart';
 import 'package:instagram_v2/utilities/constants.dart';
 import 'package:provider/provider.dart';
 
@@ -23,6 +25,7 @@ class _SocialScreenState extends State<SocialScreen>
     with SingleTickerProviderStateMixin {
   ScrollController _scrollViewController;
   TabController _tabController;
+  int _currentTab = 0;
 
   @override
   void initState() {
@@ -66,17 +69,43 @@ class _SocialScreenState extends State<SocialScreen>
                     ),
                     onPressed: () => Navigator.push(context,
                         MaterialPageRoute(builder: (_) => SearchScreen()))),
-                IconButton(
-                    icon: Icon(
-                      Icons.send,
-                      color: themeStyle.primaryIconColor,
+                Stack(
+                  children: <Widget>[
+                    FutureBuilder(
+                      future: DatabaseService.checkIsSeenAll(widget.currentUserId),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) {
+                          return Container();
+                        }
+                        return snapshot.data ? Transform.translate(
+                          offset: Offset(15, -3),
+                          child: Container(
+                            width: 10,
+                            height: 10,
+                            margin: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                                border: Border.all(width: 2, color: Colors.white),
+                                shape: BoxShape.circle,
+                                color: Color(0xFFFE8057)
+                            ),
+                          ),
+                        )
+                        : Container();
+                      }
                     ),
-                    onPressed: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => ChatListScreen(
-                                  currentUserId: widget.currentUserId,
-                                )))),
+                    IconButton(
+                        icon: Icon(
+                          Icons.send,
+                          color: themeStyle.primaryIconColor,
+                        ),
+                        onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => ChatListScreen(
+                                      currentUserId: widget.currentUserId,
+                                    )))),
+                  ],
+                ),
                 FutureBuilder(
                     future: usersRef.document(widget.currentUserId).get(),
                     builder: (context, snapshot) {
@@ -122,6 +151,8 @@ class _SocialScreenState extends State<SocialScreen>
                             width: 35,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                  color: Color(0xFFFE8057), width: 1.5),
                               image: DecorationImage(
                                   image: user.profileImageUrl.isEmpty
                                       ? AssetImage(
@@ -141,11 +172,11 @@ class _SocialScreenState extends State<SocialScreen>
                         onTap: () {
                           return Navigator.push(
                               context,
-                              MaterialPageRoute(
-                                  builder: (_) => ProfileScreen(
-                                        currentUserId: widget.currentUserId,
-                                        userId: widget.currentUserId,
-                                      )));
+                              BouncyPageRoute(
+                                  widget: ProfileScreen(
+                                currentUserId: widget.currentUserId,
+                                userId: widget.currentUserId,
+                              )));
                         },
                       );
                     }),
@@ -154,24 +185,47 @@ class _SocialScreenState extends State<SocialScreen>
               floating: true,
               forceElevated: innerBoxIsScrolled,
               bottom: new TabBar(
+                indicator: ShapeDecoration(
+                  shape: UnderlineInputBorder(
+                      borderSide: BorderSide(
+                          color: Color(0xFFFE8057),
+                          width: 4.0,
+                          style: BorderStyle.solid)),
+                ),
+                labelColor: Color(0xFFFE8057),
+                unselectedLabelColor: themeStyle.primaryIconColor,
+                onTap: (index) {
+                  setState(() {
+                    _currentTab = index;
+                  });
+                },
                 tabs: <Tab>[
                   new Tab(
                     icon: new Icon(
                       Icons.public,
-                      color: themeStyle.primaryIconColor,
+                      color: _currentTab == 0
+                          ? Color(0xFFFE8057)
+                          : themeStyle.primaryIconColor,
                     ),
+                    text: 'Feed',
                   ),
                   new Tab(
                     icon: new Icon(
                       Icons.add_circle_outline,
-                      color: themeStyle.primaryIconColor,
+                      color: _currentTab == 1
+                          ? Color(0xFFFE8057)
+                          : themeStyle.primaryIconColor,
                     ),
+                    text: 'Add Post',
                   ),
                   new Tab(
                     icon: new Icon(
                       Icons.notifications_none,
-                      color: themeStyle.primaryIconColor,
+                      color: _currentTab == 2
+                          ? Color(0xFFFE8057)
+                          : themeStyle.primaryIconColor,
                     ),
+                    text: 'Notification',
                   ),
                 ],
                 controller: _tabController,

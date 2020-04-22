@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:instagram_v2/animations/bouncy_page_route.dart';
 import 'package:instagram_v2/animations/fadeanimationup.dart';
 import 'package:instagram_v2/models/post_model.dart';
 import 'package:instagram_v2/models/user_data.dart';
@@ -152,154 +153,105 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return user.id == Provider.of<UserData>(context).currentUserId
         ? Container()
         : Container(
-      width: 145,
-      height: 40,
-      decoration: BoxDecoration(
-          color: themeStyle.primaryBackgroundColor,
-        borderRadius: BorderRadius.all(Radius.circular(8.0)),
-        border: Border.all(color: Colors.grey)
-      ),
-      child: FlatButton(
-        onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ChatScreen(currentUserId: themeStyle.currentUserId, chatWithUser: user,))),
-        child: Row(
-          children: <Widget>[
-            Text('Send Message', style: TextStyle(color: themeStyle.primaryTextColor, fontSize: 12),),
-            SizedBox(width: 10,),
-            Icon(Icons.send, color: themeStyle.primaryIconColor, size: 20,)
-          ],
-        ),
-      ),
-    );
+            width: 145,
+            height: 40,
+            decoration: BoxDecoration(
+                color: themeStyle.primaryBackgroundColor,
+                borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                border: Border.all(color: Colors.grey)),
+            child: FlatButton(
+              onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => ChatScreen(
+                            currentUserId: themeStyle.currentUserId,
+                            chatWithUser: user,
+                          ))),
+              child: Row(
+                children: <Widget>[
+                  Text(
+                    'Send Message',
+                    style: TextStyle(
+                        color: themeStyle.primaryTextColor, fontSize: 12),
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Icon(
+                    Icons.send,
+                    color: themeStyle.primaryIconColor,
+                    size: 20,
+                  )
+                ],
+              ),
+            ),
+          );
   }
 
   _buildProfileInfo(User user) {
-    return Column(
-      children: <Widget>[
-        Padding(
-          padding: EdgeInsets.fromLTRB(30.0, 30.0, 30.0, 0.0),
-          child: Row(
-            children: <Widget>[
-              FadeAnimationUp(
-                0.2,
-                CircleAvatar(
-                  radius: 50.0,
-                  backgroundColor: Colors.grey,
-                  backgroundImage: user.profileImageUrl.isEmpty
-                      ? AssetImage('assets/images/user_placeholder.jpg')
-                      : CachedNetworkImageProvider(user.profileImageUrl),
-                ),
-              ),
-              Expanded(
-                child: Column(
-                  children: <Widget>[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: <Widget>[
-                        FadeAnimationUp(
-                          0.4,
-                          Column(
-                            children: <Widget>[
-                              Text(
-                                _posts.length.toString(),
-                                style: TextStyle(
-                                  color: themeStyle.primaryTextColor,
-                                  fontSize: 18.0,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              Text(
-                                'posts',
-                                style: TextStyle(
-                                    color: themeStyle.primaryTextColor),
-                              ),
-                            ],
-                          ),
-                        ),
-                        FadeAnimationUp(
-                          0.6,
-                          Column(
-                            children: <Widget>[
-                              Text(
-                                _followerCount.toString(),
-                                style: TextStyle(
-                                  color: themeStyle.primaryTextColor,
-                                  fontSize: 18.0,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              Text(
-                                'followers',
-                                style: TextStyle(
-                                    color: themeStyle.primaryTextColor),
-                              ),
-                            ],
-                          ),
-                        ),
-                        FadeAnimationUp(
-                          0.8,
-                          Column(
-                            children: <Widget>[
-                              Text(
-                                _followingCount.toString(),
-                                style: TextStyle(
-                                  color: themeStyle.primaryTextColor,
-                                  fontSize: 18.0,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              Text(
-                                'following',
-                                style: TextStyle(
-                                    color: themeStyle.primaryTextColor),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    FadeAnimationUp(1, _displayButton(user)),
-                  ],
-                ),
-              )
-            ],
-          ),
-        ),
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 10.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              FadeAnimationUp(
-                1.2,
+    return Container(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: <Widget>[
+          FadeAnimationUp(
+            0.4,
+            Column(
+              children: <Widget>[
                 Text(
-                  user.name,
+                  _posts.length.toString(),
                   style: TextStyle(
                     color: themeStyle.primaryTextColor,
                     fontSize: 18.0,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-              ),
-              SizedBox(height: 5.0),
-              Container(
-                height: 30.0,
-                child: FadeAnimationUp(
-                  1.4,
-                  Text(
-                    user.bio,
-                    style: TextStyle(
-                        color: themeStyle.primaryTextColor, fontSize: 15.0),
-                  ),
+                Text(
+                  'posts',
+                  style: TextStyle(color: themeStyle.primaryTextColor),
                 ),
-              ),
-              FadeAnimationUp(1.6, _buildButtonChat(user)),
-              Divider(
-                color: themeStyle.primaryTextColorLight,
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      ],
+          FadeAnimationUp(
+            0.6,
+            Column(
+              children: <Widget>[
+                Text(
+                  _followerCount.toString(),
+                  style: TextStyle(
+                    color: themeStyle.primaryTextColor,
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Text(
+                  'followers',
+                  style: TextStyle(color: themeStyle.primaryTextColor),
+                ),
+              ],
+            ),
+          ),
+          FadeAnimationUp(
+            0.8,
+            Column(
+              children: <Widget>[
+                Text(
+                  _followingCount.toString(),
+                  style: TextStyle(
+                    color: themeStyle.primaryTextColor,
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Text(
+                  'following',
+                  style: TextStyle(color: themeStyle.primaryTextColor),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -338,8 +290,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         GestureDetector(
           onTap: () => Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (_) => CommentsScreen(
+            BouncyPageRoute(
+              widget: CommentsScreen(
                 post: post,
                 likeCount: post.likeCount,
               ),
@@ -383,7 +335,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         );
       }
-      return Column(children: postViews);
+      return Container(
+          color: themeStyle.primaryBackgroundColor,
+          child: Column(children: postViews));
     }
   }
 
@@ -392,32 +346,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     themeStyle = Provider.of<UserData>(context);
     return Scaffold(
       backgroundColor: themeStyle.primaryBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: themeStyle.primaryBackgroundColor,
-        title: Text(
-          'Photogram',
-          style: TextStyle(
-            color: themeStyle.primaryTextColor,
-            fontFamily: 'Billabong',
-            fontSize: 35.0,
-          ),
-        ),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(
-              Icons.exit_to_app,
-              color: themeStyle.primaryIconColor,
-            ),
-            onPressed: () {
-              AuthService.logout();
-              Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                      builder: (BuildContext context) => LoginScreen()));
-            },
-          ),
-        ],
-      ),
       body: FutureBuilder(
         future: usersRef.document(widget.userId).get(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
@@ -427,13 +355,157 @@ class _ProfileScreenState extends State<ProfileScreen> {
             );
           }
           User user = User.fromDoc(snapshot.data);
-          return ListView(
-            children: <Widget>[
-              _buildProfileInfo(user),
-              _buildToggleButtons(),
-              Divider(),
-              _buildDisplayPosts(),
-            ],
+          return Container(
+            child: Stack(
+              children: <Widget>[
+                Container(
+                  height: double.infinity,
+                ),
+                Container(
+                  height: 200,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: user.profileImageUrl.isEmpty
+                          ? AssetImage('assets/images/user_placeholder.jpg')
+                          : CachedNetworkImageProvider(user.profileImageUrl),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+                Container(
+                  height: double.infinity,
+                ),
+                Container(
+                  height: 200,
+                  decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                        Colors.white.withOpacity(.3),
+                        Colors.white.withOpacity(.5),
+                        Colors.white.withOpacity(.8)
+                      ])),
+                ),
+                SingleChildScrollView(
+                  child: Stack(
+                    children: <Widget>[
+                      Positioned(
+                        top: 150,
+                        left: 0.01,
+                        right: 0.01,
+                        child: Container(
+                          height: 700,
+                          width: MediaQuery.of(context).size.width,
+                          decoration: BoxDecoration(
+                            color: themeStyle.primaryBackgroundColor,
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(40),
+                              topRight: Radius.circular(40),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.center,
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 90.0),
+                          child: Container(
+                            height: 150,
+                            width: 150,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(40),
+                              border: Border.all(
+                                  width: 2,
+                                  color: user.isActive
+                                      ? Color(0xFFFE8057)
+                                      : Colors.grey),
+                              image: DecorationImage(
+                                image: user.profileImageUrl.isEmpty
+                                    ? AssetImage(
+                                        'assets/images/user_placeholder.jpg')
+                                    : CachedNetworkImageProvider(
+                                        user.profileImageUrl),
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.center,
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 260),
+                          child: Column(children: <Widget>[
+                            Text(
+                              user.name,
+                              style: TextStyle(
+                                fontSize: 25,
+                                color: themeStyle.primaryTextColor,
+                              ),
+                            ),
+                            Text(
+                              user.bio,
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: themeStyle.primaryTextColor,
+                              ),
+                            ),
+                            _displayButton(user),
+                            _buildButtonChat(user),
+                            _buildProfileInfo(user),
+                            _buildToggleButtons(),
+                            Divider(),
+                            _buildDisplayPosts(),
+                          ]),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Align(
+                  alignment: Alignment.topRight,
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 50.0, right: 10.0),
+                    child: GestureDetector(
+                      onTap: () {
+                        AuthService.logout();
+                        DatabaseService.updateActive(
+                            themeStyle.currentUserId, false);
+                        DatabaseService.updateToken(
+                            themeStyle.currentUserId, '');
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (BuildContext context) =>
+                                    LoginScreen()));
+                      },
+                      child: Icon(
+                        Icons.exit_to_app,
+                        color: themeStyle.primaryIconColor,
+                      ),
+                    ),
+                  ),
+                ),
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 50.0, left: 10.0),
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: Container(
+                        child: Icon(
+                          Icons.arrow_back,
+                          color: themeStyle.primaryIconColor,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           );
         },
       ),

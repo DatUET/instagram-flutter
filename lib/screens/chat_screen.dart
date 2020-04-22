@@ -43,35 +43,40 @@ class _ChatScreenState extends State<ChatScreen> {
   _buildTextMessage(Message message, bool isMe) {
     final Align msg = Align(
         alignment: isMe ? Alignment.topRight : Alignment.topLeft,
-        child: Container(
-          margin: EdgeInsets.only(
-            top: 8.0,
-            bottom: 8.0,
-          ),
-          padding: EdgeInsets.symmetric(horizontal: 25.0, vertical: 15.0),
-          //width: MediaQuery.of(context).size.width * 0.75,
-          decoration: BoxDecoration(
-            color: isMe
-                ? themeStyle.primaryMessageBoxColor
-                : themeStyle.typeMessageBoxColor,
-            borderRadius: isMe
-                ? BorderRadius.only(
-                    topLeft: Radius.circular(15.0),
-                    bottomLeft: Radius.circular(15.0),
-                  )
-                : BorderRadius.only(
-                    topRight: Radius.circular(15.0),
-                    bottomRight: Radius.circular(15.0),
-                  ),
-          ),
-          child: InkWell(
-            onLongPress: () => _androidShowOptionMessage(message),
-            child: Text(
-              message.message,
-              style: TextStyle(
-                color: themeStyle.primaryTextColorDark,
-                fontSize: 16.0,
-                fontWeight: FontWeight.w600,
+        child: Padding(
+          padding: isMe
+              ? EdgeInsets.only(left: 120.0)
+              : EdgeInsets.only(right: 120.0),
+          child: Container(
+            margin: EdgeInsets.only(
+              top: 8.0,
+              bottom: 8.0,
+            ),
+            padding: EdgeInsets.symmetric(horizontal: 25.0, vertical: 15.0),
+            //width: MediaQuery.of(context).size.width * 0.75,
+            decoration: BoxDecoration(
+              color: isMe
+                  ? themeStyle.primaryMessageBoxColor
+                  : themeStyle.typeMessageBoxColor,
+              borderRadius: isMe
+                  ? BorderRadius.only(
+                      topLeft: Radius.circular(15.0),
+                      bottomLeft: Radius.circular(15.0),
+                    )
+                  : BorderRadius.only(
+                      topRight: Radius.circular(15.0),
+                      bottomRight: Radius.circular(15.0),
+                    ),
+            ),
+            child: InkWell(
+              onLongPress: () => _androidShowOptionMessage(message),
+              child: Text(
+                message.message,
+                style: TextStyle(
+                  color: themeStyle.primaryTextColorDark,
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ),
@@ -121,7 +126,7 @@ class _ChatScreenState extends State<ChatScreen> {
     return msg;
   }
 
-  _buildDeleteMessage (Message message, bool isMe) {
+  _buildDeleteMessage(Message message, bool isMe) {
     final Align msg = Align(
         alignment: isMe ? Alignment.topRight : Alignment.topLeft,
         child: Container(
@@ -136,13 +141,13 @@ class _ChatScreenState extends State<ChatScreen> {
             border: Border.all(color: themeStyle.primaryTextColorLight),
             borderRadius: isMe
                 ? BorderRadius.only(
-              topLeft: Radius.circular(15.0),
-              bottomLeft: Radius.circular(15.0),
-            )
+                    topLeft: Radius.circular(15.0),
+                    bottomLeft: Radius.circular(15.0),
+                  )
                 : BorderRadius.only(
-              topRight: Radius.circular(15.0),
-              bottomRight: Radius.circular(15.0),
-            ),
+                    topRight: Radius.circular(15.0),
+                    bottomRight: Radius.circular(15.0),
+                  ),
           ),
           child: Text(
             message.message,
@@ -221,15 +226,14 @@ class _ChatScreenState extends State<ChatScreen> {
           children: <Widget>[
             message.type == 'photo'
                 ? SimpleDialogOption(
-              child: Text(
-                'Download Photo',
-                style: TextStyle(color: themeStyle.primaryTextColor),
-              ),
-              onPressed: () =>
-                  PhotoService.downloadImage(
-                      message.photoUrl, true,
-                      context: context),
-            )
+                    child: Text(
+                      'Download Photo',
+                      style: TextStyle(color: themeStyle.primaryTextColor),
+                    ),
+                    onPressed: () => PhotoService.downloadImage(
+                        message.photoUrl, true,
+                        context: context),
+                  )
                 : Container(),
             SimpleDialogOption(
               child: Text(
@@ -242,7 +246,10 @@ class _ChatScreenState extends State<ChatScreen> {
                   DatabaseService.deleteMessage(
                       message.id, widget.currentUserId, widget.chatWithUser.id);
                 } else {
-                  Fluttertoast.showToast(msg: 'You can not delete this message', toastLength: Toast.LENGTH_LONG, gravity: ToastGravity.BOTTOM);
+                  Fluttertoast.showToast(
+                      msg: 'You can not delete this message',
+                      toastLength: Toast.LENGTH_LONG,
+                      gravity: ToastGravity.BOTTOM);
                 }
               },
             ),
@@ -307,7 +314,7 @@ class _ChatScreenState extends State<ChatScreen> {
     if (_image != null) {
       String imageUrl = await StorageService.uploadPost(_image);
       Message message = Message(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
           senderUid: widget.currentUserId,
           receiverUid: widget.chatWithUser.id,
           type: 'photo',
@@ -330,7 +337,7 @@ class _ChatScreenState extends State<ChatScreen> {
       String message = _textEditingController.text;
       _textEditingController.clear();
       Message _messageText = Message(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
           senderUid: widget.currentUserId,
           receiverUid: widget.chatWithUser.id,
           type: 'text',
@@ -356,13 +363,39 @@ class _ChatScreenState extends State<ChatScreen> {
       backgroundColor: themeStyle.primaryBackgroundColor,
       appBar: AppBar(
         backgroundColor: themeStyle.primaryBackgroundColor,
-        title: Text(
-          widget.chatWithUser.name,
-          style: TextStyle(
-            fontSize: 28.0,
-            fontWeight: FontWeight.bold,
-            color: themeStyle.primaryTextColor,
-          ),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                  border: Border.all(
+                      width: 1.5,
+                      color: widget.chatWithUser.isActive
+                          ? Color(0xFFFE8057)
+                          : Colors.grey),
+                  image: DecorationImage(
+                    image: widget.chatWithUser.profileImageUrl.isEmpty
+                        ? AssetImage('assets/images/user_placeholder.jpg')
+                        : CachedNetworkImageProvider(
+                            widget.chatWithUser.profileImageUrl),
+                    fit: BoxFit.cover
+                  )),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                widget.chatWithUser.name,
+                style: TextStyle(
+                  fontSize: 28.0,
+                  fontWeight: FontWeight.bold,
+                  color: themeStyle.primaryTextColor,
+                ),
+              ),
+            ),
+          ],
         ),
         elevation: 0.0,
         actions: <Widget>[
@@ -410,15 +443,18 @@ class _ChatScreenState extends State<ChatScreen> {
                             return message.type == 'text'
                                 ? _buildTextMessage(message, isMe)
                                 : message.type == 'photo'
-                                ? _buildImageMessage(message, isMe)
-                                : _buildDeleteMessage(message, isMe);
+                                    ? _buildImageMessage(message, isMe)
+                                    : _buildDeleteMessage(message, isMe);
                           },
                         ),
                       );
-                    }
-                    else {
+                    } else {
                       return Center(
-                        child: Text('No Message', style: TextStyle(fontSize: 30, color: themeStyle.primaryTextColor),),
+                        child: Text(
+                          'No Message',
+                          style: TextStyle(
+                              fontSize: 30, color: themeStyle.primaryTextColor),
+                        ),
                       );
                     }
                   }),
