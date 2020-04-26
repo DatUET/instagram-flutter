@@ -6,6 +6,7 @@ class User {
   final String profileImageUrl;
   final String email;
   final String bio;
+  final String type;
   final bool isActive;
 
   User({
@@ -14,6 +15,7 @@ class User {
     this.profileImageUrl,
     this.email,
     this.bio,
+    this.type,
     this.isActive,
   });
 
@@ -24,6 +26,7 @@ class User {
       profileImageUrl: doc['profileImageUrl'],
       email: doc['email'],
       bio: doc['bio'] ?? '',
+      type: doc['type'],
       isActive: doc['isActive'],
     );
   }

@@ -52,6 +52,8 @@ dependencies:
   firebase_messaging: ^6.0.13
   flutter_local_notifications: ^1.4.1
   google_sign_in: ^4.4.3
+  outline_material_icons: ^0.1.1
+
 
 dev_dependencies:
   flutter_test:

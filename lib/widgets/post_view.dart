@@ -11,6 +11,7 @@ import 'package:instagram_v2/screens/comments_screen.dart';
 import 'package:instagram_v2/screens/profile_screen.dart';
 import 'package:instagram_v2/services/database_service.dart';
 import 'package:instagram_v2/services/photo_service.dart';
+import 'package:instagram_v2/utilities/constants.dart';
 import 'package:provider/provider.dart';
 
 class PostView extends StatefulWidget {
@@ -116,7 +117,7 @@ class _PostViewState extends State<PostView>
                         border: Border.all(
                             width: 1.5,
                             color: widget.author.isActive
-                                ? Color(0xFFFE8057)
+                                ? mainColor
                                 : Colors.grey),
                         image: DecorationImage(
                             image: widget.author.profileImageUrl.isEmpty

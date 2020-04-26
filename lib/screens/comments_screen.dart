@@ -22,7 +22,7 @@ class CommentsScreen extends StatefulWidget {
 class _CommentsScreenState extends State<CommentsScreen> {
   final TextEditingController _commentController = TextEditingController();
   bool _isCommenting = false;
-  var themeData;
+  var themeStyle;
 
   _buildComment(Comment comment) {
     return FutureBuilder(
@@ -39,7 +39,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
             decoration: BoxDecoration(
                 color: Colors.grey,
                 borderRadius: BorderRadius.all(Radius.circular(15)),
-                border: Border.all(width: 1.5, color: author.isActive ? Color(0xFFFE8057) : Colors.grey),
+                border: Border.all(width: 1.5, color: author.isActive ? mainColor : Colors.grey),
                 image: DecorationImage(image: author.profileImageUrl.isEmpty
                     ? AssetImage('assets/images/user_placeholder.jpg')
                     : CachedNetworkImageProvider(
@@ -48,19 +48,19 @@ class _CommentsScreenState extends State<CommentsScreen> {
           ),
           title: Text(
             author.name,
-            style: TextStyle(color: themeData.primaryTextColor),
+            style: TextStyle(color: themeStyle.primaryTextColor),
           ),
           subtitle: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
                 comment.content,
-                style: TextStyle(color: themeData.primaryTextColor),
+                style: TextStyle(color: themeStyle.primaryTextColor),
               ),
               SizedBox(height: 6.0),
               Text(
                 DateFormat.yMd().add_jm().format(comment.timestamp.toDate()),
-                style: TextStyle(color: themeData.primaryTextColor),
+                style: TextStyle(color: themeStyle.primaryTextColor),
               ),
             ],
           ),
@@ -87,7 +87,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
               child: TextField(
                 controller: _commentController,
                 textCapitalization: TextCapitalization.sentences,
-                style: TextStyle(color: themeData.primaryTextColor),
+                style: TextStyle(color: themeStyle.primaryTextColor),
                 onChanged: (comment) {
                   setState(() {
                     _isCommenting = comment.length > 0;
@@ -95,7 +95,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
                 },
                 decoration: InputDecoration.collapsed(
                     hintText: 'Write a comment...',
-                    hintStyle: TextStyle(color: themeData.primaryTextColor)),
+                    hintStyle: TextStyle(color: themeStyle.primaryTextColor)),
               ),
             ),
             Container(
@@ -103,7 +103,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
               child: IconButton(
                 icon: Icon(
                   Icons.send,
-                  color: themeData.primaryIconColor,
+                  color: themeStyle.primaryIconColor,
                 ),
                 onPressed: () {
                   if (_isCommenting) {
@@ -128,14 +128,15 @@ class _CommentsScreenState extends State<CommentsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    themeData = Provider.of<UserData>(context);
+    themeStyle = Provider.of<UserData>(context);
     return Scaffold(
-      backgroundColor: themeData.primaryBackgroundColor,
+      backgroundColor: themeStyle.primaryBackgroundColor,
       appBar: AppBar(
-        backgroundColor: themeData.primaryBackgroundColor,
+        backgroundColor: themeStyle.primaryBackgroundColor,
+        iconTheme: IconThemeData(color: themeStyle.primaryIconColor),
         title: Text(
           'Comments',
-          style: TextStyle(color: themeData.primaryTextColor),
+          style: TextStyle(color: themeStyle.primaryTextColor),
         ),
       ),
       body: Column(
@@ -145,7 +146,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
             child: Text(
               '${widget.likeCount} likes',
               style: TextStyle(
-                color: themeData.primaryTextColor,
+                color: themeStyle.primaryTextColor,
                 fontSize: 20.0,
                 fontWeight: FontWeight.w600,
               ),

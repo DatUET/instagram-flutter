@@ -33,6 +33,7 @@ class _PreviewPhotoScreenState extends State<PreviewPhotoScreen> {
     return Scaffold(
       backgroundColor: themeStyle.primaryBackgroundColor,
       appBar: AppBar(
+        iconTheme: IconThemeData(color: themeStyle.primaryIconColor),
         actions: <Widget>[
           IconButton(
               icon: Icon(

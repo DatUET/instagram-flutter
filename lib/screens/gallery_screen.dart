@@ -46,6 +46,7 @@ class _GalleyScreenState extends State<GalleyScreen>
       backgroundColor: themeStyle.primaryBackgroundColor,
       appBar: AppBar(
         backgroundColor: themeStyle.primaryBackgroundColor,
+        iconTheme: IconThemeData(color: themeStyle.primaryIconColor),
         title: Text(
           'Photogram',
           style: TextStyle(

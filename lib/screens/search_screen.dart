@@ -55,6 +55,7 @@ class _SearchScreenState extends State<SearchScreen> {
     return Scaffold(
       backgroundColor: themeStyle.primaryBackgroundColor,
       appBar: AppBar(
+        iconTheme: IconThemeData(color: themeStyle.primaryIconColor),
         backgroundColor: themeStyle.primaryBackgroundColor,
         title: TextField(
           controller: _searchController,

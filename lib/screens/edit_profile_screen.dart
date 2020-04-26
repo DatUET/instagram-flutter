@@ -2,11 +2,15 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:instagram_v2/models/user_data.dart';
 import 'package:instagram_v2/models/user_model.dart';
+import 'package:instagram_v2/screens/change_password_screen.dart';
 import 'package:instagram_v2/services/database_service.dart';
 import 'package:instagram_v2/services/storage_service.dart';
+import 'package:instagram_v2/utilities/constants.dart';
+import 'package:outline_material_icons/outline_material_icons.dart';
 import 'package:provider/provider.dart';
 
 class EditProfileScreen extends StatefulWidget {
@@ -100,6 +104,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       backgroundColor: themeStyle.primaryBackgroundColor,
       appBar: AppBar(
         backgroundColor: themeStyle.primaryBackgroundColor,
+        iconTheme: IconThemeData(color: themeStyle.primaryIconColor),
         title: Text(
           'Edit Profile',
           style: TextStyle(color: themeStyle.primaryTextColor),
@@ -111,8 +116,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           children: <Widget>[
             _isLoading
                 ? LinearProgressIndicator(
-                    backgroundColor: Colors.blue[200],
-                    valueColor: AlwaysStoppedAnimation(Colors.blue),
+                    backgroundColor: Color(0xFFFBBDA9),
+                    valueColor: AlwaysStoppedAnimation(mainColor),
                   )
                 : SizedBox.shrink(),
             Padding(
@@ -121,23 +126,36 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 key: _formKey,
                 child: Column(
                   children: <Widget>[
-                    Container(
-                      width: 120.0,
-                      height: 120.0,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(30)),
-                        border: Border.all(color: Color(0xFFFE8057), width: 2),
-                        image: DecorationImage(image: _displayProfileImage(), fit: BoxFit.cover)
-                      ),
-                    ),
-                    FlatButton(
-                      onPressed: _handleImageFromGallery,
-                      child: Text(
-                        'Change Profile Image',
-                        style: TextStyle(
-                            color: Theme.of(context).accentColor,
-                            fontSize: 16.0),
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        Container(
+                          width: 64,
+                        ),
+                        Container(
+                          width: 120.0,
+                          height: 120.0,
+                          decoration: BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(30)),
+                              border: Border.all(color: mainColor, width: 2),
+                              image: DecorationImage(
+                                  image: _displayProfileImage(),
+                                  fit: BoxFit.cover)),
+                        ),
+                        Container(
+                          height: 64,
+                          width: 64,
+                          decoration: BoxDecoration(
+                              color: Colors.grey, shape: BoxShape.circle),
+                          child: IconButton(
+                              icon: Icon(
+                                OMIcons.addAPhoto,
+                                size: 32,
+                              ),
+                              onPressed: _handleImageFromGallery),
+                        ),
+                      ],
                     ),
                     TextFormField(
                       initialValue: _name,
@@ -145,10 +163,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           fontSize: 18.0, color: themeStyle.primaryTextColor),
                       decoration: InputDecoration(
                           icon: Icon(
-                            Icons.person,
+                            OMIcons.person,
                             size: 30.0,
                             color: themeStyle.primaryIconColor,
                           ),
+                          focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: mainColor)),
                           labelText: 'Name',
                           labelStyle:
                               TextStyle(color: themeStyle.primaryTextColor)),
@@ -163,10 +183,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           fontSize: 18.0, color: themeStyle.primaryTextColor),
                       decoration: InputDecoration(
                           icon: Icon(
-                            Icons.book,
+                            OMIcons.bookmarkBorder,
                             size: 30.0,
                             color: themeStyle.primaryIconColor,
                           ),
+                          focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: mainColor)),
                           labelText: 'Bio',
                           labelStyle:
                               TextStyle(color: themeStyle.primaryTextColor)),
@@ -175,17 +197,32 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           : null,
                       onSaved: (input) => _bio = input,
                     ),
-                    Container(
-                      margin: EdgeInsets.all(40.0),
-                      height: 40.0,
-                      width: 250.0,
-                      child: FlatButton(
-                        onPressed: _submit,
-                        color: Colors.blue,
-                        textColor: Colors.white,
-                        child: Text(
-                          'Save Profile',
-                          style: TextStyle(fontSize: 18.0),
+                    GestureDetector(
+                      onTap: _submit,
+                      child: Container(
+                        margin: EdgeInsets.all(40.0),
+                        height: 40.0,
+                        width: 250.0,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            gradient: LinearGradient(colors: [
+                              mainColor.withOpacity(.6),
+                              mainColor.withOpacity(1),
+                            ]),
+                            boxShadow: [
+                              BoxShadow(
+                                  color: mainColor.withOpacity(.4),
+                                  blurRadius: 20,
+                                  offset: Offset(0, 10))
+                            ]),
+                        child: Center(
+                          child: Text(
+                            'Save Profile',
+                            style: TextStyle(
+                                color: themeStyle.primaryTextColor,
+                                fontSize: 18.0,
+                                fontWeight: FontWeight.w500),
+                          ),
                         ),
                       ),
                     ),
@@ -198,19 +235,50 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ),
             Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: Column(
                 children: <Widget>[
-                  Text(
-                    'Dark Theme',
-                    style: TextStyle(
-                        color: themeStyle.primaryTextColor, fontSize: 18.0),
+                  InkWell(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text(
+                          'Change Password',
+                          style: TextStyle(
+                              color: themeStyle.primaryTextColor,
+                              fontSize: 18.0),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Icon(
+                            OMIcons.arrowForwardIos,
+                            color: themeStyle.primaryIconColor,
+                          ),
+                        )
+                      ],
+                    ),
+                    onTap: () =>
+                        widget.user.type == 'Custom' ? Navigator.of(context).push(MaterialPageRoute(builder: (_) => ChangePassScreen(user: widget.user,)))
+                    : Fluttertoast.showToast(msg: "This is Google Account.\nYou can't change password", toastLength: Toast.LENGTH_LONG),
                   ),
-                  Switch(
-                      value: themeStyle.mode == 1,
-                      onChanged: (value) {
-                        themeStyle.switchMode();
-                      })
+                  SizedBox(
+                    height: 16,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Text(
+                        'Dark Theme',
+                        style: TextStyle(
+                            color: themeStyle.primaryTextColor, fontSize: 18.0),
+                      ),
+                      Switch(
+                          activeColor: mainColor,
+                          value: themeStyle.mode == 1,
+                          onChanged: (value) {
+                            themeStyle.switchMode();
+                          })
+                    ],
+                  ),
                 ],
               ),
             )

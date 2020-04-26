@@ -206,7 +206,6 @@ class DatabaseService {
     List<Activity> activity = userActivitiesSnapshot.documents
         .map((doc) => Activity.fromDoc(doc))
         .toList();
-    print('${userActivitiesSnapshot.documents[0].data} - $userId');
     return activity;
   }
 
@@ -269,9 +268,14 @@ class DatabaseService {
   }
 
   static Stream<List<Message>> getAllRecentChat(String userId) async* {
-    await for(QuerySnapshot snap in recentChatRef.document(userId).collection("history").orderBy('timestamp', descending: true).snapshots()) {
+    await for (QuerySnapshot snap in recentChatRef
+        .document(userId)
+        .collection("history")
+        .orderBy('timestamp', descending: true)
+        .snapshots()) {
       try {
-        List<Message> recentChats = snap.documents.map((doc)=>Message.fromMap(doc)).toList();
+        List<Message> recentChats =
+            snap.documents.map((doc) => Message.fromMap(doc)).toList();
         yield recentChats;
       } catch (e) {
         print(e);
@@ -296,10 +300,10 @@ class DatabaseService {
     }
   }
 
-  static Future<void> deleteMessage(String messageId, String currentUserId, String chatWithUserId) async {
-    QuerySnapshot deleteMessageSnapshot = await messageRef
-        .where('id', isEqualTo: messageId)
-        .getDocuments();
+  static Future<void> deleteMessage(
+      String messageId, String currentUserId, String chatWithUserId) async {
+    QuerySnapshot deleteMessageSnapshot =
+        await messageRef.where('id', isEqualTo: messageId).getDocuments();
     if (deleteMessageSnapshot.documents.isNotEmpty) {
       String docId = deleteMessageSnapshot.documents[0].documentID;
       await messageRef.document(docId).updateData({
@@ -311,7 +315,8 @@ class DatabaseService {
     deleteRecentChat(messageId, currentUserId, chatWithUserId);
   }
 
-  static Future<void> deleteRecentChat(String messageId, String currentUserId, String chatWithUserId) async {
+  static Future<void> deleteRecentChat(
+      String messageId, String currentUserId, String chatWithUserId) async {
     List<String> ids = [currentUserId, chatWithUserId];
     for (String id in ids) {
       QuerySnapshot recentChatQuery = await recentChatRef
@@ -328,7 +333,8 @@ class DatabaseService {
             .updateData({
           'message': 'This message was deleted',
           'type': 'delete',
-          'photoUrl': ''});
+          'photoUrl': ''
+        });
       }
     }
   }
@@ -342,7 +348,7 @@ class DatabaseService {
   }
 
   static Future<void> updateToken(String currentUserId, String token) async {
-    await tokenRef.document(currentUserId).setData({currentUserId : token});
+    await tokenRef.document(currentUserId).setData({currentUserId: token});
   }
 
   static void updateActive(String userId, bool isActive) {

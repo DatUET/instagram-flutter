@@ -12,6 +12,7 @@ import 'package:instagram_v2/models/user_model.dart';
 import 'package:instagram_v2/services/database_service.dart';
 import 'package:instagram_v2/services/photo_service.dart';
 import 'package:instagram_v2/services/storage_service.dart';
+import 'package:instagram_v2/utilities/constants.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -362,6 +363,7 @@ class _ChatScreenState extends State<ChatScreen> {
     return Scaffold(
       backgroundColor: themeStyle.primaryBackgroundColor,
       appBar: AppBar(
+        iconTheme: IconThemeData(color: themeStyle.primaryIconColor),
         backgroundColor: themeStyle.primaryBackgroundColor,
         title: Row(
           mainAxisSize: MainAxisSize.min,
@@ -374,7 +376,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   border: Border.all(
                       width: 1.5,
                       color: widget.chatWithUser.isActive
-                          ? Color(0xFFFE8057)
+                          ? mainColor
                           : Colors.grey),
                   image: DecorationImage(
                     image: widget.chatWithUser.profileImageUrl.isEmpty

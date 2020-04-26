@@ -7,6 +7,7 @@ import 'package:instagram_v2/models/user_data.dart';
 import 'package:instagram_v2/models/user_model.dart';
 import 'package:instagram_v2/screens/chat_screen.dart';
 import 'package:instagram_v2/services/database_service.dart';
+import 'package:instagram_v2/utilities/constants.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -53,7 +54,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                     borderRadius: BorderRadius.all(Radius.circular(15.0)),
                     border: Border.all(
                         width: 1.5,
-                        color: user.isActive ? Color(0xFFFE8057) : Colors.grey),
+                        color: user.isActive ? mainColor : Colors.grey),
                     image: DecorationImage(
                       image: user.profileImageUrl.isEmpty
                           ? AssetImage('assets/images/user_placeholder.jpg')
@@ -119,6 +120,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
     return Scaffold(
       backgroundColor: themeStyle.primaryBackgroundColor,
       appBar: AppBar(
+        iconTheme: IconThemeData(color: themeStyle.primaryIconColor),
         backgroundColor: themeStyle.primaryBackgroundColor,
         title: Text(
           'Photogram',

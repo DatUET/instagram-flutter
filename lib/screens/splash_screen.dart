@@ -45,9 +45,16 @@ class _SplashScreenState extends State<SplashScreen> {
     await Future.delayed(Duration(milliseconds: 3300), () {});
     FirebaseUser user = await FirebaseAuth.instance.currentUser();
     if (user != null) {
-      Provider.of<UserData>(context).currentUserId = user.uid.toString();
-      currentUserId = user.uid.toString();
-      return true;
+      if (user.isEmailVerified) {
+        Provider
+            .of<UserData>(context)
+            .currentUserId = user.uid.toString();
+        currentUserId = user.uid.toString();
+        return true;
+      }
+      else {
+        return false;
+      }
     } else {
       return false;
     }

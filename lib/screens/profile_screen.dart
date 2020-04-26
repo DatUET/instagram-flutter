@@ -1,5 +1,4 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram_v2/animations/bouncy_page_route.dart';
 import 'package:instagram_v2/animations/fadeanimationup.dart';
@@ -418,7 +417,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               border: Border.all(
                                   width: 2,
                                   color: user.isActive
-                                      ? Color(0xFFFE8057)
+                                      ? mainColor
                                       : Colors.grey),
                               image: DecorationImage(
                                 image: user.profileImageUrl.isEmpty

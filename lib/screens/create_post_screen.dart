@@ -11,6 +11,7 @@ import 'package:instagram_v2/models/user_data.dart';
 import 'package:instagram_v2/services/database_service.dart';
 import 'package:instagram_v2/services/location.dart';
 import 'package:instagram_v2/services/storage_service.dart';
+import 'package:instagram_v2/utilities/constants.dart';
 import 'package:provider/provider.dart';
 
 class CreatePostScreen extends StatefulWidget {
@@ -297,12 +298,12 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
                           gradient: LinearGradient(colors: [
-                            Color.fromRGBO(143, 148, 251, .6),
-                            Color.fromRGBO(143, 148, 251, 1),
+                            mainColor.withOpacity(.6),
+                            mainColor.withOpacity(1),
                           ]),
                           boxShadow: [
                             BoxShadow(
-                                color: Color.fromRGBO(143, 148, 251, .4),
+                                color: mainColor.withOpacity(.4),
                                 blurRadius: 20,
                                 offset: Offset(0, 10))
                           ]),

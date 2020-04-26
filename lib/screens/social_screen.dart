@@ -25,7 +25,6 @@ class _SocialScreenState extends State<SocialScreen>
     with SingleTickerProviderStateMixin {
   ScrollController _scrollViewController;
   TabController _tabController;
-  int _currentTab = 0;
 
   @override
   void initState() {
@@ -86,7 +85,7 @@ class _SocialScreenState extends State<SocialScreen>
                             decoration: BoxDecoration(
                                 border: Border.all(width: 2, color: Colors.white),
                                 shape: BoxShape.circle,
-                                color: Color(0xFFFE8057)
+                                color: mainColor
                             ),
                           ),
                         )
@@ -152,7 +151,7 @@ class _SocialScreenState extends State<SocialScreen>
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
                               border: Border.all(
-                                  color: Color(0xFFFE8057), width: 1.5),
+                                  color: mainColor, width: 1.5),
                               image: DecorationImage(
                                   image: user.profileImageUrl.isEmpty
                                       ? AssetImage(
@@ -188,42 +187,28 @@ class _SocialScreenState extends State<SocialScreen>
                 indicator: ShapeDecoration(
                   shape: UnderlineInputBorder(
                       borderSide: BorderSide(
-                          color: Color(0xFFFE8057),
+                          color: mainColor,
                           width: 4.0,
                           style: BorderStyle.solid)),
                 ),
-                labelColor: Color(0xFFFE8057),
+                labelColor: mainColor,
                 unselectedLabelColor: themeStyle.primaryIconColor,
-                onTap: (index) {
-                  setState(() {
-                    _currentTab = index;
-                  });
-                },
                 tabs: <Tab>[
                   new Tab(
                     icon: new Icon(
                       Icons.public,
-                      color: _currentTab == 0
-                          ? Color(0xFFFE8057)
-                          : themeStyle.primaryIconColor,
                     ),
                     text: 'Feed',
                   ),
                   new Tab(
                     icon: new Icon(
                       Icons.add_circle_outline,
-                      color: _currentTab == 1
-                          ? Color(0xFFFE8057)
-                          : themeStyle.primaryIconColor,
                     ),
                     text: 'Add Post',
                   ),
                   new Tab(
                     icon: new Icon(
                       Icons.notifications_none,
-                      color: _currentTab == 2
-                          ? Color(0xFFFE8057)
-                          : themeStyle.primaryIconColor,
                     ),
                     text: 'Notification',
                   ),

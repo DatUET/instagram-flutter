@@ -3,6 +3,8 @@ import 'package:instagram_v2/animations/fadeanimationdown.dart';
 import 'package:instagram_v2/models/user_data.dart';
 import 'package:instagram_v2/screens/signup_screen.dart';
 import 'package:instagram_v2/services/auth_service.dart';
+import 'package:instagram_v2/utilities/constants.dart';
+import 'package:outline_material_icons/outline_material_icons.dart';
 import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -14,21 +16,42 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  String _email, _password;
-  bool _isLoading = false, _isSccuess = true;
+  final _formKeyForgotPass = GlobalKey<FormState>();
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+  String _email, _password, _emailForgot;
+  bool _isLoading = false, _isValid = false;
+  int _codeLogin = -1;
   var themeStyle;
+  bool isSentPasswordReset = false;
+  bool _hidePassword = true;
 
   _submit(BuildContext context) async {
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
       // Logging in the user w/ Firebase
       setState(() {
+        _isValid = true;
         _isLoading = true;
       });
-      bool isSccuess = await AuthService.login(_email, _password, context);
-      if (!isSccuess) {
+      int codeLogin = await AuthService.login(_email, _password, context);
+      setState(() {
+        _isLoading = false;
+        _codeLogin = codeLogin;
+      });
+    }
+  }
+
+  _sendEmailForgotPass(BuildContext context) async {
+    if (_formKeyForgotPass.currentState.validate()) {
+      _formKeyForgotPass.currentState.save();
+      bool isSent = await AuthService.sendEmailResetPassword(_emailForgot);
+      if (isSent) {
         setState(() {
-          _isSccuess = isSccuess;
+          Navigator.pop(context);
+          _scaffoldKey.currentState.showSnackBar(SnackBar(
+            content: Text('Please check email $_emailForgot.'),
+            action: SnackBarAction(label: 'Ok', onPressed: () {}),
+          ));
         });
       }
     }
@@ -36,15 +59,123 @@ class _LoginScreenState extends State<LoginScreen> {
 
   _okError() {
     setState(() {
-      _isLoading = false;
-      _isSccuess = true;
+      _isValid = false;
     });
+  }
+
+  _showForgotPass(BuildContext context) {
+    showModalBottomSheet(
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        context: context,
+        builder: (context) {
+          return AnimatedPadding(
+            duration: const Duration(milliseconds: 100),
+            padding: MediaQuery.of(context).viewInsets,
+            child: Container(
+              height: 300,
+              decoration: BoxDecoration(
+                  color: themeStyle.primaryBackgroundColor,
+                  borderRadius: BorderRadius.only(
+                      topLeft: const Radius.circular(20),
+                      topRight: const Radius.circular(20))),
+              child: Column(
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.only(top: 32.0),
+                    child: ShaderMask(
+                      shaderCallback: (bounds) => LinearGradient(
+                          begin: Alignment.bottomLeft,
+                          end: Alignment.topRight,
+                          colors: [
+                            Color.fromRGBO(143, 148, 251, 1),
+                            Color.fromRGBO(143, 148, 251, .6),
+                          ]).createShader(bounds),
+                      child: Text(
+                        'Reset Password',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        right: 16.0, left: 16.0, top: 32.0),
+                    child: Text('Enter your registered email address',
+                        style: TextStyle(
+                            color: themeStyle.primaryTextColor, fontSize: 18)),
+                  ),
+                  Form(
+                    key: _formKeyForgotPass,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 30.0,
+                        vertical: 10.0,
+                      ),
+                      child: TextFormField(
+                        keyboardType: TextInputType.emailAddress,
+                        style: TextStyle(color: themeStyle.primaryTextColor),
+                        decoration: InputDecoration(
+                            labelText: 'Email',
+                            labelStyle:
+                                TextStyle(color: themeStyle.primaryTextColor)),
+                        validator: (input) => !input.contains('@')
+                            ? 'Please enter a valid email'
+                            : null,
+                        onSaved: (input) => _emailForgot = input,
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  isSentPasswordReset
+                      ? Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 20.0),
+                          child: Text(
+                              'We sent email to reset password. Please check email $_emailForgot'),
+                        )
+                      : Container(),
+                  Container(
+                    margin: EdgeInsets.symmetric(horizontal: 60),
+                    height: 50,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        gradient: LinearGradient(colors: [
+                          Color.fromRGBO(143, 148, 251, 1),
+                          Color.fromRGBO(143, 148, 251, .6),
+                        ]),
+                        boxShadow: [
+                          BoxShadow(
+                              color: Color.fromRGBO(143, 148, 251, .4),
+                              blurRadius: 20,
+                              offset: Offset(0, 10))
+                        ]),
+                    child: FlatButton(
+                      onPressed: () => _sendEmailForgotPass(context),
+                      child: Center(
+                        child: Text(
+                          'Send email',
+                          style: TextStyle(
+                              color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
   }
 
   @override
   Widget build(BuildContext context) {
     themeStyle = Provider.of<UserData>(context);
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: themeStyle.primaryBackgroundColor,
       body: Stack(
         children: <Widget>[
@@ -56,7 +187,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     height: 330,
                     decoration: BoxDecoration(
                         image: DecorationImage(
-                            image: AssetImage('assets/images/background.png'),
+                            image:
+                                AssetImage('assets/images/background.png'),
                             fit: BoxFit.fill)),
                     child: Stack(
                       children: <Widget>[
@@ -136,7 +268,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 borderRadius: BorderRadius.circular(10),
                                 boxShadow: [
                                   BoxShadow(
-                                      color: Color.fromRGBO(143, 148, 251, .2),
+                                      color: mainColor.withOpacity(.2),
                                       blurRadius: 20,
                                       offset: Offset(0, 10))
                                 ]),
@@ -151,18 +283,25 @@ class _LoginScreenState extends State<LoginScreen> {
                                         children: <Widget>[
                                           Padding(
                                             padding: EdgeInsets.symmetric(
-                                              horizontal: 30.0,
+                                              horizontal: 15.0,
                                               vertical: 10.0,
                                             ),
                                             child: TextFormField(
+                                              keyboardType:
+                                                  TextInputType.emailAddress,
                                               style: TextStyle(
                                                   color: themeStyle
                                                       .primaryTextColor),
                                               decoration: InputDecoration(
-                                                  labelText: 'Email',
-                                                  labelStyle: TextStyle(
-                                                      color: themeStyle
-                                                          .primaryTextColor)),
+                                                labelText: 'Email',
+                                                labelStyle: TextStyle(
+                                                    color: themeStyle
+                                                        .primaryTextColor),
+                                                focusedBorder:
+                                                    UnderlineInputBorder(
+                                                        borderSide: BorderSide(
+                                                            color: mainColor)),
+                                              ),
                                               validator: (input) => !input
                                                       .contains('@')
                                                   ? 'Please enter a valid email'
@@ -173,19 +312,41 @@ class _LoginScreenState extends State<LoginScreen> {
                                           ),
                                           Padding(
                                             padding: EdgeInsets.symmetric(
-                                              horizontal: 30.0,
+                                              horizontal: 15.0,
                                               vertical: 10.0,
                                             ),
                                             child: TextFormField(
+                                              keyboardType:
+                                                  TextInputType.visiblePassword,
                                               style: TextStyle(
                                                   color: themeStyle
                                                       .primaryTextColor),
                                               decoration: InputDecoration(
-                                                labelText: 'Password',
-                                                labelStyle: TextStyle(
-                                                    color: themeStyle
-                                                        .primaryTextColor),
-                                              ),
+                                                  labelText: 'Password',
+                                                  labelStyle: TextStyle(
+                                                      color: themeStyle
+                                                          .primaryTextColor),
+                                                  focusedBorder:
+                                                      UnderlineInputBorder(
+                                                          borderSide: BorderSide(
+                                                              color:
+                                                                  mainColor)),
+                                                  suffixIcon: GestureDetector(
+                                                    onTap: () {
+                                                      setState(() {
+                                                        _hidePassword =
+                                                            !_hidePassword;
+                                                      });
+                                                    },
+                                                    child: Icon(
+                                                      _hidePassword
+                                                          ? OMIcons.visibility
+                                                          : OMIcons
+                                                              .visibilityOff,
+                                                      color: themeStyle
+                                                          .primaryIconColor,
+                                                    ),
+                                                  )),
                                               validator: (input) => input
                                                           .length <
                                                       6
@@ -193,7 +354,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                                   : null,
                                               onSaved: (input) =>
                                                   _password = input,
-                                              obscureText: true,
+                                              obscureText: _hidePassword,
                                             ),
                                           ),
                                         ]),
@@ -210,11 +371,14 @@ class _LoginScreenState extends State<LoginScreen> {
                             2,
                             Align(
                               alignment: Alignment.centerRight,
-                              child: Text(
-                                'Forgot Password?',
-                                style: TextStyle(
-                                    color: Color.fromRGBO(143, 148, 251, 1),
-                                    fontWeight: FontWeight.bold),
+                              child: GestureDetector(
+                                onTap: () => _showForgotPass(context),
+                                child: Text(
+                                  'Forgot Password?',
+                                  style: TextStyle(
+                                      color: mainColor,
+                                      fontWeight: FontWeight.bold),
+                                ),
                               ),
                             )),
                         SizedBox(
@@ -228,12 +392,12 @@ class _LoginScreenState extends State<LoginScreen> {
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(10),
                                 gradient: LinearGradient(colors: [
-                                  Color.fromRGBO(143, 148, 251, 1),
-                                  Color.fromRGBO(143, 148, 251, .6),
+                                  mainColor.withOpacity(1),
+                                  mainColor.withOpacity(.6)
                                 ]),
                                 boxShadow: [
                                   BoxShadow(
-                                      color: Color.fromRGBO(143, 148, 251, .4),
+                                      color: mainColor.withOpacity(.4),
                                       blurRadius: 20,
                                       offset: Offset(0, 10))
                                 ]),
@@ -261,12 +425,12 @@ class _LoginScreenState extends State<LoginScreen> {
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(10),
                                 gradient: LinearGradient(colors: [
-                                  Color.fromRGBO(143, 148, 251, .6),
-                                  Color.fromRGBO(143, 148, 251, 1),
+                                  mainColor.withOpacity(.6),
+                                  mainColor.withOpacity(1),
                                 ]),
                                 boxShadow: [
                                   BoxShadow(
-                                      color: Color.fromRGBO(143, 148, 251, .4),
+                                      color: mainColor.withOpacity(.4),
                                       blurRadius: 20,
                                       offset: Offset(0, 10))
                                 ]),
@@ -287,15 +451,19 @@ class _LoginScreenState extends State<LoginScreen> {
                         SizedBox(
                           height: 10,
                         ),
-                        Text(
-                          'Or',
-                          style: TextStyle(color: themeStyle.primaryTextColor),
+                        FadeAnimation(
+                          2.6,
+                          Text(
+                            'Or',
+                            style:
+                                TextStyle(color: themeStyle.primaryTextColor),
+                          ),
                         ),
                         SizedBox(
                           height: 10,
                         ),
                         FadeAnimation(
-                          2.6,
+                          2.8,
                           Container(
                             margin: EdgeInsets.symmetric(horizontal: 60),
                             height: 50,
@@ -321,7 +489,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     child: Text(
                                       'Sign In Google',
                                       style: TextStyle(
-                                          color: Colors.white,
+                                          color: themeStyle.primaryTextColor,
                                           fontWeight: FontWeight.bold),
                                     ),
                                   ),
@@ -337,99 +505,130 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
           ),
-          _isLoading
+          _isValid
               ? Container(
-                  width: double.infinity,
-                  height: double.infinity,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.withOpacity(.5),
-                  ),
-                  child: Center(
-                    child: Container(
-                      height: 180,
-                      width: 180,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          color: themeStyle.primaryBackgroundColor),
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                            left: 20.0, right: 20, bottom: 15, top: 15),
-                        child: _isSccuess
-                            ? Column(
-                                children: <Widget>[
-                                  SizedBox(
-                                    height: 20,
-                                  ),
-                                  CircularProgressIndicator(),
-                                  SizedBox(
-                                    height: 35,
-                                  ),
-                                  Center(
-                                      child: Text(
-                                    'Logging in!\n Please wait....',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        color: themeStyle.primaryTextColor,
-                                        fontSize: 20),
-                                  ))
-                                ],
-                              )
-                            : Column(
-                                children: <Widget>[
-                                  Icon(
-                                    Icons.error_outline,
-                                    color: Colors.red,
-                                    size: 40,
-                                  ),
-                                  SizedBox(
-                                    height: 10,
-                                  ),
-                                  Center(
-                                      child: Text(
-                                    'Email or Password is not match',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        color: themeStyle.primaryTextColor,
-                                        fontSize: 17),
-                                  )),
-                                  SizedBox(
-                                    height: 10,
-                                  ),
-                                  Center(
-                                    child: Container(
-                                      height: 30,
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          gradient: LinearGradient(colors: [
-                                            Color.fromRGBO(143, 148, 251, 1),
-                                            Color.fromRGBO(143, 148, 251, .6),
-                                          ]),
-                                          boxShadow: [
-                                            BoxShadow(
-                                                color: Color.fromRGBO(
-                                                    143, 148, 251, .4),
-                                                blurRadius: 20,
-                                                offset: Offset(0, 10))
-                                          ]),
-                                      child: FlatButton(
-                                        onPressed: () => _okError(),
-                                        child: Center(
-                                          child: Text(
-                                            'OK',
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                            ),
+                  child: _isLoading
+                      ? Container(
+                          width: double.infinity,
+                          height: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Colors.grey.withOpacity(.5),
+                          ),
+                          child: Center(
+                            child: Container(
+                              height: 180,
+                              width: 180,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20),
+                                  color: themeStyle.primaryBackgroundColor),
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 20.0, right: 20, bottom: 15, top: 15),
+                                child: Column(
+                                  children: <Widget>[
+                                    SizedBox(
+                                      height: 20,
+                                    ),
+                                    CircularProgressIndicator(),
+                                    SizedBox(
+                                      height: 35,
+                                    ),
+                                    Center(
+                                        child: Text(
+                                      'Registing!\n Please wait...',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontSize: 20,
+                                          color: themeStyle.primaryTextColor),
+                                    ))
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        )
+                      : Container(
+                          width: double.infinity,
+                          height: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Colors.grey.withOpacity(.5),
+                          ),
+                          child: Center(
+                            child: _codeLogin == 0
+                                ? Container()
+                                : Container(
+                                    height: 180,
+                                    width: 180,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(20),
+                                        color:
+                                            themeStyle.primaryBackgroundColor),
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 20.0,
+                                          right: 20,
+                                          bottom: 15,
+                                          top: 15),
+                                      child: Column(
+                                        children: <Widget>[
+                                          Icon(
+                                            Icons.error_outline,
+                                            color: Colors.red,
+                                            size: 40,
                                           ),
-                                        ),
+                                          SizedBox(
+                                            height: 10,
+                                          ),
+                                          Center(
+                                              child: Text(
+                                            _codeLogin == 1
+                                                ? 'Verification\nPlease check your email'
+                                                : 'Sorry!\nAn error occurred',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(fontSize: 17),
+                                          )),
+                                          SizedBox(
+                                            height: 10,
+                                          ),
+                                          Center(
+                                            child: Container(
+                                              height: 30,
+                                              decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                  gradient:
+                                                      LinearGradient(colors: [
+                                                    Color.fromRGBO(
+                                                        143, 148, 251, 1),
+                                                    Color.fromRGBO(
+                                                        143, 148, 251, .6),
+                                                  ]),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                        color: Color.fromRGBO(
+                                                            143, 148, 251, .4),
+                                                        blurRadius: 20,
+                                                        offset: Offset(0, 10))
+                                                  ]),
+                                              child: FlatButton(
+                                                onPressed: () => _okError(),
+                                                child: Center(
+                                                  child: Text(
+                                                    'OK',
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          )
+                                        ],
                                       ),
                                     ),
-                                  )
-                                ],
-                              ),
-                      ),
-                    ),
-                  ),
+                                  ),
+                          ),
+                        ),
                 )
               : Container(),
         ],

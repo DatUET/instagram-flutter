@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
 
 final _firestore = Firestore.instance;
 final storageRef = FirebaseStorage.instance.ref();
@@ -14,3 +15,5 @@ final activitiesRef = _firestore.collection('activities');
 final messageRef = _firestore.collection('message');
 final recentChatRef = _firestore.collection('recentChat');
 final tokenRef = _firestore.collection('tokens');
+
+final Color mainColor = Color(0xFFFE8057);
