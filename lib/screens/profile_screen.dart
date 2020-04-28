@@ -126,7 +126,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
               ),
-              color: Colors.blue,
+              color: mainColor,
               textColor: Colors.white,
               child: Text(
                 'Edit Profile',
@@ -138,7 +138,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             width: 200.0,
             child: FlatButton(
               onPressed: _followOrUnfollow,
-              color: _isFollowing ? Colors.grey[200] : Colors.blue,
+              color: _isFollowing ? Colors.grey[200] : mainColor,
               textColor: _isFollowing ? Colors.black : Colors.white,
               child: Text(
                 _isFollowing ? 'Unfollow' : 'Follow',

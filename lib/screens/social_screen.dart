@@ -123,9 +123,9 @@ class _SocialScreenState extends State<SocialScreen>
                                     fit: BoxFit.cover),
                                 boxShadow: [
                                   BoxShadow(
-                                      blurRadius: 10,
-                                      color: Colors.grey,
-                                      offset: Offset(5, 5))
+                                      blurRadius: 5,
+                                      color: Colors.grey[500],
+                                      offset: Offset(3, 3))
                                 ],
                               ),
                             ),
@@ -161,9 +161,9 @@ class _SocialScreenState extends State<SocialScreen>
                                   fit: BoxFit.cover),
                               boxShadow: [
                                 BoxShadow(
-                                    blurRadius: 10,
-                                    color: Colors.grey,
-                                    offset: Offset(5, 5))
+                                    blurRadius: 5,
+                                    color: Colors.grey[600],
+                                    offset: Offset(3.5, 3.5))
                               ],
                             ),
                           ),

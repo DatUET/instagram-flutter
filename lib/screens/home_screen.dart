@@ -12,6 +12,7 @@ import 'package:instagram_v2/screens/gallery_screen.dart';
 import 'package:instagram_v2/screens/social_screen.dart';
 import 'package:instagram_v2/services/database_service.dart';
 import 'package:instagram_v2/utilities/constants.dart';
+import 'package:outline_material_icons/outline_material_icons.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -146,7 +147,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         items: [
           BottomNavigationBarItem(
             icon: Icon(
-              Icons.home,
+              OMIcons.home,
               size: 32.0,
               color: _currentTab == 0
                   ? mainColor
@@ -155,7 +156,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           ),
           BottomNavigationBarItem(
             icon: Icon(
-              Icons.photo_library,
+              OMIcons.photoAlbum,
               size: 32.0,
               color: _currentTab == 1
                   ? mainColor
@@ -164,7 +165,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           ),
           BottomNavigationBarItem(
             icon: Icon(
-              Icons.camera,
+              OMIcons.cameraEnhance,
               size: 32.0,
               color: _currentTab == 2
                   ? mainColor

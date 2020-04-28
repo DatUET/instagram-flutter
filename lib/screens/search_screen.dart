@@ -5,6 +5,7 @@ import 'package:instagram_v2/models/user_data.dart';
 import 'package:instagram_v2/models/user_model.dart';
 import 'package:instagram_v2/screens/profile_screen.dart';
 import 'package:instagram_v2/services/database_service.dart';
+import 'package:instagram_v2/utilities/constants.dart';
 import 'package:provider/provider.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -19,11 +20,32 @@ class _SearchScreenState extends State<SearchScreen> {
 
   _buildUserTile(User user) {
     return ListTile(
-      leading: CircleAvatar(
-        radius: 20.0,
-        backgroundImage: user.profileImageUrl.isEmpty
-            ? AssetImage('assets/images/user_placeholder.jpg')
-            : CachedNetworkImageProvider(user.profileImageUrl),
+      contentPadding: EdgeInsets.only(top: 3.0, bottom: 3.0, right: 16.0, left: 16.0),
+      leading: Container(
+        width: 50,
+        height: 50,
+        decoration: BoxDecoration(
+            color: Colors.grey,
+            borderRadius: BorderRadius.all(Radius.circular(15)),
+            border: Border.all(
+                width: 1.5,
+                color: user.isActive
+                    ? mainColor
+                    : Colors.grey),
+            boxShadow: [
+              BoxShadow(
+                  color: Colors.grey[600],
+                  blurRadius: 5.0,
+                  offset: Offset(3, 3))
+            ],
+            image: DecorationImage(
+                image: user.profileImageUrl.isEmpty
+                    ? AssetImage(
+                    'assets/images/user_placeholder.jpg')
+                    : CachedNetworkImageProvider(
+                  user.profileImageUrl,
+                ),
+                fit: BoxFit.cover)),
       ),
       title: Text(
         user.name,

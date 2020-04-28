@@ -119,6 +119,12 @@ class _PostViewState extends State<PostView>
                             color: widget.author.isActive
                                 ? mainColor
                                 : Colors.grey),
+                        boxShadow: [
+                          BoxShadow(
+                              color: Colors.grey[600],
+                              blurRadius: 5.0,
+                              offset: Offset(3, 3))
+                        ],
                         image: DecorationImage(
                             image: widget.author.profileImageUrl.isEmpty
                                 ? AssetImage(
