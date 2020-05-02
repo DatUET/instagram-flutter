@@ -6,14 +6,14 @@ import 'package:instagram_v2/models/user_data.dart';
 import 'package:instagram_v2/models/user_model.dart';
 import 'package:instagram_v2/services/database_service.dart';
 import 'package:instagram_v2/utilities/constants.dart';
+import 'package:instagram_v2/widgets/post_view.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class CommentsScreen extends StatefulWidget {
   final Post post;
-  final int likeCount;
 
-  CommentsScreen({this.post, this.likeCount});
+  CommentsScreen({this.post});
 
   @override
   _CommentsScreenState createState() => _CommentsScreenState();
@@ -23,6 +23,21 @@ class _CommentsScreenState extends State<CommentsScreen> {
   final TextEditingController _commentController = TextEditingController();
   bool _isCommenting = false;
   var themeStyle;
+  User _author;
+
+  _getAuthorUser() async {
+    User author = await DatabaseService.getUserWithId(widget.post.authorId);
+    setState(() {
+      _author = author;
+    });
+  }
+
+
+  @override
+  void initState() {
+    super.initState();
+    _getAuthorUser();
+  }
 
   _buildComment(Comment comment) {
     return FutureBuilder(
@@ -48,7 +63,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
           ),
           title: Text(
             author.name,
-            style: TextStyle(color: themeStyle.primaryTextColor),
+            style: TextStyle(color: themeStyle.primaryTextColor, fontWeight: FontWeight.bold),
           ),
           subtitle: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -139,46 +154,45 @@ class _CommentsScreenState extends State<CommentsScreen> {
           style: TextStyle(color: themeStyle.primaryTextColor),
         ),
       ),
-      body: Column(
-        children: <Widget>[
-          Padding(
-            padding: EdgeInsets.all(12.0),
-            child: Text(
-              '${widget.likeCount} likes',
-              style: TextStyle(
-                color: themeStyle.primaryTextColor,
-                fontSize: 20.0,
-                fontWeight: FontWeight.w600,
+      body: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: Column(
+          children: <Widget>[
+            Expanded(
+              child: ListView(
+                children: <Widget>[
+                  PostView(currentUserId: themeStyle.currentUserId, post: widget.post, author: _author, isCommentScreen: true,),
+                  StreamBuilder(
+                    stream: commentsRef
+                        .document(widget.post.id)
+                        .collection('postComments')
+                        .orderBy('timestamp', descending: true)
+                        .snapshots(),
+                    builder: (BuildContext context, AsyncSnapshot snapshot) {
+                      if (!snapshot.hasData) {
+                        return Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        physics: ClampingScrollPhysics(),
+                        itemCount: snapshot.data.documents.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          Comment comment =
+                          Comment.fromDoc(snapshot.data.documents[index]);
+                          return _buildComment(comment);
+                        },
+                      );
+                    },
+                  ),
+                ],
               ),
             ),
-          ),
-          StreamBuilder(
-            stream: commentsRef
-                .document(widget.post.id)
-                .collection('postComments')
-                .orderBy('timestamp', descending: true)
-                .snapshots(),
-            builder: (BuildContext context, AsyncSnapshot snapshot) {
-              if (!snapshot.hasData) {
-                return Center(
-                  child: CircularProgressIndicator(),
-                );
-              }
-              return Expanded(
-                child: ListView.builder(
-                  itemCount: snapshot.data.documents.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    Comment comment =
-                    Comment.fromDoc(snapshot.data.documents[index]);
-                    return _buildComment(comment);
-                  },
-                ),
-              );
-            },
-          ),
-          Divider(height: 1.0),
-          _buildCommentTF(),
-        ],
+            Divider(height: 1.0),
+            _buildCommentTF(),
+          ],
+        ),
       ),
     );
   }

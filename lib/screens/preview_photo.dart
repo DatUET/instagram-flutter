@@ -50,6 +50,7 @@ class _PreviewPhotoScreenState extends State<PreviewPhotoScreen> {
                       MaterialPageRoute(
                           builder: (_) => CreatePostScreen(
                                 imagePost: imageFile,
+                            haveScaffold: true,
                               )));
                 }
               })

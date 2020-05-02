@@ -16,8 +16,9 @@ import 'package:provider/provider.dart';
 
 class CreatePostScreen extends StatefulWidget {
   final File imagePost;
+  final bool haveScaffold;
 
-  CreatePostScreen({this.imagePost});
+  CreatePostScreen({this.imagePost, this.haveScaffold});
 
   @override
   _CreatePostScreenState createState() => _CreatePostScreenState();
@@ -233,6 +234,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 30.0),
                     child: TextField(
+                      cursorColor: mainColor,
                       controller: _captionController,
                       style: TextStyle(
                           fontSize: 18.0, color: themeStyle.primaryTextColor),
@@ -242,6 +244,11 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                         labelText: 'Caption',
                         labelStyle:
                             TextStyle(color: themeStyle.primaryTextColor),
+                          focusedBorder:
+                          UnderlineInputBorder(
+                              borderSide: BorderSide(
+                                  color:
+                                  mainColor))
                       ),
                       onChanged: (input) => _caption = input,
                     ),
@@ -374,10 +381,11 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
     themeStyle = Provider.of<UserData>(context);
-    return widget.imagePost != null
+    return widget.haveScaffold
         ? Scaffold(
             backgroundColor: themeStyle.primaryBackgroundColor,
             appBar: AppBar(
+              iconTheme: IconThemeData(color: themeStyle.primaryIconColor),
               title: Text(
                 'Create New Post',
                 style: TextStyle(color: themeStyle.primaryTextColor),

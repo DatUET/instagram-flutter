@@ -188,6 +188,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     child: Container(
                       margin: EdgeInsets.only(right: 5.0),
                       child: TextField(
+                        cursorColor: mainColor,
                         controller: _textEditingController,
                         style:
                             TextStyle(color: themeStyle.primaryTextColorDark),

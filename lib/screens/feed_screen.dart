@@ -76,6 +76,7 @@ class _FeedScreenState extends State<FeedScreen> {
                           currentUserId: widget.currentUserId,
                           post: post,
                           author: author,
+                          isCommentScreen: false,
                         );
                       },
                     );

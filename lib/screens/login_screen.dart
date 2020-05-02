@@ -20,7 +20,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   String _email, _password, _emailForgot;
   bool _isLoading = false, _isValid = false;
-  int _codeLogin = -1;
+  String _strLogin;
   var themeStyle;
   bool isSentPasswordReset = false;
   bool _hidePassword = true;
@@ -33,10 +33,10 @@ class _LoginScreenState extends State<LoginScreen> {
         _isValid = true;
         _isLoading = true;
       });
-      int codeLogin = await AuthService.login(_email, _password, context);
+      String strLogin = await AuthService.login(_email, _password, context);
       setState(() {
         _isLoading = false;
-        _codeLogin = codeLogin;
+        _strLogin = strLogin;
       });
     }
   }
@@ -187,8 +187,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     height: 330,
                     decoration: BoxDecoration(
                         image: DecorationImage(
-                            image:
-                                AssetImage('assets/images/background.png'),
+                            image: AssetImage('assets/images/background.png'),
                             fit: BoxFit.fill)),
                     child: Stack(
                       children: <Widget>[
@@ -287,6 +286,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                               vertical: 10.0,
                                             ),
                                             child: TextFormField(
+                                              cursorColor: mainColor,
                                               keyboardType:
                                                   TextInputType.emailAddress,
                                               style: TextStyle(
@@ -316,6 +316,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                               vertical: 10.0,
                                             ),
                                             child: TextFormField(
+                                              cursorColor: mainColor,
                                               keyboardType:
                                                   TextInputType.visiblePassword,
                                               style: TextStyle(
@@ -535,7 +536,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ),
                                     Center(
                                         child: Text(
-                                      'Registing!\n Please wait...',
+                                      'Log in!\n Please wait...',
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                           fontSize: 20,
@@ -554,7 +555,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             color: Colors.grey.withOpacity(.5),
                           ),
                           child: Center(
-                            child: _codeLogin == 0
+                            child: _strLogin == 'done'
                                 ? Container()
                                 : Container(
                                     height: 180,
@@ -581,9 +582,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                           ),
                                           Center(
                                               child: Text(
-                                            _codeLogin == 1
-                                                ? 'Verification\nPlease check your email'
-                                                : 'Sorry!\nAn error occurred',
+                                            _strLogin,
                                             textAlign: TextAlign.center,
                                             style: TextStyle(fontSize: 17),
                                           )),
@@ -598,15 +597,13 @@ class _LoginScreenState extends State<LoginScreen> {
                                                       BorderRadius.circular(10),
                                                   gradient:
                                                       LinearGradient(colors: [
-                                                    Color.fromRGBO(
-                                                        143, 148, 251, 1),
-                                                    Color.fromRGBO(
-                                                        143, 148, 251, .6),
+                                                    mainColor,
+                                                    mainColor.withOpacity(.6),
                                                   ]),
                                                   boxShadow: [
                                                     BoxShadow(
-                                                        color: Color.fromRGBO(
-                                                            143, 148, 251, .4),
+                                                        color: mainColor
+                                                            .withOpacity(.4),
                                                         blurRadius: 20,
                                                         offset: Offset(0, 10))
                                                   ]),

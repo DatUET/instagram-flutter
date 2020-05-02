@@ -108,7 +108,6 @@ class _ActivityScreenState extends State<ActivityScreen> {
                 BouncyPageRoute(
                   widget: CommentsScreen(
                     post: post,
-                    likeCount: post.likeCount,
                   ),
                 ),
               );

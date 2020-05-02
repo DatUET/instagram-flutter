@@ -242,7 +242,7 @@ public class EditImageActivity extends BaseActivity implements OnPhotoEditorList
         if (requestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
             showLoading("Saving...");
             File file = new File(Environment.getExternalStorageDirectory()
-                    + File.separator + "" + "/DCIM/Screenshots/IMG_"
+                    + File.separator + "" + "/DCIM/Camera/"
                     + System.currentTimeMillis() + ".jpg");
             try {
                 file.createNewFile();

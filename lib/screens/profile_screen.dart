@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:instagram_v2/animations/bouncy_page_route.dart';
 import 'package:instagram_v2/animations/fadeanimationup.dart';
 import 'package:instagram_v2/models/post_model.dart';
@@ -262,7 +263,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           icon: Icon(Icons.grid_on),
           iconSize: 30.0,
           color: _displayPosts == 0
-              ? Theme.of(context).primaryColor
+              ? mainColor
               : themeStyle.primaryIconColor,
           onPressed: () => setState(() {
             _displayPosts = 0;
@@ -272,7 +273,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           icon: Icon(Icons.list),
           iconSize: 30.0,
           color: _displayPosts == 1
-              ? Theme.of(context).primaryColor
+              ? mainColor
               : themeStyle.primaryIconColor,
           onPressed: () => setState(() {
             _displayPosts = 1;
@@ -283,7 +284,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   _buildTilePost(Post post, int index) {
-    return GridTile(
+    return Container(
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(20)),
+        boxShadow: [
+          BoxShadow( color: Colors.grey[600],
+              blurRadius: 10.0,
+              offset: Offset(0, 5))
+        ]
+      ),
       child: FadeAnimationUp(
         (index * 2) / 10.0,
         GestureDetector(
@@ -292,13 +301,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
             BouncyPageRoute(
               widget: CommentsScreen(
                 post: post,
-                likeCount: post.likeCount,
               ),
             ),
           ),
-          child: Image(
-            image: CachedNetworkImageProvider(post.imageUrl),
-            fit: BoxFit.cover,
+          child: ClipRRect(
+            borderRadius: BorderRadius.all(Radius.circular(20)),
+            child: Image(
+              image: CachedNetworkImageProvider(post.imageUrl),
+              fit: BoxFit.cover,
+            ),
           ),
         ),
       ),
@@ -308,19 +319,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
   _buildDisplayPosts() {
     if (_displayPosts == 0) {
       // Grid
-      List<GridTile> tiles = [];
-      for (int i = 0; i < _posts.length; i++) {
-        Post post = _posts[i];
-        tiles.add(_buildTilePost(post, i));
-      }
-      return GridView.count(
-        crossAxisCount: 3,
-        childAspectRatio: 1.0,
-        mainAxisSpacing: 2.0,
-        crossAxisSpacing: 2.0,
+      return StaggeredGridView.countBuilder(
+        crossAxisCount: 2,
+        itemCount: _posts.length,
+        mainAxisSpacing: 12.0,
+        crossAxisSpacing: 12.0,
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
-        children: tiles,
+        itemBuilder: (context, index) => _buildTilePost(_posts[index], index),
+        staggeredTileBuilder: (index) {
+          return StaggeredTile.count(1, index.isEven ? 2 : 1);
+        },
       );
     } else {
       // Column
@@ -331,6 +340,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             currentUserId: widget.currentUserId,
             post: _posts[i],
             author: _profileUser,
+            isCommentScreen: false,
           ),
         );
       }
@@ -416,9 +426,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               borderRadius: BorderRadius.circular(40),
                               border: Border.all(
                                   width: 2,
-                                  color: user.isActive
-                                      ? mainColor
-                                      : Colors.grey),
+                                  color:
+                                      user.isActive ? mainColor : Colors.grey),
                               image: DecorationImage(
                                 image: user.profileImageUrl.isEmpty
                                     ? AssetImage(

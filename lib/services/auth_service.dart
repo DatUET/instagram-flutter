@@ -52,7 +52,7 @@ class AuthService {
     }
   }
 
-  static Future<int> login(
+  static Future<String> login(
       String email, String password, BuildContext context) async {
     try {
       AuthResult authResult = await _auth.signInWithEmailAndPassword(
@@ -66,16 +66,33 @@ class AuthService {
           Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(builder: (_) => HomeScreen(user.uid)),
                   (Route<dynamic> route) => false);
-          return 0;
+          return 'done';
         }
         else {
-          return 1;
+          return 'Verification\nPlease check your email';
         }
       }
     } catch (e) {
+      String errorMessage;
       print(e);
+      switch (e.code) {
+        case "ERROR_INVALID_EMAIL":
+          errorMessage = "Your email address appears to be malformed.";
+          break;
+        case "ERROR_WRONG_PASSWORD":
+          errorMessage = "Your password is wrong.";
+          break;
+        case "ERROR_USER_NOT_FOUND":
+          errorMessage = "User with this email doesn't exist.";
+          break;
+        case "ERROR_NETWORK_REQUEST_FAILED":
+          errorMessage = "A network error";
+          break;
+        default:
+          errorMessage = 'Sorry!\nAn error occurred';
+      }
+      return errorMessage;
     }
-    return 2;
   }
 
   static Future<void> loginGoogle(BuildContext context) async {

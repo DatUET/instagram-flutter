@@ -220,11 +220,11 @@ class _SocialScreenState extends State<SocialScreen>
         },
         body: new TabBarView(
           children: <Widget>[
-            new FeedScreen(
+            FeedScreen(
               currentUserId: widget.currentUserId,
             ),
-            new CreatePostScreen(),
-            new ActivityScreen(
+            CreatePostScreen(haveScaffold: false,),
+            ActivityScreen(
               currentUserId: widget.currentUserId,
             )
           ],

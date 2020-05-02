@@ -24,7 +24,7 @@ class _GalleyScreenState extends State<GalleyScreen>
   Future<void> _getImagePath() async {
     var dir = await getTemporaryDirectory();
     Map<dynamic, dynamic> allImage = await FlutterGallaryPlugin.getAllImages;
-    print(allImage[0]);
+    print('${allImage.length} ${dir.toString()}');
     setState(() {
       _allUri = allImage["URIList"] as List;
       _allUri = _allUri.reversed.toList();
@@ -61,9 +61,8 @@ class _GalleyScreenState extends State<GalleyScreen>
     );
   }
 
-  Future<void> _buildGridTileList() async {}
-
   _buildGridTile() {
+    print('${themeStyle.gridTileImage.length}');
     if (themeStyle.gridTileImage.length > 0) {
       return GridView.count(
         addAutomaticKeepAlives: true,
@@ -76,7 +75,7 @@ class _GalleyScreenState extends State<GalleyScreen>
       );
     } else {
       List<GridTile> tiles = [];
-      for (int i = 0; i < _allUri.length - 1; i++) {
+      for (int i = 0; i < _allUri.length; i++) {
         File file = File.fromUri(Uri.parse(_allUri[i]));
         var tile = _buildTilePost(file, i);
         tiles.add(tile);
@@ -131,7 +130,7 @@ class _GalleyScreenState extends State<GalleyScreen>
     var result = await FlutterImageCompress.compressAndGetFile(
       file.absolute.path,
       targetPath,
-      quality: 20,
+      quality: file.lengthSync() > 300000 ? 15 : 20,
       rotate: 0,
     );
     print(result.lengthSync());

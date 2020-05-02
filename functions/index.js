@@ -108,6 +108,7 @@ exports.sendNotification = functions.region("asia-northeast1").firestore
     const userDoc = await userRef.doc(senderUid).get();
     if (userDoc.exists) {
       senderName = userDoc.get("name");
+      avatar = userDoc.get("profileImageUrl");
       console.log(senderName);
     }
     var token;
@@ -123,11 +124,13 @@ exports.sendNotification = functions.region("asia-northeast1").firestore
       notification: {
           title: senderName + " sent you a message.",
           body: message,
+          image: avatar,
           clickAction: "FLUTTER_NOTIFICATION_CLICK",
       },
       data: {
+        type: 'chat',
         senderUid: senderUid,
-          receiverUid: receiverUid
+        receiverUid: receiverUid
       }
   }
   if (token !== '') {
@@ -161,14 +164,17 @@ exports.sendNotifiActivities = functions.region("asia-northeast1").firestore
       console.log(token);
     }
     var action = activity["comment"] === null ? " like" : " comment";
+    var postImage = activity["postImageUrl"];
     const payload = {
       notification: {
           title: fromUserName + action + " your post" ,
           body: "Click to see",
-          clickAction: "FLUTTER_NOTIFICATION_CLICK"
+          image: postImage,
+          clickAction: "FLUTTER_NOTIFICATION_CLICK",
       },
       data: {
-          postId: activity['postId']
+          type:'post',
+          postId: activity['postId'],
       }
   }
   if (token !== '') {

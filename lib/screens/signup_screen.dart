@@ -43,7 +43,13 @@ class _SignupScreenState extends State<SignupScreen> {
         _isSccuess = isSccuess;
       });
       if (isSccuess) {
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => SuccessScreen(type: 0, email: _email,)));
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (_) => SuccessScreen(
+                      type: 0,
+                      email: _email,
+                    )));
       }
     }
   }
@@ -158,16 +164,23 @@ class _SignupScreenState extends State<SignupScreen> {
                                                 vertical: 10.0,
                                               ),
                                               child: TextFormField(
+                                                cursorColor: mainColor,
                                                 keyboardType:
                                                     TextInputType.text,
                                                 style: TextStyle(
                                                     color: themeStyle
                                                         .primaryTextColor),
                                                 decoration: InputDecoration(
-                                                    labelText: 'Name',
-                                                    labelStyle: TextStyle(
-                                                        color: themeStyle
-                                                            .primaryTextColor)),
+                                                  labelText: 'Name',
+                                                  labelStyle: TextStyle(
+                                                      color: themeStyle
+                                                          .primaryTextColor),
+                                                  focusedBorder:
+                                                      UnderlineInputBorder(
+                                                          borderSide: BorderSide(
+                                                              color:
+                                                                  mainColor)),
+                                                ),
                                                 validator: (input) => input
                                                         .trim()
                                                         .isEmpty
@@ -183,6 +196,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                                 vertical: 10.0,
                                               ),
                                               child: TextFormField(
+                                                cursorColor: mainColor,
                                                 controller:
                                                     _emailInputController,
                                                 focusNode: _focusEmailInput,
@@ -192,10 +206,16 @@ class _SignupScreenState extends State<SignupScreen> {
                                                     color: themeStyle
                                                         .primaryTextColor),
                                                 decoration: InputDecoration(
-                                                    labelText: 'Email',
-                                                    labelStyle: TextStyle(
-                                                        color: themeStyle
-                                                            .primaryTextColor)),
+                                                  labelText: 'Email',
+                                                  labelStyle: TextStyle(
+                                                      color: themeStyle
+                                                          .primaryTextColor),
+                                                  focusedBorder:
+                                                      UnderlineInputBorder(
+                                                          borderSide: BorderSide(
+                                                              color:
+                                                                  mainColor)),
+                                                ),
                                                 validator: (input) => !input
                                                         .contains('@')
                                                     ? 'Please enter a valid email'
@@ -212,6 +232,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                                 vertical: 10.0,
                                               ),
                                               child: TextFormField(
+                                                cursorColor: mainColor,
                                                 style: TextStyle(
                                                     color: themeStyle
                                                         .primaryTextColor),
@@ -220,6 +241,11 @@ class _SignupScreenState extends State<SignupScreen> {
                                                     labelStyle: TextStyle(
                                                         color: themeStyle
                                                             .primaryTextColor),
+                                                    focusedBorder:
+                                                        UnderlineInputBorder(
+                                                            borderSide: BorderSide(
+                                                                color:
+                                                                    mainColor)),
                                                     suffixIcon: GestureDetector(
                                                       onTap: () {
                                                         setState(() {

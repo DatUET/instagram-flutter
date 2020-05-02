@@ -12,14 +12,16 @@ import 'package:instagram_v2/screens/profile_screen.dart';
 import 'package:instagram_v2/services/database_service.dart';
 import 'package:instagram_v2/services/photo_service.dart';
 import 'package:instagram_v2/utilities/constants.dart';
+import 'package:outline_material_icons/outline_material_icons.dart';
 import 'package:provider/provider.dart';
 
 class PostView extends StatefulWidget {
   final String currentUserId;
   final Post post;
   final User author;
+  final bool isCommentScreen;
 
-  PostView({this.currentUserId, this.post, this.author});
+  PostView({this.currentUserId, this.post, this.author, this.isCommentScreen});
 
   @override
   _PostViewState createState() => _PostViewState();
@@ -178,7 +180,7 @@ class _PostViewState extends State<PostView>
                         BoxShadow(
                             color: Colors.grey[800],
                             blurRadius: 20.0,
-                            offset: Offset(5, 5))
+                            offset: Offset(0, 5))
                       ]),
                 ),
                 _heartAnim
@@ -219,7 +221,7 @@ class _PostViewState extends State<PostView>
                       iconSize: 30.0,
                       onPressed: _likePost,
                     ),
-                    IconButton(
+                    widget.isCommentScreen ? Container() : IconButton(
                       icon: Icon(
                         Icons.comment,
                         color: themeStyle.primaryIconColor,
@@ -230,7 +232,6 @@ class _PostViewState extends State<PostView>
                         BouncyPageRoute(
                           widget: CommentsScreen(
                             post: widget.post,
-                            likeCount: _likeCount,
                           ),
                         ),
                       ),
