@@ -12,6 +12,7 @@ import 'package:instagram_v2/screens/login_screen.dart';
 import 'package:instagram_v2/services/auth_service.dart';
 import 'package:instagram_v2/services/database_service.dart';
 import 'package:instagram_v2/utilities/constants.dart';
+import 'package:instagram_v2/widgets/pickup_layout.dart';
 import 'package:instagram_v2/widgets/post_view.dart';
 import 'package:provider/provider.dart';
 
@@ -353,169 +354,171 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     themeStyle = Provider.of<UserData>(context);
-    return Scaffold(
-      backgroundColor: themeStyle.primaryBackgroundColor,
-      body: FutureBuilder(
-        future: usersRef.document(widget.userId).get(),
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
-          if (!snapshot.hasData) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-          User user = User.fromDoc(snapshot.data);
-          return Container(
-            child: Stack(
-              children: <Widget>[
-                Container(
-                  height: double.infinity,
-                ),
-                Container(
-                  height: 200,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: user.profileImageUrl.isEmpty
-                          ? AssetImage('assets/images/user_placeholder.jpg')
-                          : CachedNetworkImageProvider(user.profileImageUrl),
-                      fit: BoxFit.cover,
+    return PickupLayout(
+      scaffold: Scaffold(
+        backgroundColor: themeStyle.primaryBackgroundColor,
+        body: FutureBuilder(
+          future: usersRef.document(widget.userId).get(),
+          builder: (BuildContext context, AsyncSnapshot snapshot) {
+            if (!snapshot.hasData) {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+            User user = User.fromDoc(snapshot.data);
+            return Container(
+              child: Stack(
+                children: <Widget>[
+                  Container(
+                    height: double.infinity,
+                  ),
+                  Container(
+                    height: 200,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: user.profileImageUrl.isEmpty
+                            ? AssetImage('assets/images/user_placeholder.jpg')
+                            : CachedNetworkImageProvider(user.profileImageUrl),
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
-                ),
-                Container(
-                  height: double.infinity,
-                ),
-                Container(
-                  height: 200,
-                  decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                        Colors.white.withOpacity(.3),
-                        Colors.white.withOpacity(.5),
-                        Colors.white.withOpacity(.8)
-                      ])),
-                ),
-                SingleChildScrollView(
-                  child: Stack(
-                    children: <Widget>[
-                      Positioned(
-                        top: 150,
-                        left: 0.01,
-                        right: 0.01,
-                        child: Container(
-                          height: 700,
-                          width: MediaQuery.of(context).size.width,
-                          decoration: BoxDecoration(
-                            color: themeStyle.primaryBackgroundColor,
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(40),
-                              topRight: Radius.circular(40),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Align(
-                        alignment: Alignment.center,
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 90.0),
+                  Container(
+                    height: double.infinity,
+                  ),
+                  Container(
+                    height: 200,
+                    decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                          Colors.white.withOpacity(.3),
+                          Colors.white.withOpacity(.5),
+                          Colors.white.withOpacity(.8)
+                        ])),
+                  ),
+                  SingleChildScrollView(
+                    child: Stack(
+                      children: <Widget>[
+                        Positioned(
+                          top: 150,
+                          left: 0.01,
+                          right: 0.01,
                           child: Container(
-                            height: 150,
-                            width: 150,
+                            height: 700,
+                            width: MediaQuery.of(context).size.width,
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(40),
-                              border: Border.all(
-                                  width: 2,
-                                  color:
-                                      user.isActive ? mainColor : Colors.grey),
-                              image: DecorationImage(
-                                image: user.profileImageUrl.isEmpty
-                                    ? AssetImage(
-                                        'assets/images/user_placeholder.jpg')
-                                    : CachedNetworkImageProvider(
-                                        user.profileImageUrl),
-                                fit: BoxFit.cover,
+                              color: themeStyle.primaryBackgroundColor,
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(40),
+                                topRight: Radius.circular(40),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                      Align(
-                        alignment: Alignment.center,
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 260),
-                          child: Column(children: <Widget>[
-                            Text(
-                              user.name,
-                              style: TextStyle(
-                                fontSize: 25,
-                                color: themeStyle.primaryTextColor,
+                        Align(
+                          alignment: Alignment.center,
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 90.0),
+                            child: Container(
+                              height: 150,
+                              width: 150,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(40),
+                                border: Border.all(
+                                    width: 2,
+                                    color:
+                                        user.isActive ? mainColor : Colors.grey),
+                                image: DecorationImage(
+                                  image: user.profileImageUrl.isEmpty
+                                      ? AssetImage(
+                                          'assets/images/user_placeholder.jpg')
+                                      : CachedNetworkImageProvider(
+                                          user.profileImageUrl),
+                                  fit: BoxFit.cover,
+                                ),
                               ),
                             ),
-                            Text(
-                              user.bio,
-                              style: TextStyle(
-                                fontSize: 15,
-                                color: themeStyle.primaryTextColor,
-                              ),
-                            ),
-                            _displayButton(user),
-                            _buildButtonChat(user),
-                            _buildProfileInfo(user),
-                            _buildToggleButtons(),
-                            Divider(),
-                            _buildDisplayPosts(),
-                          ]),
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-                Align(
-                  alignment: Alignment.topRight,
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 50.0, right: 10.0),
-                    child: GestureDetector(
-                      onTap: () {
-                        AuthService.logout();
-                        DatabaseService.updateActive(
-                            themeStyle.currentUserId, false);
-                        DatabaseService.updateToken(
-                            themeStyle.currentUserId, '');
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (BuildContext context) =>
-                                    LoginScreen()));
-                      },
-                      child: Icon(
-                        Icons.exit_to_app,
-                        color: themeStyle.primaryIconColor,
-                      ),
+                        Align(
+                          alignment: Alignment.center,
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 260),
+                            child: Column(children: <Widget>[
+                              Text(
+                                user.name,
+                                style: TextStyle(
+                                  fontSize: 25,
+                                  color: themeStyle.primaryTextColor,
+                                ),
+                              ),
+                              Text(
+                                user.bio,
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  color: themeStyle.primaryTextColor,
+                                ),
+                              ),
+                              _displayButton(user),
+                              _buildButtonChat(user),
+                              _buildProfileInfo(user),
+                              _buildToggleButtons(),
+                              Divider(),
+                              _buildDisplayPosts(),
+                            ]),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ),
-                Align(
-                  alignment: Alignment.topLeft,
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 50.0, left: 10.0),
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: Container(
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 50.0, right: 10.0),
+                      child: GestureDetector(
+                        onTap: () {
+                          AuthService.logout();
+                          DatabaseService.updateActive(
+                              themeStyle.currentUserId, false);
+                          DatabaseService.updateToken(
+                              themeStyle.currentUserId, '');
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (BuildContext context) =>
+                                      LoginScreen()));
+                        },
                         child: Icon(
-                          Icons.arrow_back,
+                          Icons.exit_to_app,
                           color: themeStyle.primaryIconColor,
                         ),
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
-          );
-        },
+                  Align(
+                    alignment: Alignment.topLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 50.0, left: 10.0),
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: Container(
+                          child: Icon(
+                            Icons.arrow_back,
+                            color: themeStyle.primaryIconColor,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }

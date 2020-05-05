@@ -15,7 +15,8 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _formKey = GlobalKey<FormState>();
+  final _formKeyEmail = GlobalKey<FormState>();
+  final _formKeyPassword = GlobalKey<FormState>();
   final _formKeyForgotPass = GlobalKey<FormState>();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   String _email, _password, _emailForgot;
@@ -26,8 +27,9 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _hidePassword = true;
 
   _submit(BuildContext context) async {
-    if (_formKey.currentState.validate()) {
-      _formKey.currentState.save();
+    if (_formKeyEmail.currentState.validate() && _formKeyPassword.currentState.validate()) {
+      _formKeyEmail.currentState.save();
+      _formKeyPassword.currentState.save();
       // Logging in the user w/ Firebase
       setState(() {
         _isValid = true;
@@ -88,8 +90,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           begin: Alignment.bottomLeft,
                           end: Alignment.topRight,
                           colors: [
-                            Color.fromRGBO(143, 148, 251, 1),
-                            Color.fromRGBO(143, 148, 251, .6),
+                           mainColor,
+                            mainColor.withOpacity(.6)
                           ]).createShader(bounds),
                       child: Text(
                         'Reset Password',
@@ -115,10 +117,15 @@ class _LoginScreenState extends State<LoginScreen> {
                         vertical: 10.0,
                       ),
                       child: TextFormField(
+                        cursorColor: mainColor,
                         keyboardType: TextInputType.emailAddress,
                         style: TextStyle(color: themeStyle.primaryTextColor),
                         decoration: InputDecoration(
                             labelText: 'Email',
+                            focusedBorder:
+                            UnderlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: mainColor)),
                             labelStyle:
                                 TextStyle(color: themeStyle.primaryTextColor)),
                         validator: (input) => !input.contains('@')
@@ -144,12 +151,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
                         gradient: LinearGradient(colors: [
-                          Color.fromRGBO(143, 148, 251, 1),
-                          Color.fromRGBO(143, 148, 251, .6),
+                          mainColor,
+                          mainColor.withOpacity(.6)
                         ]),
                         boxShadow: [
                           BoxShadow(
-                              color: Color.fromRGBO(143, 148, 251, .4),
+                              color: mainColor.withOpacity(.4),
                               blurRadius: 20,
                               offset: Offset(0, 10))
                         ]),
@@ -183,186 +190,194 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Container(
               child: Column(
                 children: <Widget>[
-                  Container(
-                    height: 330,
-                    decoration: BoxDecoration(
-                        image: DecorationImage(
-                            image: AssetImage('assets/images/background.png'),
-                            fit: BoxFit.fill)),
-                    child: Stack(
-                      children: <Widget>[
-                        Positioned(
-                          left: 30,
-                          width: 80,
-                          height: 200,
-                          child: FadeAnimation(
-                            1,
-                            Container(
-                              decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                      image: AssetImage(
-                                          'assets/images/light-1.png'))),
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          left: 140,
-                          width: 80,
-                          height: 150,
-                          child: FadeAnimation(
-                            1.3,
-                            Container(
-                              decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                      image: AssetImage(
-                                          'assets/images/light-2.png'))),
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          right: 40,
-                          top: 40,
-                          width: 80,
-                          height: 200,
-                          child: FadeAnimation(
-                            1.5,
-                            Container(
-                              decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                      image: AssetImage(
-                                          'assets/images/clock.png'))),
-                            ),
-                          ),
-                        ),
-                        Positioned(
+                  FadeAnimation(
+                    0.8, Container(
+                      height: 330,
+                      decoration: BoxDecoration(
+                          image: DecorationImage(
+                              image: AssetImage('assets/images/background.png'),
+                              fit: BoxFit.fill)),
+                      child: Stack(
+                        children: <Widget>[
+                          Positioned(
+                            left: 30,
+                            width: 80,
+                            height: 200,
                             child: FadeAnimation(
-                          1.6,
-                          Container(
-                            margin: EdgeInsets.only(top: 50),
-                            child: Center(
-                              child: Text(
-                                'Login',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 40,
-                                    fontWeight: FontWeight.bold),
+                              1,
+                              Container(
+                                decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                        image: AssetImage(
+                                            'assets/images/light-1.png'))),
                               ),
                             ),
                           ),
-                        )),
-                      ],
+                          Positioned(
+                            left: 140,
+                            width: 80,
+                            height: 150,
+                            child: FadeAnimation(
+                              1.3,
+                              Container(
+                                decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                        image: AssetImage(
+                                            'assets/images/light-2.png'))),
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            right: 40,
+                            top: 40,
+                            width: 80,
+                            height: 200,
+                            child: FadeAnimation(
+                              1.5,
+                              Container(
+                                decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                        image: AssetImage(
+                                            'assets/images/clock.png'))),
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                              child: FadeAnimation(
+                            1.6,
+                            Container(
+                              margin: EdgeInsets.only(top: 50),
+                              child: Center(
+                                child: Text(
+                                  'Login',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 40,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+                          )),
+                        ],
+                      ),
                     ),
                   ),
                   Padding(
                     padding: EdgeInsets.only(
-                        left: 30, right: 30, bottom: 30, top: 0),
+                        left: 30, right: 30, bottom: 30, top: 10),
                     child: Column(
                       children: <Widget>[
                         FadeAnimation(
-                          1.8,
-                          Container(
-                            padding: EdgeInsets.all(5),
+                          1.8, Container(
                             decoration: BoxDecoration(
-                                color: themeStyle.typeMessageBoxColor,
-                                borderRadius: BorderRadius.circular(10),
-                                boxShadow: [
-                                  BoxShadow(
-                                      color: mainColor.withOpacity(.2),
-                                      blurRadius: 20,
-                                      offset: Offset(0, 10))
-                                ]),
-                            child: Column(
-                              children: <Widget>[
-                                Container(
-                                  padding: EdgeInsets.all(8),
-                                  child: Form(
-                                    key: _formKey,
-                                    child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: <Widget>[
-                                          Padding(
-                                            padding: EdgeInsets.symmetric(
-                                              horizontal: 15.0,
-                                              vertical: 10.0,
-                                            ),
-                                            child: TextFormField(
-                                              cursorColor: mainColor,
-                                              keyboardType:
-                                                  TextInputType.emailAddress,
-                                              style: TextStyle(
-                                                  color: themeStyle
-                                                      .primaryTextColor),
-                                              decoration: InputDecoration(
-                                                labelText: 'Email',
-                                                labelStyle: TextStyle(
-                                                    color: themeStyle
-                                                        .primaryTextColor),
-                                                focusedBorder:
-                                                    UnderlineInputBorder(
-                                                        borderSide: BorderSide(
-                                                            color: mainColor)),
-                                              ),
-                                              validator: (input) => !input
-                                                      .contains('@')
-                                                  ? 'Please enter a valid email'
-                                                  : null,
-                                              onSaved: (input) =>
-                                                  _email = input,
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: EdgeInsets.symmetric(
-                                              horizontal: 15.0,
-                                              vertical: 10.0,
-                                            ),
-                                            child: TextFormField(
-                                              cursorColor: mainColor,
-                                              keyboardType:
-                                                  TextInputType.visiblePassword,
-                                              style: TextStyle(
-                                                  color: themeStyle
-                                                      .primaryTextColor),
-                                              decoration: InputDecoration(
-                                                  labelText: 'Password',
-                                                  labelStyle: TextStyle(
-                                                      color: themeStyle
-                                                          .primaryTextColor),
-                                                  focusedBorder:
-                                                      UnderlineInputBorder(
-                                                          borderSide: BorderSide(
-                                                              color:
-                                                                  mainColor)),
-                                                  suffixIcon: GestureDetector(
-                                                    onTap: () {
-                                                      setState(() {
-                                                        _hidePassword =
-                                                            !_hidePassword;
-                                                      });
-                                                    },
-                                                    child: Icon(
-                                                      _hidePassword
-                                                          ? OMIcons.visibility
-                                                          : OMIcons
-                                                              .visibilityOff,
-                                                      color: themeStyle
-                                                          .primaryIconColor,
-                                                    ),
-                                                  )),
-                                              validator: (input) => input
-                                                          .length <
-                                                      6
-                                                  ? 'Must be at least 6 characters'
-                                                  : null,
-                                              onSaved: (input) =>
-                                                  _password = input,
-                                              obscureText: _hidePassword,
-                                            ),
-                                          ),
-                                        ]),
-                                  ),
-                                )
+                                borderRadius: BorderRadius.all(Radius.circular(12)),
+                              color: themeStyle.typeMessageBoxColor,
+                              boxShadow: [
+                                BoxShadow(
+                                    color: mainColor.withOpacity(.13),
+                                    blurRadius: 15,
+                                    offset: Offset(0, 10))
                               ],
                             ),
+                            child: Form(
+                              key: _formKeyEmail,
+                              child: Padding(
+                                padding: EdgeInsets.only(
+                                  left: 15.0,
+                                  right: 15,
+                                  bottom: 3.0,
+                                ),
+                                child: TextFormField(
+                                  cursorColor: mainColor,
+                                  keyboardType:
+                                  TextInputType.emailAddress,
+                                  style: TextStyle(
+                                      color: themeStyle
+                                          .primaryTextColor),
+                                  decoration: InputDecoration(
+                                    labelText: 'Email',
+                                    labelStyle: TextStyle(
+                                        color: themeStyle
+                                            .primaryTextColor),
+                                    focusedBorder:
+                                    UnderlineInputBorder(
+                                        borderSide: BorderSide(
+                                            color: mainColor)),
+                                  ),
+                                  validator: (input) => !input
+                                      .contains('@')
+                                      ? 'Please enter a valid email'
+                                      : null,
+                                  onSaved: (input) =>
+                                  _email = input,
+                                ),
+                              ),),
+                          ),
+                        ),
+                        SizedBox(height: 30,),
+                        FadeAnimation(
+                          1.8, Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.all(Radius.circular(12)),
+                              color: themeStyle.typeMessageBoxColor,
+                                boxShadow: [
+                                  BoxShadow(
+                                      color: mainColor.withOpacity(.13),
+                                      blurRadius: 15,
+                                      offset: Offset(0, 10))
+                                ],
+                            ),
+                            child: Form(
+                              key: _formKeyPassword,
+                              child: Padding(
+                                padding: EdgeInsets.only(
+                                  left: 15.0,
+                                  right: 15,
+                                  bottom: 3.0,
+                                ),
+                                child: TextFormField(
+                                  cursorColor: mainColor,
+                                  keyboardType:
+                                  TextInputType.visiblePassword,
+                                  style: TextStyle(
+                                      color: themeStyle
+                                          .primaryTextColor),
+                                  decoration: InputDecoration(
+                                      labelText: 'Password',
+                                      labelStyle: TextStyle(
+                                          color: themeStyle
+                                              .primaryTextColor),
+                                      focusedBorder:
+                                      UnderlineInputBorder(
+                                          borderSide: BorderSide(
+                                              color:
+                                              mainColor)),
+                                      suffixIcon: GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            _hidePassword =
+                                            !_hidePassword;
+                                          });
+                                        },
+                                        child: Icon(
+                                          _hidePassword
+                                              ? OMIcons.visibility
+                                              : OMIcons
+                                              .visibilityOff,
+                                          color: themeStyle
+                                              .primaryIconColor,
+                                        ),
+                                      )),
+                                  validator: (input) => input
+                                      .length <
+                                      6
+                                      ? 'Must be at least 6 characters'
+                                      : null,
+                                  onSaved: (input) =>
+                                  _password = input,
+                                  obscureText: _hidePassword,
+                                ),
+                              ),),
                           ),
                         ),
                         SizedBox(
@@ -584,7 +599,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                               child: Text(
                                             _strLogin,
                                             textAlign: TextAlign.center,
-                                            style: TextStyle(fontSize: 17),
+                                            style: TextStyle(fontSize: 17, color: themeStyle
+                                                .primaryTextColor),
                                           )),
                                           SizedBox(
                                             height: 10,

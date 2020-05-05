@@ -59,7 +59,13 @@ class _CameraScreenState extends State {
     });
   }
 
-  Future _initCameraController(CameraDescription cameraDescription) async {
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  _initCameraController(CameraDescription cameraDescription) async {
     if (controller != null) {
       await controller.dispose();
     }

@@ -4,6 +4,7 @@ import 'package:instagram_v2/models/user_model.dart';
 import 'package:instagram_v2/screens/success_screen.dart';
 import 'package:instagram_v2/services/auth_service.dart';
 import 'package:instagram_v2/utilities/constants.dart';
+import 'package:instagram_v2/widgets/pickup_layout.dart';
 import 'package:outline_material_icons/outline_material_icons.dart';
 import 'package:provider/provider.dart';
 
@@ -85,173 +86,175 @@ class _ChangePassScreenState extends State<ChangePassScreen> {
   @override
   Widget build(BuildContext context) {
     themeStyle = Provider.of<UserData>(context);
-    return Scaffold(
-      backgroundColor: themeStyle.primaryBackgroundColor,
-      appBar: AppBar(
-          elevation: 0,
-          backgroundColor: themeStyle.primaryBackgroundColor,
-          iconTheme: IconThemeData(color: themeStyle.primaryIconColor)),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 32.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text(
-                'Reset Password',
-                style: TextStyle(
-                    color: themeStyle.primaryTextColor,
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold),
-              ),
-              SizedBox(
-                height: 64.0,
-              ),
-              Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-                Form(
-                  key: _formKeyCurrentPass,
-                  child: TextFormField(
-                    focusNode: _focusNodeCurrentPass,
-                    controller: _currentPassController,
-                    cursorColor: mainColor,
-                    keyboardType: TextInputType.visiblePassword,
-                    style: TextStyle(
-                        fontSize: 18, color: themeStyle.primaryTextColor),
-                    decoration: InputDecoration(
-                        labelText: 'Curent Password',
-                        labelStyle:
-                            TextStyle(color: themeStyle.primaryTextColor),
-                        focusedBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(color: mainColor)),
-                        suffixIcon: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _hideCurrentPass = !_hideCurrentPass;
-                            });
-                          },
-                          child: Icon(
-                            _hideCurrentPass
-                                ? OMIcons.visibility
-                                : OMIcons.visibilityOff,
-                            color: themeStyle.primaryIconColor,
-                          ),
-                        )),
-                    validator: (input) =>
-                        (input.isNotEmpty && _correctCurrentPass)
-                            ? null
-                            : 'Invalid password',
-                    obscureText: _hideCurrentPass,
-                  ),
+    return PickupLayout(
+      scaffold: Scaffold(
+        backgroundColor: themeStyle.primaryBackgroundColor,
+        appBar: AppBar(
+            elevation: 0,
+            backgroundColor: themeStyle.primaryBackgroundColor,
+            iconTheme: IconThemeData(color: themeStyle.primaryIconColor)),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 32.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  'Reset Password',
+                  style: TextStyle(
+                      color: themeStyle.primaryTextColor,
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold),
                 ),
                 SizedBox(
-                  height: 16.0,
+                  height: 64.0,
                 ),
-                Form(
-                  key: _formKeyNewPass,
-                  child: TextFormField(
-                    controller: _newPassController,
-                    focusNode: _focusNodeNewPass,
-                    cursorColor: mainColor,
-                    keyboardType: TextInputType.visiblePassword,
-                    style: TextStyle(
-                        fontSize: 18, color: themeStyle.primaryTextColor),
-                    decoration: InputDecoration(
-                        labelText: 'New Password',
-                        labelStyle:
-                            TextStyle(color: themeStyle.primaryTextColor),
-                        focusedBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(color: mainColor)),
-                        suffixIcon: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _hideNewPassword = !_hideNewPassword;
-                            });
-                          },
-                          child: Icon(
-                            _hideNewPassword
-                                ? OMIcons.visibility
-                                : OMIcons.visibilityOff,
-                            color: themeStyle.primaryIconColor,
-                          ),
-                        )),
-                    validator: (input) => input.length < 6
-                        ? 'Must be at least 6 characters'
-                        : null,
-                    onSaved: (input) => _newPassword = input,
-                    obscureText: _hideNewPassword,
-                  ),
-                ),
-                SizedBox(
-                  height: 16.0,
-                ),
-                Form(
-                  key: _formKeyConfirmPass,
-                  child: TextFormField(
-                    controller: _confirmPassController,
-                    focusNode: _focusNodeConfirmPass,
-                    cursorColor: mainColor,
-                    keyboardType: TextInputType.visiblePassword,
-                    style: TextStyle(
-                        fontSize: 18, color: themeStyle.primaryTextColor),
-                    decoration: InputDecoration(
-                        labelText: 'Confirm New Password',
-                        labelStyle:
-                            TextStyle(color: themeStyle.primaryTextColor),
-                        focusedBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(color: mainColor)),
-                        suffixIcon: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _hideConfirmNewPassword =
-                                  !_hideConfirmNewPassword;
-                            });
-                          },
-                          child: Icon(
-                            _hideConfirmNewPassword
-                                ? OMIcons.visibility
-                                : OMIcons.visibilityOff,
-                            color: themeStyle.primaryIconColor,
-                          ),
-                        )),
-                    validator: (input) => input.length < 6
-                        ? 'Must be at least 6 characters'
-                        : input != _newPassword
-                            ? 'Incorrect password confirmation'
-                            : null,
-                    obscureText: _hideConfirmNewPassword,
-                  ),
-                ),
-              ]),
-              SizedBox(
-                height: 64.0,
-              ),
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: 30),
-                height: 50,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    gradient: LinearGradient(colors: [
-                      mainColor.withOpacity(.6),
-                      mainColor.withOpacity(1),
-                    ]),
-                    boxShadow: [
-                      BoxShadow(
-                          color: mainColor.withOpacity(.4),
-                          blurRadius: 20,
-                          offset: Offset(0, 10))
-                    ]),
-                child: FlatButton(
-                  onPressed: () => _submit(context),
-                  child: Center(
-                    child: Text(
-                      'Update Password',
+                Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
+                  Form(
+                    key: _formKeyCurrentPass,
+                    child: TextFormField(
+                      focusNode: _focusNodeCurrentPass,
+                      controller: _currentPassController,
+                      cursorColor: mainColor,
+                      keyboardType: TextInputType.visiblePassword,
                       style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold),
+                          fontSize: 18, color: themeStyle.primaryTextColor),
+                      decoration: InputDecoration(
+                          labelText: 'Curent Password',
+                          labelStyle:
+                              TextStyle(color: themeStyle.primaryTextColor),
+                          focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: mainColor)),
+                          suffixIcon: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _hideCurrentPass = !_hideCurrentPass;
+                              });
+                            },
+                            child: Icon(
+                              _hideCurrentPass
+                                  ? OMIcons.visibility
+                                  : OMIcons.visibilityOff,
+                              color: themeStyle.primaryIconColor,
+                            ),
+                          )),
+                      validator: (input) =>
+                          (input.isNotEmpty && _correctCurrentPass)
+                              ? null
+                              : 'Invalid password',
+                      obscureText: _hideCurrentPass,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 16.0,
+                  ),
+                  Form(
+                    key: _formKeyNewPass,
+                    child: TextFormField(
+                      controller: _newPassController,
+                      focusNode: _focusNodeNewPass,
+                      cursorColor: mainColor,
+                      keyboardType: TextInputType.visiblePassword,
+                      style: TextStyle(
+                          fontSize: 18, color: themeStyle.primaryTextColor),
+                      decoration: InputDecoration(
+                          labelText: 'New Password',
+                          labelStyle:
+                              TextStyle(color: themeStyle.primaryTextColor),
+                          focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: mainColor)),
+                          suffixIcon: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _hideNewPassword = !_hideNewPassword;
+                              });
+                            },
+                            child: Icon(
+                              _hideNewPassword
+                                  ? OMIcons.visibility
+                                  : OMIcons.visibilityOff,
+                              color: themeStyle.primaryIconColor,
+                            ),
+                          )),
+                      validator: (input) => input.length < 6
+                          ? 'Must be at least 6 characters'
+                          : null,
+                      onSaved: (input) => _newPassword = input,
+                      obscureText: _hideNewPassword,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 16.0,
+                  ),
+                  Form(
+                    key: _formKeyConfirmPass,
+                    child: TextFormField(
+                      controller: _confirmPassController,
+                      focusNode: _focusNodeConfirmPass,
+                      cursorColor: mainColor,
+                      keyboardType: TextInputType.visiblePassword,
+                      style: TextStyle(
+                          fontSize: 18, color: themeStyle.primaryTextColor),
+                      decoration: InputDecoration(
+                          labelText: 'Confirm New Password',
+                          labelStyle:
+                              TextStyle(color: themeStyle.primaryTextColor),
+                          focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: mainColor)),
+                          suffixIcon: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _hideConfirmNewPassword =
+                                    !_hideConfirmNewPassword;
+                              });
+                            },
+                            child: Icon(
+                              _hideConfirmNewPassword
+                                  ? OMIcons.visibility
+                                  : OMIcons.visibilityOff,
+                              color: themeStyle.primaryIconColor,
+                            ),
+                          )),
+                      validator: (input) => input.length < 6
+                          ? 'Must be at least 6 characters'
+                          : input != _newPassword
+                              ? 'Incorrect password confirmation'
+                              : null,
+                      obscureText: _hideConfirmNewPassword,
+                    ),
+                  ),
+                ]),
+                SizedBox(
+                  height: 64.0,
+                ),
+                Container(
+                  margin: EdgeInsets.symmetric(horizontal: 30),
+                  height: 50,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      gradient: LinearGradient(colors: [
+                        mainColor.withOpacity(.6),
+                        mainColor.withOpacity(1),
+                      ]),
+                      boxShadow: [
+                        BoxShadow(
+                            color: mainColor.withOpacity(.4),
+                            blurRadius: 20,
+                            offset: Offset(0, 10))
+                      ]),
+                  child: FlatButton(
+                    onPressed: () => _submit(context),
+                    child: Center(
+                      child: Text(
+                        'Update Password',
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold),
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

@@ -182,3 +182,39 @@ exports.sendNotifiActivities = functions.region("asia-northeast1").firestore
   }
   return;
   });
+
+exports.sendNotifiVideoCall = functions.region("asia-northeast1").firestore
+  .document("/call/{userId}")
+  .onCreate(async (snapshot, context) => {
+    const call = snapshot.data();
+    var receiverUid;
+    if (call['callerId'] === context.params.userId && call['hasDialled']) {
+      receiverUid = call['receiverId'];
+    }
+    const callerName = call['callerName'];
+    var token;
+    var avatar = call['callerPic'];
+    const tokenRef = admin
+      .firestore()
+      .collection("tokens");
+    const tokenDoc = await tokenRef.doc(receiverUid).get();
+    if (tokenDoc.exists) {
+      token = tokenDoc.get(receiverUid);
+      console.log(token);
+    }
+    const payload = {
+      notification: {
+          title: callerName + " is calling you.",
+          body: 'Click to answer',
+          image: avatar,
+          clickAction: "FLUTTER_NOTIFICATION_CLICK",
+      },
+      data: {
+        type: 'video call',
+      }
+  }
+  if (token !== '') {
+    return admin.messaging().sendToDevice(token, payload);
+  }
+  return;
+  });

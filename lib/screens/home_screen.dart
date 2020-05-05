@@ -17,6 +17,7 @@ import 'package:instagram_v2/screens/social_screen.dart';
 import 'package:instagram_v2/screens/splash_screen.dart';
 import 'package:instagram_v2/services/database_service.dart';
 import 'package:instagram_v2/utilities/constants.dart';
+import 'package:instagram_v2/widgets/pickup_layout.dart';
 import 'package:outline_material_icons/outline_material_icons.dart';
 import 'package:provider/provider.dart';
 
@@ -102,12 +103,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.paused) {
-      print('Pause');
+      //print('Pause');
       DatabaseService.updateActive(widget.currentUserId, false);
     } else if (state == AppLifecycleState.resumed) {
-      print('Resumed');
+      //print('Resumed');
       DatabaseService.updateActive(widget.currentUserId, true);
     }
+    print('state = $state');
   }
 
   Future<void> showNotification(message) async {
@@ -126,6 +128,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       message['notification']['title'].toString(),
       message['notification']['body'].toString(),
       platformChannelSpecifics,
+      payload: 'default_sound'
     );
   }
 
@@ -141,59 +144,61 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     final themeStyle = Provider.of<UserData>(context);
-    return Scaffold(
-      body: PageView(
-        controller: _pageController,
-        children: <Widget>[
-          SocialScreen(
-            currentUserId: themeStyle.currentUserId,
-          ),
-          GalleyScreen(),
-          CameraScreen()
-        ],
-        onPageChanged: (int index) {
-          setState(() {
-            _currentTab = index;
-          });
-        },
-      ),
-      bottomNavigationBar: CupertinoTabBar(
-        backgroundColor: themeStyle.primaryBackgroundColor,
-        currentIndex: _currentTab,
-        onTap: (int index) {
-          setState(() {
-            _currentTab = index;
-          });
-          _pageController.animateToPage(
-            index,
-            duration: Duration(milliseconds: 200),
-            curve: Curves.easeIn,
-          );
-        },
-        activeColor: Colors.black,
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(
-              OMIcons.home,
-              size: 32.0,
-              color: _currentTab == 0 ? mainColor : themeStyle.primaryIconColor,
+    return PickupLayout(
+      scaffold: Scaffold(
+        body: PageView(
+          controller: _pageController,
+          children: <Widget>[
+            SocialScreen(
+              currentUserId: themeStyle.currentUserId,
             ),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              OMIcons.photoAlbum,
-              size: 32.0,
-              color: _currentTab == 1 ? mainColor : themeStyle.primaryIconColor,
+            GalleyScreen(),
+            CameraScreen()
+          ],
+          onPageChanged: (int index) {
+            setState(() {
+              _currentTab = index;
+            });
+          },
+        ),
+        bottomNavigationBar: CupertinoTabBar(
+          backgroundColor: themeStyle.primaryBackgroundColor,
+          currentIndex: _currentTab,
+          onTap: (int index) {
+            setState(() {
+              _currentTab = index;
+            });
+            _pageController.animateToPage(
+              index,
+              duration: Duration(milliseconds: 200),
+              curve: Curves.easeIn,
+            );
+          },
+          activeColor: Colors.black,
+          items: [
+            BottomNavigationBarItem(
+              icon: Icon(
+                OMIcons.home,
+                size: 32.0,
+                color: _currentTab == 0 ? mainColor : themeStyle.primaryIconColor,
+              ),
             ),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              OMIcons.cameraEnhance,
-              size: 32.0,
-              color: _currentTab == 2 ? mainColor : themeStyle.primaryIconColor,
+            BottomNavigationBarItem(
+              icon: Icon(
+                OMIcons.photoAlbum,
+                size: 32.0,
+                color: _currentTab == 1 ? mainColor : themeStyle.primaryIconColor,
+              ),
             ),
-          ),
-        ],
+            BottomNavigationBarItem(
+              icon: Icon(
+                OMIcons.cameraEnhance,
+                size: 32.0,
+                color: _currentTab == 2 ? mainColor : themeStyle.primaryIconColor,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

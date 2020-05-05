@@ -6,6 +6,7 @@ import 'package:instagram_v2/models/user_data.dart';
 import 'package:instagram_v2/models/user_model.dart';
 import 'package:instagram_v2/services/database_service.dart';
 import 'package:instagram_v2/utilities/constants.dart';
+import 'package:instagram_v2/widgets/pickup_layout.dart';
 import 'package:instagram_v2/widgets/post_view.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -144,54 +145,56 @@ class _CommentsScreenState extends State<CommentsScreen> {
   @override
   Widget build(BuildContext context) {
     themeStyle = Provider.of<UserData>(context);
-    return Scaffold(
-      backgroundColor: themeStyle.primaryBackgroundColor,
-      appBar: AppBar(
+    return PickupLayout(
+      scaffold: Scaffold(
         backgroundColor: themeStyle.primaryBackgroundColor,
-        iconTheme: IconThemeData(color: themeStyle.primaryIconColor),
-        title: Text(
-          'Comments',
-          style: TextStyle(color: themeStyle.primaryTextColor),
+        appBar: AppBar(
+          backgroundColor: themeStyle.primaryBackgroundColor,
+          iconTheme: IconThemeData(color: themeStyle.primaryIconColor),
+          title: Text(
+            'Comments',
+            style: TextStyle(color: themeStyle.primaryTextColor),
+          ),
         ),
-      ),
-      body: GestureDetector(
-        onTap: () => FocusScope.of(context).unfocus(),
-        child: Column(
-          children: <Widget>[
-            Expanded(
-              child: ListView(
-                children: <Widget>[
-                  PostView(currentUserId: themeStyle.currentUserId, post: widget.post, author: _author, isCommentScreen: true,),
-                  StreamBuilder(
-                    stream: commentsRef
-                        .document(widget.post.id)
-                        .collection('postComments')
-                        .orderBy('timestamp', descending: true)
-                        .snapshots(),
-                    builder: (BuildContext context, AsyncSnapshot snapshot) {
-                      if (!snapshot.hasData) {
-                        return Center(
-                          child: CircularProgressIndicator(),
+        body: GestureDetector(
+          onTap: () => FocusScope.of(context).unfocus(),
+          child: Column(
+            children: <Widget>[
+              Expanded(
+                child: ListView(
+                  children: <Widget>[
+                    PostView(currentUserId: themeStyle.currentUserId, post: widget.post, author: _author, isCommentScreen: true,),
+                    StreamBuilder(
+                      stream: commentsRef
+                          .document(widget.post.id)
+                          .collection('postComments')
+                          .orderBy('timestamp', descending: true)
+                          .snapshots(),
+                      builder: (BuildContext context, AsyncSnapshot snapshot) {
+                        if (!snapshot.hasData) {
+                          return Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+                        return ListView.builder(
+                          shrinkWrap: true,
+                          physics: ClampingScrollPhysics(),
+                          itemCount: snapshot.data.documents.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            Comment comment =
+                            Comment.fromDoc(snapshot.data.documents[index]);
+                            return _buildComment(comment);
+                          },
                         );
-                      }
-                      return ListView.builder(
-                        shrinkWrap: true,
-                        physics: ClampingScrollPhysics(),
-                        itemCount: snapshot.data.documents.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          Comment comment =
-                          Comment.fromDoc(snapshot.data.documents[index]);
-                          return _buildComment(comment);
-                        },
-                      );
-                    },
-                  ),
-                ],
+                      },
+                    ),
+                  ],
+                ),
               ),
-            ),
-            Divider(height: 1.0),
-            _buildCommentTF(),
-          ],
+              Divider(height: 1.0),
+              _buildCommentTF(),
+            ],
+          ),
         ),
       ),
     );

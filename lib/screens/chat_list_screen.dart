@@ -8,6 +8,7 @@ import 'package:instagram_v2/models/user_model.dart';
 import 'package:instagram_v2/screens/chat_screen.dart';
 import 'package:instagram_v2/services/database_service.dart';
 import 'package:instagram_v2/utilities/constants.dart';
+import 'package:instagram_v2/widgets/pickup_layout.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -117,49 +118,51 @@ class _ChatListScreenState extends State<ChatListScreen> {
   @override
   Widget build(BuildContext context) {
     themeStyle = Provider.of<UserData>(context);
-    return Scaffold(
-      backgroundColor: themeStyle.primaryBackgroundColor,
-      appBar: AppBar(
-        iconTheme: IconThemeData(color: themeStyle.primaryIconColor),
+    return PickupLayout(
+      scaffold: Scaffold(
         backgroundColor: themeStyle.primaryBackgroundColor,
-        title: Text(
-          'Photogram',
-          style: TextStyle(
-            color: themeStyle.primaryTextColor,
-            fontFamily: 'Billabong',
-            fontSize: 35.0,
+        appBar: AppBar(
+          iconTheme: IconThemeData(color: themeStyle.primaryIconColor),
+          backgroundColor: themeStyle.primaryBackgroundColor,
+          title: Text(
+            'Photogram',
+            style: TextStyle(
+              color: themeStyle.primaryTextColor,
+              fontFamily: 'Billabong',
+              fontSize: 35.0,
+            ),
           ),
         ),
-      ),
-      body: StreamBuilder(
-          stream: DatabaseService.getAllRecentChat(widget.currentUserId),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
+        body: StreamBuilder(
+            stream: DatabaseService.getAllRecentChat(widget.currentUserId),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) {
+                return Container(
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                );
+              }
+              _recentChatList = snapshot.data;
               return Container(
-                child: Center(
-                  child: CircularProgressIndicator(),
+                child: ListView.separated(
+                  itemCount: _recentChatList.length,
+                  separatorBuilder: (context, index) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: Divider(
+                        color: Colors.grey,
+                      ),
+                    );
+                  },
+                  itemBuilder: (BuildContext context, int index) {
+                    Message message = _recentChatList[index];
+                    return _buildRecentChat(message);
+                  },
                 ),
               );
-            }
-            _recentChatList = snapshot.data;
-            return Container(
-              child: ListView.separated(
-                itemCount: _recentChatList.length,
-                separatorBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Divider(
-                      color: Colors.grey,
-                    ),
-                  );
-                },
-                itemBuilder: (BuildContext context, int index) {
-                  Message message = _recentChatList[index];
-                  return _buildRecentChat(message);
-                },
-              ),
-            );
-          }),
+            }),
+      ),
     );
   }
 }

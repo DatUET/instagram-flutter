@@ -12,10 +12,14 @@ import 'package:instagram_v2/models/user_model.dart';
 import 'package:instagram_v2/services/database_service.dart';
 import 'package:instagram_v2/services/photo_service.dart';
 import 'package:instagram_v2/services/storage_service.dart';
+import 'package:instagram_v2/utilities/call_utils.dart';
 import 'package:instagram_v2/utilities/constants.dart';
+import 'package:instagram_v2/utilities/permisstions.dart';
+import 'package:instagram_v2/widgets/pickup_layout.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class ChatScreen extends StatefulWidget {
   final String currentUserId;
@@ -33,12 +37,21 @@ class _ChatScreenState extends State<ChatScreen> {
   TextEditingController _textEditingController = TextEditingController();
   ScrollController _listController = ScrollController();
   File _image;
+  User _currentUser;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    //_setUpChat();
+    _setUpChat();
+  }
+
+  _setUpChat() async {
+    User currentUser =
+        await DatabaseService.getUserWithId(widget.currentUserId);
+    setState(() {
+      _currentUser = currentUser;
+    });
   }
 
   _buildTextMessage(Message message, bool isMe) {
@@ -361,109 +374,116 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     themeStyle = Provider.of<UserData>(context);
-    return Scaffold(
-      backgroundColor: themeStyle.primaryBackgroundColor,
-      appBar: AppBar(
-        iconTheme: IconThemeData(color: themeStyle.primaryIconColor),
+    return PickupLayout(
+      scaffold: Scaffold(
         backgroundColor: themeStyle.primaryBackgroundColor,
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(12.0)),
-                  border: Border.all(
-                      width: 1.5,
-                      color: widget.chatWithUser.isActive
-                          ? mainColor
-                          : Colors.grey),
-                  image: DecorationImage(
-                    image: widget.chatWithUser.profileImageUrl.isEmpty
-                        ? AssetImage('assets/images/user_placeholder.jpg')
-                        : CachedNetworkImageProvider(
-                            widget.chatWithUser.profileImageUrl),
-                    fit: BoxFit.cover
-                  )),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                widget.chatWithUser.name,
-                style: TextStyle(
-                  fontSize: 28.0,
-                  fontWeight: FontWeight.bold,
-                  color: themeStyle.primaryTextColor,
+        appBar: AppBar(
+          iconTheme: IconThemeData(color: themeStyle.primaryIconColor),
+          backgroundColor: themeStyle.primaryBackgroundColor,
+          title: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                    border: Border.all(
+                        width: 1.5,
+                        color: widget.chatWithUser.isActive
+                            ? mainColor
+                            : Colors.grey),
+                    image: DecorationImage(
+                        image: widget.chatWithUser.profileImageUrl.isEmpty
+                            ? AssetImage('assets/images/user_placeholder.jpg')
+                            : CachedNetworkImageProvider(
+                                widget.chatWithUser.profileImageUrl),
+                        fit: BoxFit.cover)),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  widget.chatWithUser.name,
+                  style: TextStyle(
+                    fontSize: 28.0,
+                    fontWeight: FontWeight.bold,
+                    color: themeStyle.primaryTextColor,
+                  ),
                 ),
               ),
+            ],
+          ),
+          elevation: 0.0,
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.video_call),
+              iconSize: 30.0,
+              color: Colors.white,
+              onPressed: () async =>
+                  await Permissions.cameraAndMicrophonePermissionsGranted()
+                      ? CallUtils.dial(
+                          from: _currentUser,
+                          to: widget.chatWithUser,
+                          context: context)
+                      : {},
             ),
           ],
         ),
-        elevation: 0.0,
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.more_horiz),
-            iconSize: 30.0,
-            color: Colors.white,
-            onPressed: () {},
-          ),
-        ],
-      ),
-      body: GestureDetector(
-        onTap: () => FocusScope.of(context).unfocus(),
-        child: Column(
-          children: <Widget>[
-            Expanded(
-              child: StreamBuilder(
-                  stream: DatabaseService.getAllMessage(
-                      widget.currentUserId, widget.chatWithUser.id),
-                  builder: (context, snapshot) {
-                    _messageList = snapshot.data;
-                    if (!snapshot.hasData) {
-                      return Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    }
-                    if (_messageList.length > 0) {
-                      if (_messageList[0].receiverUid == widget.currentUserId) {
-                        DatabaseService.updateIsSeen(
-                            widget.currentUserId, widget.chatWithUser.id);
+        body: GestureDetector(
+          onTap: () => FocusScope.of(context).unfocus(),
+          child: Column(
+            children: <Widget>[
+              Expanded(
+                child: StreamBuilder(
+                    stream: DatabaseService.getAllMessage(
+                        widget.currentUserId, widget.chatWithUser.id),
+                    builder: (context, snapshot) {
+                      _messageList = snapshot.data;
+                      if (!snapshot.hasData) {
+                        return Center(
+                          child: CircularProgressIndicator(),
+                        );
                       }
-                      return Container(
-                        decoration: BoxDecoration(
-                          color: themeStyle.primaryBackgroundColor,
-                        ),
-                        child: ListView.builder(
-                          controller: _listController,
-                          reverse: true,
-                          padding: EdgeInsets.only(top: 15.0),
-                          itemCount: _messageList.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            final Message message = _messageList[index];
-                            final bool isMe =
-                                message.senderUid == widget.currentUserId;
-                            return message.type == 'text'
-                                ? _buildTextMessage(message, isMe)
-                                : message.type == 'photo'
-                                    ? _buildImageMessage(message, isMe)
-                                    : _buildDeleteMessage(message, isMe);
-                          },
-                        ),
-                      );
-                    } else {
-                      return Center(
-                        child: Text(
-                          'No Message',
-                          style: TextStyle(
-                              fontSize: 30, color: themeStyle.primaryTextColor),
-                        ),
-                      );
-                    }
-                  }),
-            ),
-            _buildMessageComposer(),
-          ],
+                      if (_messageList.length > 0) {
+                        if (_messageList[0].receiverUid == widget.currentUserId) {
+                          DatabaseService.updateIsSeen(
+                              widget.currentUserId, widget.chatWithUser.id);
+                        }
+                        return Container(
+                          decoration: BoxDecoration(
+                            color: themeStyle.primaryBackgroundColor,
+                          ),
+                          child: ListView.builder(
+                            controller: _listController,
+                            reverse: true,
+                            padding: EdgeInsets.only(top: 15.0),
+                            itemCount: _messageList.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              final Message message = _messageList[index];
+                              final bool isMe =
+                                  message.senderUid == widget.currentUserId;
+                              return message.type == 'text'
+                                  ? _buildTextMessage(message, isMe)
+                                  : message.type == 'photo'
+                                      ? _buildImageMessage(message, isMe)
+                                      : _buildDeleteMessage(message, isMe);
+                            },
+                          ),
+                        );
+                      } else {
+                        return Center(
+                          child: Text(
+                            'No Message',
+                            style: TextStyle(
+                                fontSize: 30, color: themeStyle.primaryTextColor),
+                          ),
+                        );
+                      }
+                    }),
+              ),
+              _buildMessageComposer(),
+            ],
+          ),
         ),
       ),
     );

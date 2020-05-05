@@ -26,7 +26,8 @@ public class MainActivity extends FlutterActivity {
 
   @Override
   public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
-    GeneratedPluginRegistrant.registerWith(flutterEngine);
+      super.configureFlutterEngine(flutterEngine);
+    //GeneratedPluginRegistrant.registerWith(flutterEngine);
 
     new MethodChannel(getFlutterEngine().getDartExecutor().getBinaryMessenger(), "photogram")
             .setMethodCallHandler(new MethodChannel.MethodCallHandler() {

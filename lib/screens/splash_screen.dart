@@ -11,6 +11,7 @@ import 'package:instagram_v2/screens/chat_screen.dart';
 import 'package:instagram_v2/screens/home_screen.dart';
 import 'package:instagram_v2/screens/login_screen.dart';
 import 'package:instagram_v2/services/database_service.dart';
+import 'package:instagram_v2/widgets/pickup_layout.dart';
 import 'package:provider/provider.dart';
 import 'dart:async';
 
@@ -56,13 +57,10 @@ class _SplashScreenState extends State<SplashScreen> {
     FirebaseUser user = await FirebaseAuth.instance.currentUser();
     if (user != null) {
       if (user.isEmailVerified) {
-        Provider
-            .of<UserData>(context)
-            .currentUserId = user.uid.toString();
+        Provider.of<UserData>(context).currentUserId = user.uid.toString();
         currentUserId = user.uid.toString();
         return true;
-      }
-      else {
+      } else {
         return false;
       }
     } else {
@@ -72,7 +70,8 @@ class _SplashScreenState extends State<SplashScreen> {
 
   void _navigateToHome() {
     Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (BuildContext context) => HomeScreen(currentUserId)),
+        MaterialPageRoute(
+            builder: (BuildContext context) => HomeScreen(currentUserId)),
         (Route<dynamic> route) => false);
   }
 
@@ -84,20 +83,19 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: FutureBuilder(
-          future: _getBackgroundColor(),
-          builder: (context, snapshot) {
-            return Container(
-              color: snapshot.data,
-              width: double.infinity,
-              height: double.infinity,
-              child: FlareActor(
-                'assets/flares/test_1.flr',
-                alignment: Alignment.center,
-                animation: 'intro',
-              ),
-            );
-          })
-    );
+        body: FutureBuilder(
+            future: _getBackgroundColor(),
+            builder: (context, snapshot) {
+              return Container(
+                color: snapshot.data,
+                width: double.infinity,
+                height: double.infinity,
+                child: FlareActor(
+                  'assets/flares/test_1.flr',
+                  alignment: Alignment.center,
+                  animation: 'intro',
+                ),
+              );
+            }));
   }
 }
