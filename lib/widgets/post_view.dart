@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:animator/animator.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:instagram_v2/animations/bouncy_page_route.dart';
 import 'package:instagram_v2/models/post_model.dart';
 import 'package:instagram_v2/models/user_data.dart';
@@ -13,6 +14,7 @@ import 'package:instagram_v2/services/database_service.dart';
 import 'package:instagram_v2/services/photo_service.dart';
 import 'package:instagram_v2/utilities/constants.dart';
 import 'package:outline_material_icons/outline_material_icons.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 class PostView extends StatefulWidget {
@@ -33,11 +35,13 @@ class _PostViewState extends State<PostView>
   bool _isLiked = false;
   bool _heartAnim = false;
   var themeStyle;
+  PermissionStatus _status;
 
   @override
   void initState() {
     super.initState();
     _likeCount = widget.post.likeCount;
+    PermissionHandler().checkPermissionStatus(PermissionGroup.storage).then(_updateStatus);
     _initPostLiked();
   }
 
@@ -47,6 +51,25 @@ class _PostViewState extends State<PostView>
     if (oldWidget.post.likeCount != widget.post.likeCount) {
       _likeCount = widget.post.likeCount;
     }
+  }
+
+  _updateStatus(PermissionStatus status) {
+    setState(() {
+      _status = status;
+    });
+  }
+
+  _askPermission() {
+    PermissionHandler().requestPermissions([PermissionGroup.storage]).then((statuses) {
+      final status = statuses[PermissionGroup.storage];
+      if (status != PermissionStatus.granted) {
+        Fluttertoast.showToast(msg: 'Please allow permission!', toastLength: Toast.LENGTH_LONG);
+      } else {
+        PhotoService.downloadImage(
+            widget.post.imageUrl, false);
+        _updateStatus(status);
+      }
+    });
   }
 
   _initPostLiked() async {
@@ -232,6 +255,7 @@ class _PostViewState extends State<PostView>
                         BouncyPageRoute(
                           widget: CommentsScreen(
                             post: widget.post,
+
                           ),
                         ),
                       ),
@@ -242,8 +266,14 @@ class _PostViewState extends State<PostView>
                           color: themeStyle.primaryIconColor,
                         ),
                         iconSize: 30.0,
-                        onPressed: () => PhotoService.downloadImage(
-                            widget.post.imageUrl, false))
+                        onPressed: () {
+                          if (_status == PermissionStatus.granted) {
+                            PhotoService.downloadImage(
+                                widget.post.imageUrl, false);
+                          } else {
+                            _askPermission();
+                          }
+                        })
                   ],
                 ),
                 Padding(

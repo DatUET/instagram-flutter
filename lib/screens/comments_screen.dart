@@ -24,21 +24,6 @@ class _CommentsScreenState extends State<CommentsScreen> {
   final TextEditingController _commentController = TextEditingController();
   bool _isCommenting = false;
   var themeStyle;
-  User _author;
-
-  _getAuthorUser() async {
-    User author = await DatabaseService.getUserWithId(widget.post.authorId);
-    setState(() {
-      _author = author;
-    });
-  }
-
-
-  @override
-  void initState() {
-    super.initState();
-    _getAuthorUser();
-  }
 
   _buildComment(Comment comment) {
     return FutureBuilder(
@@ -55,16 +40,22 @@ class _CommentsScreenState extends State<CommentsScreen> {
             decoration: BoxDecoration(
                 color: Colors.grey,
                 borderRadius: BorderRadius.all(Radius.circular(15)),
-                border: Border.all(width: 1.5, color: author.isActive ? mainColor : Colors.grey),
-                image: DecorationImage(image: author.profileImageUrl.isEmpty
-                    ? AssetImage('assets/images/user_placeholder.jpg')
-                    : CachedNetworkImageProvider(
-                  author.profileImageUrl,),fit: BoxFit.cover)
-            ),
+                border: Border.all(
+                    width: 1.5,
+                    color: author.isActive ? mainColor : Colors.grey),
+                image: DecorationImage(
+                    image: author.profileImageUrl.isEmpty
+                        ? AssetImage('assets/images/user_placeholder.jpg')
+                        : CachedNetworkImageProvider(
+                            author.profileImageUrl,
+                          ),
+                    fit: BoxFit.cover)),
           ),
           title: Text(
             author.name,
-            style: TextStyle(color: themeStyle.primaryTextColor, fontWeight: FontWeight.bold),
+            style: TextStyle(
+                color: themeStyle.primaryTextColor,
+                fontWeight: FontWeight.bold),
           ),
           subtitle: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -163,7 +154,22 @@ class _CommentsScreenState extends State<CommentsScreen> {
               Expanded(
                 child: ListView(
                   children: <Widget>[
-                    PostView(currentUserId: themeStyle.currentUserId, post: widget.post, author: _author, isCommentScreen: true,),
+                    FutureBuilder(
+                        future:
+                            DatabaseService.getUserWithId(widget.post.authorId),
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) {
+                            return Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+                          return PostView(
+                            currentUserId: themeStyle.currentUserId,
+                            post: widget.post,
+                            author: snapshot.data,
+                            isCommentScreen: true,
+                          );
+                        }),
                     StreamBuilder(
                       stream: commentsRef
                           .document(widget.post.id)
@@ -182,7 +188,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
                           itemCount: snapshot.data.documents.length,
                           itemBuilder: (BuildContext context, int index) {
                             Comment comment =
-                            Comment.fromDoc(snapshot.data.documents[index]);
+                                Comment.fromDoc(snapshot.data.documents[index]);
                             return _buildComment(comment);
                           },
                         );

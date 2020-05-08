@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:instagram_v2/models/call_model.dart';
+import 'package:instagram_v2/models/message_model.dart';
+import 'package:instagram_v2/services/database_service.dart';
 import 'package:instagram_v2/utilities/constants.dart';
 
 class CallService {
@@ -24,9 +26,20 @@ class CallService {
   }
 
   static Future<bool> endCall(Call call) async {
+    Message message = Message(
+      id: call.channelId,
+      senderUid: call.callerId,
+      receiverUid: call.receiverId,
+      type: 'video call',
+      message: 'Video Call',
+      timestamp: Timestamp.fromMillisecondsSinceEpoch(int.parse(call.channelId)),
+      isSeen: false,
+      photoUrl: '',
+    );
     try {
       await callRef.document(call.callerId).delete();
       await callRef.document(call.receiverId).delete();
+      await DatabaseService.sendMessage(message);
       return true;
     } catch (e) {
       print(e);

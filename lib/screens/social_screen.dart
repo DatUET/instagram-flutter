@@ -25,12 +25,18 @@ class _SocialScreenState extends State<SocialScreen>
     with SingleTickerProviderStateMixin {
   ScrollController _scrollViewController;
   TabController _tabController;
+  int indexTab = 0;
 
   @override
   void initState() {
     super.initState();
     _scrollViewController = new ScrollController(initialScrollOffset: 0.0);
     _tabController = new TabController(vsync: this, length: 3);
+    _tabController.addListener(() {
+      setState(() {
+        indexTab = _tabController.index;
+      });
+    });
   }
 
   @override
@@ -45,10 +51,20 @@ class _SocialScreenState extends State<SocialScreen>
     final themeStyle = Provider.of<UserData>(context);
     return Scaffold(
       backgroundColor: themeStyle.primaryBackgroundColor,
+      floatingActionButton: indexTab == 0 ? FloatingActionButton(
+        child: Icon(Icons.keyboard_arrow_up,),
+        backgroundColor: mainColor,
+        onPressed: () {
+          _scrollViewController.animateTo(
+              0.0,
+              curve: Curves.easeOut,
+              duration: const Duration(milliseconds: 300),
+          );
+        },
+      ) : null,
       body: NestedScrollView(
         controller: _scrollViewController,
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-          //<-- headerSliverBuilder
           return <Widget>[
             new SliverAppBar(
               backgroundColor: themeStyle.primaryBackgroundColor,

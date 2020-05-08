@@ -10,6 +10,7 @@ import 'package:instagram_v2/screens/change_password_screen.dart';
 import 'package:instagram_v2/services/database_service.dart';
 import 'package:instagram_v2/services/storage_service.dart';
 import 'package:instagram_v2/utilities/constants.dart';
+import 'package:instagram_v2/widgets/custom_dialog.dart';
 import 'package:instagram_v2/widgets/pickup_layout.dart';
 import 'package:outline_material_icons/outline_material_icons.dart';
 import 'package:provider/provider.dart';
@@ -96,6 +97,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
       Navigator.pop(context);
     }
+  }
+
+  _showQRDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) => CustomDialog(
+        title: "Your QR Code",
+        id: widget.user.id,
+        buttonText: "Okay",
+        imageUrl: widget.user.profileImageUrl,
+      ),
+    );
   }
 
   @override
@@ -261,6 +274,31 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       onTap: () =>
                           widget.user.type == 'Custom' ? Navigator.of(context).push(MaterialPageRoute(builder: (_) => ChangePassScreen(user: widget.user,)))
                       : Fluttertoast.showToast(msg: "This is Google Account.\nYou can't change password", toastLength: Toast.LENGTH_LONG),
+                    ),
+                    SizedBox(
+                      height: 16,
+                    ),
+                    InkWell(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text(
+                            'QR Code',
+                            style: TextStyle(
+                                color: themeStyle.primaryTextColor,
+                                fontSize: 18.0),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Icon(
+                              OMIcons.arrowForwardIos,
+                              color: themeStyle.primaryIconColor,
+                            ),
+                          )
+                        ],
+                      ),
+                      onTap: () =>
+                      _showQRDialog()
                     ),
                     SizedBox(
                       height: 16,

@@ -87,7 +87,7 @@ class _ChatScreenState extends State<ChatScreen> {
               child: Text(
                 message.message,
                 style: TextStyle(
-                  color: themeStyle.primaryTextColorDark,
+                  color: isMe ? Colors.white : themeStyle.primaryTextColorDark,
                   fontSize: 16.0,
                   fontWeight: FontWeight.w600,
                 ),
@@ -131,6 +131,92 @@ class _ChatScreenState extends State<ChatScreen> {
                 imageUrl: message.photoUrl,
                 fit: BoxFit.cover,
               ),
+            ),
+          ),
+        ));
+    if (isMe) {
+      return msg;
+    }
+    return msg;
+  }
+
+  _buildVideoCallMessage(Message message, bool isMe) {
+    final Align msg = Align(
+        alignment: isMe ? Alignment.topRight : Alignment.topLeft,
+        child: Padding(
+          padding: isMe
+              ? EdgeInsets.only(left: 120.0)
+              : EdgeInsets.only(right: 120.0),
+          child: Container(
+            margin: EdgeInsets.only(
+              top: 8.0,
+              bottom: 8.0,
+            ),
+            padding: EdgeInsets.symmetric(horizontal: 25.0, vertical: 15.0),
+            //width: MediaQuery.of(context).size.width * 0.75,
+            decoration: BoxDecoration(
+              color: isMe
+                  ? themeStyle.primaryMessageBoxColor
+                  : themeStyle.typeMessageBoxColor,
+              borderRadius: isMe
+                  ? BorderRadius.only(
+                      topLeft: Radius.circular(15.0),
+                      bottomLeft: Radius.circular(15.0),
+                    )
+                  : BorderRadius.only(
+                      topRight: Radius.circular(15.0),
+                      bottomRight: Radius.circular(15.0),
+                    ),
+            ),
+            child: Column(
+              children: <Widget>[
+                Text(
+                  isMe
+                      ? 'You called for ${widget.chatWithUser.name}'
+                      : '${widget.chatWithUser.name} called for you',
+                  style: TextStyle(
+                    color: isMe ? Colors.white : themeStyle.primaryTextColor,
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                SizedBox(
+                  height: 8,
+                ),
+                Text(
+                  'Call start: ${message.timestamp.toDate().hour}:${message.timestamp.toDate().minute}',
+                  style: TextStyle(
+                      color: isMe ? Colors.white : themeStyle.primaryTextColor),
+                ),
+                SizedBox(
+                  height: 8,
+                ),
+                InkWell(
+                  child: Container(
+                      height: 24,
+                      width: 100,
+                      decoration: BoxDecoration(
+                          color: Colors.white54,
+                          borderRadius: BorderRadius.all(Radius.circular(12))),
+                      child: Center(
+                        child: Text(
+                          'Call Again',
+                          textAlign: TextAlign.right,
+                          style: TextStyle(
+                              color: isMe ? Colors.white70 : themeStyle.mode == 1 ? Colors.white70 : Colors.black45,
+                            fontWeight: FontWeight.w500
+                          ),
+                        ),
+                      )),
+                  onTap: () async =>
+                      await Permissions.cameraAndMicrophonePermissionsGranted()
+                          ? CallUtils.dial(
+                              from: _currentUser,
+                              to: widget.chatWithUser,
+                              context: context)
+                          : {},
+                )
+              ],
             ),
           ),
         ));
@@ -418,7 +504,7 @@ class _ChatScreenState extends State<ChatScreen> {
             IconButton(
               icon: Icon(Icons.video_call),
               iconSize: 30.0,
-              color: Colors.white,
+              color: mainColor,
               onPressed: () async =>
                   await Permissions.cameraAndMicrophonePermissionsGranted()
                       ? CallUtils.dial(
@@ -445,7 +531,8 @@ class _ChatScreenState extends State<ChatScreen> {
                         );
                       }
                       if (_messageList.length > 0) {
-                        if (_messageList[0].receiverUid == widget.currentUserId) {
+                        if (_messageList[0].receiverUid ==
+                            widget.currentUserId) {
                           DatabaseService.updateIsSeen(
                               widget.currentUserId, widget.chatWithUser.id);
                         }
@@ -466,7 +553,10 @@ class _ChatScreenState extends State<ChatScreen> {
                                   ? _buildTextMessage(message, isMe)
                                   : message.type == 'photo'
                                       ? _buildImageMessage(message, isMe)
-                                      : _buildDeleteMessage(message, isMe);
+                                      : message.type == 'video call'
+                                          ? _buildVideoCallMessage(
+                                              message, isMe)
+                                          : _buildDeleteMessage(message, isMe);
                             },
                           ),
                         );
@@ -475,7 +565,8 @@ class _ChatScreenState extends State<ChatScreen> {
                           child: Text(
                             'No Message',
                             style: TextStyle(
-                                fontSize: 30, color: themeStyle.primaryTextColor),
+                                fontSize: 30,
+                                color: themeStyle.primaryTextColor),
                           ),
                         );
                       }

@@ -218,3 +218,9 @@ exports.sendNotifiVideoCall = functions.region("asia-northeast1").firestore
   }
   return;
   });
+
+  exports.onEndCall = functions.region("asia-northeast1").firestore
+  .document("/call/{userId}")
+  .onDelete(async (snapshot, context) => {
+    
+  });

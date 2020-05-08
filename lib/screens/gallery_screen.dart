@@ -4,10 +4,12 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'package:image_gallery/image_gallery.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:instagram_v2/models/user_data.dart';
 import 'package:instagram_v2/screens/preview_photo.dart';
+import 'package:media_gallery/media_gallery.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 class GalleyScreen extends StatefulWidget {
@@ -17,17 +19,21 @@ class GalleyScreen extends StatefulWidget {
 
 class _GalleyScreenState extends State<GalleyScreen>
     with AutomaticKeepAliveClientMixin {
-  List _allUri = [];
+  List<Media> _allUri = [];
   var _dir;
   var themeStyle;
 
   Future<void> _getImagePath() async {
     var dir = await getTemporaryDirectory();
-    Map<dynamic, dynamic> allImage = await FlutterGallaryPlugin.getAllImages;
-    print('${allImage.length} ${dir.toString()}');
+    final List<MediaCollection> collections = await MediaGallery.listMediaCollections(
+      mediaTypes: [MediaType.image],
+    );
+    final MediaPage imagePage = await collections[0].getMedias(
+      mediaType: MediaType.image,
+      take: 500,
+    );
     setState(() {
-      _allUri = allImage["URIList"] as List;
-      _allUri = _allUri.reversed.toList();
+      _allUri = imagePage.items;
       _dir = dir;
     });
   }
@@ -36,7 +42,26 @@ class _GalleyScreenState extends State<GalleyScreen>
   void initState() {
     // TODO: implement initState
     super.initState();
-    _getImagePath();
+    PermissionHandler().checkPermissionStatus(PermissionGroup.storage).then(_updateStatus);
+  }
+
+  _updateStatus(PermissionStatus status) {
+    if (status == PermissionStatus.granted) {
+      _getImagePath();
+    } else {
+      _askPermission();
+    }
+  }
+
+  _askPermission() {
+    PermissionHandler().requestPermissions([PermissionGroup.storage]).then((statuses) {
+      final status = statuses[PermissionGroup.storage];
+      if (status != PermissionStatus.granted) {
+        Fluttertoast.showToast(msg: 'Please allow permission!', toastLength: Toast.LENGTH_LONG);
+      } else {
+        _updateStatus(status);
+      }
+    });
   }
 
   @override
@@ -61,7 +86,7 @@ class _GalleyScreenState extends State<GalleyScreen>
     );
   }
 
-  _buildGridTile() {
+  _buildGridTile()  {
     print('${themeStyle.gridTileImage.length}');
     if (themeStyle.gridTileImage.length > 0) {
       return GridView.count(
@@ -76,8 +101,7 @@ class _GalleyScreenState extends State<GalleyScreen>
     } else {
       List<GridTile> tiles = [];
       for (int i = 0; i < _allUri.length; i++) {
-        File file = File.fromUri(Uri.parse(_allUri[i]));
-        var tile = _buildTilePost(file, i);
+        var tile = _buildTilePost(i);
         tiles.add(tile);
       }
       setState(() {
@@ -95,11 +119,11 @@ class _GalleyScreenState extends State<GalleyScreen>
     }
   }
 
-  _buildTilePost(File file, int i) {
+  _buildTilePost(int i) {
     final targetPath = _dir.absolute.path + "/temp$i.jpg";
     return GridTile(
       child: FutureBuilder(
-          future: _compressAndGetFile(file, targetPath),
+          future: _compressAndGetFile(targetPath, i),
           builder: (context, snapshot) {
             return snapshot.hasData
                 ? InkWell(
@@ -126,7 +150,8 @@ class _GalleyScreenState extends State<GalleyScreen>
     );
   }
 
-  Future<File> _compressAndGetFile(File file, String targetPath) async {
+  Future<File> _compressAndGetFile(String targetPath, int i) async {
+    File file = await _allUri[i].getFile();
     var result = await FlutterImageCompress.compressAndGetFile(
       file.absolute.path,
       targetPath,
