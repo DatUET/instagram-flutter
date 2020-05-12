@@ -12,11 +12,15 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
 class CameraScreen extends StatefulWidget {
+  final PageController pageController;
+
+  CameraScreen(this.pageController);
+
   @override
   _CameraScreenState createState() => _CameraScreenState();
 }
 
-class _CameraScreenState extends State {
+class _CameraScreenState extends State<CameraScreen> {
   CameraController controller;
   List cameras;
   int selectedCameraIndex;
@@ -182,8 +186,11 @@ class _CameraScreenState extends State {
                 ),
               ),
               onTap: () {
-                Navigator.push(
-                    context, MaterialPageRoute(builder: (_) => GalleyScreen()));
+                widget.pageController.animateToPage(
+                  1,
+                  duration: Duration(milliseconds: 200),
+                  curve: Curves.easeIn,
+                );
               },
             );
           }),

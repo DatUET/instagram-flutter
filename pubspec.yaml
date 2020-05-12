@@ -58,6 +58,8 @@ dependencies:
   flutter_ringtone_player: ^2.0.0
   qr_flutter: ^3.1.0
   flutter_barcode_scanner: ^1.0.0
+  cache_image: ^1.0.5
+
 
 dev_dependencies:
   flutter_test:

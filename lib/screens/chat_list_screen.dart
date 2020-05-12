@@ -1,11 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:instagram_v2/models/call_model.dart';
 import 'package:instagram_v2/models/message_model.dart';
 import 'package:instagram_v2/models/user_data.dart';
 import 'package:instagram_v2/models/user_model.dart';
 import 'package:instagram_v2/screens/chat_screen.dart';
+import 'package:instagram_v2/screens/pickup_screen.dart';
+import 'package:instagram_v2/services/call_service.dart';
 import 'package:instagram_v2/services/database_service.dart';
 import 'package:instagram_v2/utilities/constants.dart';
 import 'package:instagram_v2/widgets/pickup_layout.dart';
@@ -40,9 +42,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
         future: DatabaseService.getUserWithId(chatWithUserId),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
+            return Container();
           }
           User user = snapshot.data;
           return Container(
@@ -134,34 +134,45 @@ class _ChatListScreenState extends State<ChatListScreen> {
           ),
         ),
         body: StreamBuilder(
-            stream: DatabaseService.getAllRecentChat(widget.currentUserId),
-            builder: (context, snapshot) {
-              if (!snapshot.hasData) {
-                return Container(
-                  child: Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                );
+          stream: CallService.callStream(widget.currentUserId),
+          builder: (context, snapshot) {
+            if (snapshot.hasData && snapshot.data.data != null) {
+              Call call = Call.fromMap(snapshot.data.data);
+              if (!call.hasDialled) {
+                return PickUpScreen(call: call,);
               }
-              _recentChatList = snapshot.data;
-              return Container(
-                child: ListView.separated(
-                  itemCount: _recentChatList.length,
-                  separatorBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Divider(
-                        color: Colors.grey,
+            }
+            return StreamBuilder<List<Message>>(
+                stream: DatabaseService.getAllRecentChat(widget.currentUserId),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return Container(
+                      child: Center(
+                        child: CircularProgressIndicator(),
                       ),
                     );
-                  },
-                  itemBuilder: (BuildContext context, int index) {
-                    Message message = _recentChatList[index];
-                    return _buildRecentChat(message);
-                  },
-                ),
-              );
-            }),
+                  }
+                  _recentChatList = snapshot.data;
+                  return Container(
+                    child: ListView.separated(
+                      itemCount: _recentChatList.length,
+                      separatorBuilder: (context, index) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: Divider(
+                            color: Colors.grey,
+                          ),
+                        );
+                      },
+                      itemBuilder: (BuildContext context, int index) {
+                        Message message = _recentChatList[index];
+                        return _buildRecentChat(message);
+                      },
+                    ),
+                  );
+                });
+          }
+        ),
       ),
     );
   }

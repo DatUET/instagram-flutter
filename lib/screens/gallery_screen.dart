@@ -20,11 +20,11 @@ class GalleyScreen extends StatefulWidget {
 class _GalleyScreenState extends State<GalleyScreen>
     with AutomaticKeepAliveClientMixin {
   List<Media> _allUri = [];
-  var _dir;
+  Directory _dir;
   var themeStyle;
 
   Future<void> _getImagePath() async {
-    var dir = await getTemporaryDirectory();
+    Directory dir = await getTemporaryDirectory();
     final List<MediaCollection> collections = await MediaGallery.listMediaCollections(
       mediaTypes: [MediaType.image],
     );
@@ -45,9 +45,21 @@ class _GalleyScreenState extends State<GalleyScreen>
     PermissionHandler().checkPermissionStatus(PermissionGroup.storage).then(_updateStatus);
   }
 
+
+  @override
+  void dispose() {
+    _clearCache();
+    super.dispose();
+  }
+
+  _clearCache() async {
+    await _dir.delete();
+  }
+
   _updateStatus(PermissionStatus status) {
     if (status == PermissionStatus.granted) {
-      _getImagePath();
+      if (themeStyle.gridTileImage.length == 0 )
+        _getImagePath();
     } else {
       _askPermission();
     }
@@ -88,25 +100,11 @@ class _GalleyScreenState extends State<GalleyScreen>
 
   _buildGridTile()  {
     print('${themeStyle.gridTileImage.length}');
-    if (themeStyle.gridTileImage.length > 0) {
-      return GridView.count(
-        addAutomaticKeepAlives: true,
-        crossAxisCount: 3,
-        childAspectRatio: 1.0,
-        mainAxisSpacing: 5.0,
-        crossAxisSpacing: 5.0,
-        shrinkWrap: true,
-        children: themeStyle.gridTileImage,
-      );
-    } else {
       List<GridTile> tiles = [];
       for (int i = 0; i < _allUri.length; i++) {
         var tile = _buildTilePost(i);
         tiles.add(tile);
       }
-      setState(() {
-        themeStyle.gridTileImage = tiles;
-      });
       return GridView.count(
         addAutomaticKeepAlives: true,
         crossAxisCount: 3,
@@ -116,7 +114,6 @@ class _GalleyScreenState extends State<GalleyScreen>
         shrinkWrap: true,
         children: tiles,
       );
-    }
   }
 
   _buildTilePost(int i) {
@@ -158,7 +155,6 @@ class _GalleyScreenState extends State<GalleyScreen>
       quality: file.lengthSync() > 300000 ? 15 : 20,
       rotate: 0,
     );
-    print(result.lengthSync());
     return result;
   }
 

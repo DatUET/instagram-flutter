@@ -5,8 +5,7 @@ import 'package:instagram_v2/services/database_service.dart';
 import 'package:instagram_v2/utilities/constants.dart';
 
 class CallService {
-  static Stream<DocumentSnapshot> callStream(String uid) =>
-    callRef.document(uid).snapshots();
+  static Stream<DocumentSnapshot> callStream(String uid) => callRef.document(uid).snapshots();
 
   static Future<bool> makeCall(Call call) async {
     try {
@@ -36,10 +35,10 @@ class CallService {
       isSeen: false,
       photoUrl: '',
     );
-    try {
+    try {//
+      await DatabaseService.sendMessage(message);
       await callRef.document(call.callerId).delete();
       await callRef.document(call.receiverId).delete();
-      await DatabaseService.sendMessage(message);
       return true;
     } catch (e) {
       print(e);

@@ -320,17 +320,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
   _buildDisplayPosts() {
     if (_displayPosts == 0) {
       // Grid
-      return StaggeredGridView.countBuilder(
-        crossAxisCount: 2,
-        itemCount: _posts.length,
-        mainAxisSpacing: 12.0,
-        crossAxisSpacing: 12.0,
-        shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
-        itemBuilder: (context, index) => _buildTilePost(_posts[index], index),
-        staggeredTileBuilder: (index) {
-          return StaggeredTile.count(1, index.isEven ? 2 : 1);
-        },
+      return Container(
+        color: themeStyle.primaryBackgroundColor,
+        child: StaggeredGridView.countBuilder(
+          crossAxisCount: 2,
+          itemCount: _posts.length,
+          mainAxisSpacing: 12.0,
+          crossAxisSpacing: 12.0,
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          itemBuilder: (context, index) => _buildTilePost(_posts[index], index),
+          staggeredTileBuilder: (index) {
+            return StaggeredTile.count(1, index.isEven ? 2 : 1);
+          },
+        ),
       );
     } else {
       // Column
@@ -357,8 +360,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return PickupLayout(
       scaffold: Scaffold(
         backgroundColor: themeStyle.primaryBackgroundColor,
-        body: FutureBuilder(
-          future: usersRef.document(widget.userId).get(),
+        body: StreamBuilder(
+          stream: usersRef.document(widget.userId).snapshots(),
           builder: (BuildContext context, AsyncSnapshot snapshot) {
             if (!snapshot.hasData) {
               return Center(

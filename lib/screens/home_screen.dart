@@ -110,7 +110,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       //print('Resumed');
       DatabaseService.updateActive(widget.currentUserId, true);
     }
-    print('state = $state');
+//    print('state = $state');
   }
 
   Future<void> showNotification(message) async {
@@ -142,6 +142,14 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     flutterLocalNotificationsPlugin.initialize(initializationSettings);
   }
 
+  jumpToGallery() {
+    _pageController.animateToPage(
+      1,
+      duration: Duration(milliseconds: 200),
+      curve: Curves.easeIn,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeStyle = Provider.of<UserData>(context);
@@ -154,7 +162,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               currentUserId: themeStyle.currentUserId,
             ),
             GalleyScreen(),
-            CameraScreen()
+            CameraScreen(_pageController)
           ],
           onPageChanged: (int index) {
             setState(() {

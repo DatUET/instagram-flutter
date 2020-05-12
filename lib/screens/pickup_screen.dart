@@ -20,95 +20,97 @@ class PickUpScreen extends StatelessWidget {
     final themeStyle = Provider.of<UserData>(context);
     return Scaffold(
       backgroundColor: themeStyle.primaryBackgroundColor,
-      body: Container(
-        alignment: Alignment.center,
-        padding: EdgeInsets.symmetric(vertical: 100),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'Incoming...',
-              style: TextStyle(fontSize: 30),
-            ),
-            SizedBox(
-              height: 30,
-            ),
-            Container(
-              height: 150,
-              width: 150,
-              decoration: BoxDecoration(
-                  border: Border.all(color: mainColor, width: 2.5),
-                  borderRadius: BorderRadius.all(Radius.circular(20)),
-                  image: DecorationImage(
-                    fit: BoxFit.cover,
-                    image: call.callerPic == ''
-                        ? AssetImage('assets/images/user_placeholder.jpg')
-                        : CachedNetworkImageProvider(
-                            call.callerPic,
-                          ),
+      body: SingleChildScrollView(
+        child: Container(
+          alignment: Alignment.center,
+          padding: EdgeInsets.symmetric(vertical: 100),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                'Incoming...',
+                style: TextStyle(fontSize: 30, color: themeStyle.primaryTextColor),
+              ),
+              SizedBox(
+                height: 30,
+              ),
+              Container(
+                height: 150,
+                width: 150,
+                decoration: BoxDecoration(
+                    border: Border.all(color: mainColor, width: 2.5),
+                    borderRadius: BorderRadius.all(Radius.circular(20)),
+                    image: DecorationImage(
+                      fit: BoxFit.cover,
+                      image: call.callerPic == ''
+                          ? AssetImage('assets/images/user_placeholder.jpg')
+                          : CachedNetworkImageProvider(
+                              call.callerPic,
+                            ),
+                    )),
+              ),
+              SizedBox(
+                height: 15,
+              ),
+              Text(
+                call.callerName,
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: themeStyle.primaryTextColor),
+              ),
+              SizedBox(
+                height: 75,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  ClipOval(
+                      child: Material(
+                    color: Colors.redAccent,
+                    child: InkWell(
+                      splashColor: Colors.white.withOpacity(.2),
+                      child: SizedBox(
+                          width: 64,
+                          height: 64,
+                          child: Icon(
+                            Icons.call_end,
+                            color: Colors.white,
+                          )),
+                      onTap: () async {
+                        await FlutterRingtonePlayer.stop();
+                        await CallService.endCall(call);
+                      },
+                    ),
                   )),
-            ),
-            SizedBox(
-              height: 15,
-            ),
-            Text(
-              call.callerName,
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-            ),
-            SizedBox(
-              height: 75,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                ClipOval(
-                    child: Material(
-                  color: Colors.redAccent,
-                  child: InkWell(
-                    splashColor: Colors.white.withOpacity(.2),
-                    child: SizedBox(
-                        width: 64,
-                        height: 64,
-                        child: Icon(
-                          Icons.call_end,
-                          color: Colors.white,
-                        )),
-                    onTap: () async {
-                      FlutterRingtonePlayer.stop();
-                      await CallService.endCall(call);
-                    },
+                  SizedBox(
+                    width: 50,
                   ),
-                )),
-                SizedBox(
-                  width: 50,
-                ),
-                ClipOval(
-                    child: Material(
-                  color: Colors.green,
-                  child: InkWell(
-                    splashColor: Colors.white.withOpacity(.2),
-                    child: SizedBox(
-                        width: 64,
-                        height: 64,
-                        child: Icon(
-                          Icons.call,
-                          color: Colors.white,
-                        )),
-                    onTap: () async {
-                      FlutterRingtonePlayer.stop();
-                      await Permissions
-                            .cameraAndMicrophonePermissionsGranted()
-                        ?
-                    Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => CallScreen(call: call)))
-                        : {};},
-                  ),
-                )),
-              ],
-            )
-          ],
+                  ClipOval(
+                      child: Material(
+                    color: Colors.green,
+                    child: InkWell(
+                      splashColor: Colors.white.withOpacity(.2),
+                      child: SizedBox(
+                          width: 64,
+                          height: 64,
+                          child: Icon(
+                            Icons.call,
+                            color: Colors.white,
+                          )),
+                      onTap: () async {
+                        await FlutterRingtonePlayer.stop();
+                        await Permissions
+                              .cameraAndMicrophonePermissionsGranted()
+                          ?
+                      Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => CallScreen(call: call)))
+                          : {};},
+                    ),
+                  )),
+                ],
+              )
+            ],
+          ),
         ),
       ),
     );

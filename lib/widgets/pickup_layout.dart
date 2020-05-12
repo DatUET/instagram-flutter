@@ -23,7 +23,6 @@ class PickupLayout extends StatelessWidget {
           if (!call.hasDialled) {
             return PickUpScreen(call: call,);
           }
-          return scaffold;
         }
         return scaffold;
         }
