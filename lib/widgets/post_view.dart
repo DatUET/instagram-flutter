@@ -31,7 +31,6 @@ class PostView extends StatefulWidget {
 
 class _PostViewState extends State<PostView>
     with AutomaticKeepAliveClientMixin<PostView> {
-  int _likeCount = 0;
   bool _isLiked = false;
   bool _heartAnim = false;
   var themeStyle;
@@ -40,7 +39,7 @@ class _PostViewState extends State<PostView>
   @override
   void initState() {
     super.initState();
-    _likeCount = widget.post.likeCount;
+    //_likeCount = widget.post.likeCount;
     PermissionHandler().checkPermissionStatus(PermissionGroup.storage).then(_updateStatus);
     _initPostLiked();
   }
@@ -49,7 +48,7 @@ class _PostViewState extends State<PostView>
   void didUpdateWidget(PostView oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.post.likeCount != widget.post.likeCount) {
-      _likeCount = widget.post.likeCount;
+      //_likeCount = widget.post.likeCount;
     }
   }
 
@@ -91,7 +90,7 @@ class _PostViewState extends State<PostView>
           currentUserId: widget.currentUserId, post: widget.post);
       setState(() {
         _isLiked = false;
-        _likeCount = _likeCount - 1;
+        //_likeCount = _likeCount - 1;
       });
     } else {
       // Like Post
@@ -100,7 +99,7 @@ class _PostViewState extends State<PostView>
       setState(() {
         _heartAnim = true;
         _isLiked = true;
-        _likeCount = _likeCount + 1;
+        //_likeCount = _likeCount + 1;
       });
       Timer(Duration(milliseconds: 350), () {
         setState(() {
@@ -186,7 +185,7 @@ class _PostViewState extends State<PostView>
             ),
           ),
           GestureDetector(
-            onDoubleTap: _likePost,
+            onDoubleTap: !widget.isCommentScreen ? _likePost : () {},
             child: Stack(
               alignment: Alignment.center,
               children: <Widget>[
@@ -231,7 +230,7 @@ class _PostViewState extends State<PostView>
               children: <Widget>[
                 Row(
                   children: <Widget>[
-                    IconButton(
+                    widget.isCommentScreen ? Container() : IconButton(
                       icon: _isLiked
                           ? Icon(
                               Icons.favorite,
@@ -278,13 +277,21 @@ class _PostViewState extends State<PostView>
                 ),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 12.0),
-                  child: Text(
-                    '${_likeCount.toString()} likes',
-                    style: TextStyle(
-                      color: themeStyle.primaryTextColor,
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  child: StreamBuilder(
+                    stream: postsRef.document(widget.post.authorId).collection('userPosts').document(widget.post.id).snapshots(),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData)
+                        return Container();
+                      Post post = Post.fromDoc(snapshot.data);
+                      return Text(
+                        '${post.likeCount.toString()} likes',
+                        style: TextStyle(
+                          color: themeStyle.primaryTextColor,
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      );
+                    }
                   ),
                 ),
                 SizedBox(height: 4.0),

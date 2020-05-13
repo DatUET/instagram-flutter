@@ -8,6 +8,7 @@ import 'package:instagram_v2/models/user_model.dart';
 import 'package:instagram_v2/screens/comments_screen.dart';
 import 'package:instagram_v2/services/database_service.dart';
 import 'package:instagram_v2/utilities/constants.dart';
+import 'package:instagram_v2/widgets/activity_view.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -48,76 +49,6 @@ class _ActivityScreenState extends State<ActivityScreen> {
     }
   }
 
-  _buildActivity(Activity activity) {
-    return FutureBuilder(
-      future: DatabaseService.getUserWithId(activity.fromUserId),
-      builder: (BuildContext context, AsyncSnapshot snapshot) {
-        if (!snapshot.hasData) {
-          return Container();
-        }
-        User user = snapshot.data;
-        return Container(
-          color: themeStyle.primaryBackgroundColor,
-          child: ListTile(
-            leading: Container(
-              height: 40,
-              width: 40,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                    color: user.isActive ? mainColor : Colors.grey,
-                    width: 1.5),
-                image: DecorationImage(
-                    image: user.profileImageUrl.isEmpty
-                        ? AssetImage('assets/images/user_placeholder.jpg')
-                        : CachedNetworkImageProvider(user.profileImageUrl),
-                    fit: BoxFit.cover),
-              ),
-            ),
-            title: activity.comment != null
-                ? Text('${user.name} commented: "${activity.comment}"',
-                    style: TextStyle(
-                      color: themeStyle.primaryTextColor,
-                    ))
-                : Text('${user.name} liked your post',
-                    style: TextStyle(
-                      color: themeStyle.primaryTextColor,
-                    )),
-            subtitle: Text(
-                DateFormat.yMd().add_jm().format(
-                      activity.timestamp.toDate(),
-                    ),
-                style: TextStyle(
-                  color: themeStyle.primaryTextColor,
-                )),
-            trailing: CachedNetworkImage(
-              imageUrl: activity.postImageUrl,
-              height: 40.0,
-              width: 40.0,
-              fit: BoxFit.cover,
-            ),
-            onTap: () async {
-              String currentUserId =
-                  Provider.of<UserData>(context).currentUserId;
-              Post post = await DatabaseService.getUserPost(
-                currentUserId,
-                activity.postId,
-              );
-              Navigator.push(
-                context,
-                BouncyPageRoute(
-                  widget: CommentsScreen(
-                    post: post,
-                  ),
-                ),
-              );
-            },
-          ),
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     themeStyle = Provider.of<UserData>(context);
@@ -137,10 +68,11 @@ class _ActivityScreenState extends State<ActivityScreen> {
                   ),
                 )
               : ListView.builder(
+        addAutomaticKeepAlives: true,
                   itemCount: _activities.length,
                   itemBuilder: (BuildContext context, int index) {
                     Activity activity = _activities[index];
-                    return _buildActivity(activity);
+                    return ActivityView(activity: activity);
                   },
                 ),
     );
