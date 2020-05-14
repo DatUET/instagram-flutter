@@ -160,7 +160,9 @@ class _CommentsScreenState extends State<CommentsScreen> {
                         builder: (context, snapshot) {
                           if (!snapshot.hasData) {
                             return Center(
-                              child: CircularProgressIndicator(),
+                              child: CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<Color>(mainColor),
+                              ),
                             );
                           }
                           return PostView(
@@ -179,7 +181,9 @@ class _CommentsScreenState extends State<CommentsScreen> {
                       builder: (BuildContext context, AsyncSnapshot snapshot) {
                         if (!snapshot.hasData) {
                           return Center(
-                            child: CircularProgressIndicator(),
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(mainColor),
+                            ),
                           );
                         }
                         return ListView.builder(

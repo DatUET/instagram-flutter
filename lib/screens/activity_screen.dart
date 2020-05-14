@@ -53,11 +53,14 @@ class _ActivityScreenState extends State<ActivityScreen> {
   Widget build(BuildContext context) {
     themeStyle = Provider.of<UserData>(context);
     return SmartRefresher(
+      header: WaterDropMaterialHeader(backgroundColor: mainColor,),
       controller: _refreshController,
       onRefresh: () => _setupActivities(),
       child: _isLoading
           ? Center(
-              child: CircularProgressIndicator(),
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(mainColor),
+              ),
             )
           : _activities.isEmpty
               ? Center(

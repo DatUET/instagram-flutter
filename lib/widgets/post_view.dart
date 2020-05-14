@@ -40,16 +40,10 @@ class _PostViewState extends State<PostView>
   void initState() {
     super.initState();
     //_likeCount = widget.post.likeCount;
-    PermissionHandler().checkPermissionStatus(PermissionGroup.storage).then(_updateStatus);
+    PermissionHandler()
+        .checkPermissionStatus(PermissionGroup.storage)
+        .then(_updateStatus);
     _initPostLiked();
-  }
-
-  @override
-  void didUpdateWidget(PostView oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.post.likeCount != widget.post.likeCount) {
-      //_likeCount = widget.post.likeCount;
-    }
   }
 
   _updateStatus(PermissionStatus status) {
@@ -59,13 +53,14 @@ class _PostViewState extends State<PostView>
   }
 
   _askPermission() {
-    PermissionHandler().requestPermissions([PermissionGroup.storage]).then((statuses) {
+    PermissionHandler()
+        .requestPermissions([PermissionGroup.storage]).then((statuses) {
       final status = statuses[PermissionGroup.storage];
       if (status != PermissionStatus.granted) {
-        Fluttertoast.showToast(msg: 'Please allow permission!', toastLength: Toast.LENGTH_LONG);
+        Fluttertoast.showToast(
+            msg: 'Please allow permission!', toastLength: Toast.LENGTH_LONG);
       } else {
-        PhotoService.downloadImage(
-            widget.post.imageUrl, false);
+        PhotoService.downloadImage(widget.post.imageUrl, false);
         _updateStatus(status);
       }
     });
@@ -230,35 +225,38 @@ class _PostViewState extends State<PostView>
               children: <Widget>[
                 Row(
                   children: <Widget>[
-                    widget.isCommentScreen ? Container() : IconButton(
-                      icon: _isLiked
-                          ? Icon(
-                              Icons.favorite,
-                              color: Colors.red,
-                            )
-                          : Icon(
-                              Icons.favorite_border,
+                    widget.isCommentScreen
+                        ? Container()
+                        : IconButton(
+                            icon: _isLiked
+                                ? Icon(
+                                    Icons.favorite,
+                                    color: Colors.red,
+                                  )
+                                : Icon(
+                                    Icons.favorite_border,
+                                    color: themeStyle.primaryIconColor,
+                                  ),
+                            iconSize: 30.0,
+                            onPressed: _likePost,
+                          ),
+                    widget.isCommentScreen
+                        ? Container()
+                        : IconButton(
+                            icon: Icon(
+                              Icons.comment,
                               color: themeStyle.primaryIconColor,
                             ),
-                      iconSize: 30.0,
-                      onPressed: _likePost,
-                    ),
-                    widget.isCommentScreen ? Container() : IconButton(
-                      icon: Icon(
-                        Icons.comment,
-                        color: themeStyle.primaryIconColor,
-                      ),
-                      iconSize: 30.0,
-                      onPressed: () => Navigator.push(
-                        context,
-                        BouncyPageRoute(
-                          widget: CommentsScreen(
-                            post: widget.post,
-
+                            iconSize: 30.0,
+                            onPressed: () => Navigator.push(
+                              context,
+                              BouncyPageRoute(
+                                widget: CommentsScreen(
+                                  post: widget.post,
+                                ),
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                    ),
                     IconButton(
                         icon: Icon(
                           Icons.file_download,
@@ -278,21 +276,23 @@ class _PostViewState extends State<PostView>
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 12.0),
                   child: StreamBuilder(
-                    stream: postsRef.document(widget.post.authorId).collection('userPosts').document(widget.post.id).snapshots(),
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData)
-                        return Container();
-                      Post post = Post.fromDoc(snapshot.data);
-                      return Text(
-                        '${post.likeCount.toString()} likes',
-                        style: TextStyle(
-                          color: themeStyle.primaryTextColor,
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      );
-                    }
-                  ),
+                      stream: postsRef
+                          .document(widget.post.authorId)
+                          .collection('userPosts')
+                          .document(widget.post.id)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) return Container();
+                        Post post = Post.fromDoc(snapshot.data);
+                        return Text(
+                          '${post.likeCount.toString()} likes',
+                          style: TextStyle(
+                            color: themeStyle.primaryTextColor,
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        );
+                      }),
                 ),
                 SizedBox(height: 4.0),
                 Row(

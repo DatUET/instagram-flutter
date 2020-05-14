@@ -148,7 +148,9 @@ class _ChatListScreenState extends State<ChatListScreen> {
                   if (!snapshot.hasData) {
                     return Container(
                       child: Center(
-                        child: CircularProgressIndicator(),
+                        child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(mainColor),
+                        ),
                       ),
                     );
                   }

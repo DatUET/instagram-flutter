@@ -352,7 +352,9 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                             SizedBox(
                               height: 20,
                             ),
-                            CircularProgressIndicator(),
+                            CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(mainColor),
+                            ),
                             SizedBox(
                               height: 35,
                             ),

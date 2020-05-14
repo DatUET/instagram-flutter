@@ -157,7 +157,9 @@ class _SearchScreenState extends State<SearchScreen> {
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
                     return Center(
-                      child: CircularProgressIndicator(),
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(mainColor),
+                      ),
                     );
                   }
                   if (snapshot.data.documents.length == 0) {

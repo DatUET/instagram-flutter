@@ -48,10 +48,13 @@ class _FeedScreenState extends State<FeedScreen> {
   Widget build(BuildContext context) {
     themeStyle = Provider.of<UserData>(context);
     return SmartRefresher(
+      header: WaterDropMaterialHeader(backgroundColor: mainColor,),
       controller: _refreshController,
       onRefresh: () => _setupFeed(),
       child: _isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? Center(child: CircularProgressIndicator(
+        valueColor: AlwaysStoppedAnimation<Color>(mainColor),
+      ))
           : (_posts.isEmpty
               ? Center(
                   child: Text(

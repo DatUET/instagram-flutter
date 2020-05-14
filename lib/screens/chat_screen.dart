@@ -527,7 +527,9 @@ class _ChatScreenState extends State<ChatScreen> {
                       _messageList = snapshot.data;
                       if (!snapshot.hasData) {
                         return Center(
-                          child: CircularProgressIndicator(),
+                          child: CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(mainColor),
+                          ),
                         );
                       }
                       if (_messageList.length > 0) {

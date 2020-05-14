@@ -29,7 +29,7 @@ class PhotoService {
         Navigator.pop(context);
       }
       await dio
-          .download(url, "/storage/emulated/0/DCIM/Camera/$timeNow.jpg")
+          .download(url, "/storage/emulated/0/DCIM/Camera/IMG_$timeNow.jpg")
           .whenComplete(() => Fluttertoast.showToast(
                 msg: 'Image Saved!',
                 toastLength: Toast.LENGTH_LONG,

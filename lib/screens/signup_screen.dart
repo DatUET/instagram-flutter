@@ -404,7 +404,9 @@ class _SignupScreenState extends State<SignupScreen> {
                                     SizedBox(
                                       height: 20,
                                     ),
-                                    CircularProgressIndicator(),
+                                    CircularProgressIndicator(
+                                      valueColor: AlwaysStoppedAnimation<Color>(mainColor),
+                                    ),
                                     SizedBox(
                                       height: 35,
                                     ),
