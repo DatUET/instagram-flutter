@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:instagram_v2/models/call_model.dart';
 import 'package:instagram_v2/models/message_model.dart';
 import 'package:instagram_v2/services/database_service.dart';
@@ -25,24 +26,29 @@ class CallService {
   }
 
   static Future<bool> endCall(Call call) async {
-    Message message = Message(
-      id: call.channelId,
-      senderUid: call.callerId,
-      receiverUid: call.receiverId,
-      type: 'video call',
-      message: 'Video Call',
-      timestamp: Timestamp.fromMillisecondsSinceEpoch(int.parse(call.channelId)),
-      isSeen: false,
-      photoUrl: '',
-    );
-    try {//
-      await DatabaseService.sendMessage(message);
-      await callRef.document(call.callerId).delete();
-      await callRef.document(call.receiverId).delete();
-      return true;
-    } catch (e) {
-      print(e);
-      return false;
+    FirebaseUser user = await FirebaseAuth.instance.currentUser();
+    if (call.callerId == user.uid) {
+      Message message = Message(
+        id: call.channelId,
+        senderUid: call.callerId,
+        receiverUid: call.receiverId,
+        type: 'video call',
+        message: 'Video Call',
+        timestamp: Timestamp.fromMillisecondsSinceEpoch(
+            int.parse(call.channelId)),
+        isSeen: false,
+        photoUrl: '',
+      );
+      try { //
+        await DatabaseService.sendMessage(message);
+        await callRef.document(call.callerId).delete();
+        await callRef.document(call.receiverId).delete();
+        return true;
+      } catch (e) {
+        print(e);
+        return false;
+      }
     }
+    return false;
   }
 }

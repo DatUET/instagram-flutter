@@ -67,10 +67,10 @@ class _CallScreenState extends State<CallScreen> {
     };
 
     AgoraRtcEngine.onJoinChannelSuccess = (
-        String channel,
-        int uid,
-        int elapsed,
-        ) {
+      String channel,
+      int uid,
+      int elapsed,
+    ) {
       setState(() {
         final info = 'onJoinChannel: $channel, uid: $uid';
         _infoStrings.add(info);
@@ -93,7 +93,7 @@ class _CallScreenState extends State<CallScreen> {
     };
 
     AgoraRtcEngine.onUserOffline = (int uid, int reason) {
-      CallService.endCall(widget.call);
+      CallService.endCall(widget.call );
       setState(() {
         final info = 'userOffline: $uid';
         _infoStrings.add(info);
@@ -102,11 +102,11 @@ class _CallScreenState extends State<CallScreen> {
     };
 
     AgoraRtcEngine.onFirstRemoteVideoFrame = (
-        int uid,
-        int width,
-        int height,
-        int elapsed,
-        ) {
+      int uid,
+      int width,
+      int height,
+      int elapsed,
+    ) {
       setState(() {
         final info = 'firstRemoteVideo: $uid ${width}x $height';
         _infoStrings.add(info);
@@ -128,13 +128,13 @@ class _CallScreenState extends State<CallScreen> {
     SchedulerBinding.instance.addPostFrameCallback((_) {
       userProvider = Provider.of<UserData>(context, listen: false);
 
-      callStreamSubscription = CallService
-          .callStream(userProvider.currentUserId)
-          .listen((DocumentSnapshot ds) {
+      callStreamSubscription =
+          CallService.callStream(userProvider.currentUserId)
+              .listen((DocumentSnapshot ds) {
         // defining the logic
         switch (ds.data) {
           case null:
-          // snapshot is null which means that call is hanged and documents are deleted
+            // snapshot is null which means that call is hanged and documents are deleted
             Navigator.pop(context);
             break;
 
@@ -153,18 +153,8 @@ class _CallScreenState extends State<CallScreen> {
     return list;
   }
 
-
   Widget _videoView(view) {
     return Expanded(child: Container(child: view));
-  }
-
-  _expandedVideoRow(List<Widget> views) {
-    final wrappedViews = views.map<Widget>(_videoView).toList();
-    return Expanded(
-      child: Row(
-        children: wrappedViews,
-      ),
-    );
   }
 
   void _onToggleMute() {
@@ -183,33 +173,23 @@ class _CallScreenState extends State<CallScreen> {
     switch (views.length) {
       case 1:
         return Container(
-            child: Column(
-              children: <Widget>[_videoView(views[0])],
-            ));
+            child: Stack(
+          children: <Widget>[_videoView(views[0])],
+        ));
       case 2:
         return Container(
-            child: Column(
-              children: <Widget>[
-                _expandedVideoRow([views[0]]),
-                _expandedVideoRow([views[1]])
-              ],
-            ));
-      case 3:
-        return Container(
-            child: Column(
-              children: <Widget>[
-                _expandedVideoRow(views.sublist(0, 2)),
-                _expandedVideoRow(views.sublist(2, 3))
-              ],
-            ));
-      case 4:
-        return Container(
-            child: Column(
-              children: <Widget>[
-                _expandedVideoRow(views.sublist(0, 2)),
-                _expandedVideoRow(views.sublist(2, 4))
-              ],
-            ));
+            child: Stack(
+          children: <Widget>[
+            Container(child: views[1]),
+            Positioned(
+                top: 32,
+                right: 24,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                  child: Container(height: 180, width: 120, child: views[0]),
+                ))
+          ],
+        ));
       default:
     }
     return Container();
