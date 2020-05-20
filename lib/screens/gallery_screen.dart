@@ -25,7 +25,7 @@ class _GalleyScreenState extends State<GalleyScreen>
   Directory _dir;
   var themeStyle;
   RefreshController _refreshController =
-  RefreshController(initialRefresh: false);
+      RefreshController(initialRefresh: false);
 
   Future<void> _getImagePath() async {
     _allUri.clear();
@@ -37,7 +37,6 @@ class _GalleyScreenState extends State<GalleyScreen>
     );
     final MediaPage imagePage = await collections[0].getMedias(
       mediaType: MediaType.image,
-
     );
     setState(() {
       _allUri = imagePage.items;
@@ -104,18 +103,22 @@ class _GalleyScreenState extends State<GalleyScreen>
         ),
       ),
       body: SmartRefresher(
-        controller: _refreshController,
-          header: WaterDropMaterialHeader(backgroundColor: mainColor,),
-          child: _buildGridTile(), onRefresh: () => _getImagePath()),
+          controller: _refreshController,
+          header: WaterDropMaterialHeader(
+            backgroundColor: mainColor,
+          ),
+          child: _buildGridTile(),
+          onRefresh: () => _getImagePath()),
     );
   }
 
   _buildGridTile() {
-    print('${themeStyle.gridTileImage.length}');
     List<GridTile> tiles = [];
     for (int i = 0; i < _allUri.length; i++) {
-      var tile = _buildTilePost(i);
-      tiles.add(tile);
+      if (i < 100) {
+        var tile = _buildTilePost(i);
+        tiles.add(tile);
+      }
     }
     return GridView.count(
       addAutomaticKeepAlives: true,
@@ -164,7 +167,11 @@ class _GalleyScreenState extends State<GalleyScreen>
     var result = await FlutterImageCompress.compressAndGetFile(
       file.absolute.path,
       targetPath,
-      quality: file.lengthSync() > 300000 ? 15 : 20,
+      quality: file.lengthSync() > 1000000
+          ? (1000000 / file.lengthSync() * 100).toInt()
+          : file.lengthSync() > 300000
+              ? (300000 / file.lengthSync() * 100).toInt()
+              : 20,
       rotate: 0,
     );
     return result;

@@ -40,7 +40,6 @@ class UserData extends ChangeNotifier {
     if (mode == null) {
       mode = 0;
     }
-    print("mode: $mode");
     if (mode == 0) {
       primaryBackgroundColor = Colors.grey[100];
       primaryTextColorDark = Colors.grey[900];

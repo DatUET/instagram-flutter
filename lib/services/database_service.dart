@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:instagram_v2/models/activity_model.dart';
-import 'package:instagram_v2/models/comment_model.dart';
 import 'package:instagram_v2/models/message_model.dart';
 import 'package:instagram_v2/models/post_model.dart';
 import 'package:instagram_v2/models/user_model.dart';
@@ -17,7 +16,7 @@ class DatabaseService {
 
   static Future<QuerySnapshot> searchUsers(String name) {
     Future<QuerySnapshot> users =
-        usersRef.where('name', isEqualTo: name).getDocuments();
+    usersRef.where('name', isEqualTo: name).getDocuments();
     return users;
   }
 
@@ -29,6 +28,7 @@ class DatabaseService {
       'authorId': post.authorId,
       'timestamp': post.timestamp,
       'location': post.location,
+      'enableDownload': post.enableDownload,
     });
   }
 
@@ -105,7 +105,7 @@ class DatabaseService {
         .orderBy('timestamp', descending: true)
         .getDocuments();
     List<Post> posts =
-        feedSnapshot.documents.map((doc) => Post.fromDoc(doc)).toList();
+    feedSnapshot.documents.map((doc) => Post.fromDoc(doc)).toList();
     return posts;
   }
 
@@ -116,7 +116,7 @@ class DatabaseService {
         .orderBy('timestamp', descending: true)
         .getDocuments();
     List<Post> posts =
-        userPostsSnapshot.documents.map((doc) => Post.fromDoc(doc)).toList();
+    userPostsSnapshot.documents.map((doc) => Post.fromDoc(doc)).toList();
     return posts;
   }
 
@@ -222,15 +222,15 @@ class DatabaseService {
       String fromUserId, String toUserId) async* {
     await for (QuerySnapshot snap in messageRef
         .where("groupId",
-            isEqualTo: getUniqueId(
-              fromUserId,
-              toUserId,
-            ))
+        isEqualTo: getUniqueId(
+          fromUserId,
+          toUserId,
+        ))
         .orderBy('timestamp', descending: true)
         .snapshots()) {
       try {
         List<Message> chats =
-            snap.documents.map((doc) => Message.fromMap(doc)).toList();
+        snap.documents.map((doc) => Message.fromMap(doc)).toList();
         yield chats;
       } catch (e) {
         print(e);
@@ -275,7 +275,7 @@ class DatabaseService {
         .snapshots()) {
       try {
         List<Message> recentChats =
-            snap.documents.map((doc) => Message.fromMap(doc)).toList();
+        snap.documents.map((doc) => Message.fromMap(doc)).toList();
         yield recentChats;
       } catch (e) {
         print(e);
@@ -303,7 +303,7 @@ class DatabaseService {
   static Future<void> deleteMessage(
       String messageId, String currentUserId, String chatWithUserId) async {
     QuerySnapshot deleteMessageSnapshot =
-        await messageRef.where('id', isEqualTo: messageId).getDocuments();
+    await messageRef.where('id', isEqualTo: messageId).getDocuments();
     if (deleteMessageSnapshot.documents.isNotEmpty) {
       String docId = deleteMessageSnapshot.documents[0].documentID;
       await messageRef.document(docId).updateData({
@@ -366,5 +366,14 @@ class DatabaseService {
         .getDocuments();
     print(checkIsSeenAllSnapshot.documents.isEmpty);
     return checkIsSeenAllSnapshot.documents.isNotEmpty;
+  }
+
+  static Future<List<Post>> getTrendingLike() async {
+    QuerySnapshot trendingLikeSnapshot = await trendingLikeRef
+        .orderBy('likeCount', descending: true)
+        .getDocuments();
+    List<Post> posts =
+    trendingLikeSnapshot.documents.map((doc) => Post.fromDoc(doc)).toList();
+    return posts;
   }
 }

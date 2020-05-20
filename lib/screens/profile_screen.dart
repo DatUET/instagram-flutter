@@ -263,9 +263,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         IconButton(
           icon: Icon(Icons.grid_on),
           iconSize: 30.0,
-          color: _displayPosts == 0
-              ? mainColor
-              : themeStyle.primaryIconColor,
+          color: _displayPosts == 0 ? mainColor : themeStyle.primaryIconColor,
           onPressed: () => setState(() {
             _displayPosts = 0;
           }),
@@ -273,9 +271,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         IconButton(
           icon: Icon(Icons.list),
           iconSize: 30.0,
-          color: _displayPosts == 1
-              ? mainColor
-              : themeStyle.primaryIconColor,
+          color: _displayPosts == 1 ? mainColor : themeStyle.primaryIconColor,
           onPressed: () => setState(() {
             _displayPosts = 1;
           }),
@@ -288,12 +284,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Container(
       decoration: BoxDecoration(
           borderRadius: BorderRadius.all(Radius.circular(20)),
-        boxShadow: [
-          BoxShadow( color: Colors.grey[600],
-              blurRadius: 10.0,
-              offset: Offset(0, 5))
-        ]
-      ),
+          boxShadow: [
+            BoxShadow(
+                color: Colors.grey[600], blurRadius: 10.0, offset: Offset(0, 5))
+          ]),
       child: FadeAnimationUp(
         (index * 2) / 10.0,
         GestureDetector(
@@ -352,6 +346,120 @@ class _ProfileScreenState extends State<ProfileScreen> {
           color: themeStyle.primaryBackgroundColor,
           child: Column(children: postViews));
     }
+  }
+
+  _showDialogLogout() {
+    showGeneralDialog(
+        barrierColor: Colors.black.withOpacity(0.5),
+        transitionBuilder: (context, a1, a2, widget) {
+          return Transform.scale(
+            scale: a1.value,
+            child: Opacity(
+              opacity: a1.value,
+              child: AlertDialog(
+                contentPadding: EdgeInsets.only(top: 20.0),
+                backgroundColor: themeStyle.primaryBackgroundColor,
+                shape: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12.0),
+                ),
+                title: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Icon(
+                      Icons.warning,
+                      color: Colors.redAccent,
+                      size: 32,
+                    ),
+                    Text(
+                      'Logout',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.redAccent, fontSize: 24),
+                    ),
+                  ],
+                ),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Text(
+                      'Are you sure?',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          color: themeStyle.primaryTextColor,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500),
+                    ),
+                    SizedBox(
+                      height: 8,
+                    ),
+                    Divider(),
+                    Row(
+                      children: <Widget>[
+                        Expanded(
+                          flex: 1,
+                          child: GestureDetector(
+                            child: Container(
+                                height: 48.0,
+                                child: Center(
+                                  child: Text(
+                                    'No',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        color: themeStyle.primaryTextColor,
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 16),
+                                  ),
+                                )),
+                            onTap: () {
+                              Navigator.pop(context);
+                            },
+                          ),
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: GestureDetector(
+                            child: Container(
+                                height: 48.0,
+                                decoration: BoxDecoration(
+                                    color: Colors.redAccent,
+                                    borderRadius: BorderRadius.only(
+                                        bottomRight: Radius.circular(12.0))),
+                                child: Center(
+                                  child: Text(
+                                    'Yes',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 16),
+                                  ),
+                                )),
+                            onTap: () {
+                              AuthService.logout();
+                              DatabaseService.updateActive(
+                                  themeStyle.currentUserId, false);
+                              DatabaseService.updateToken(
+                                  themeStyle.currentUserId, '');
+                              Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (BuildContext context) =>
+                                          LoginScreen()), (Route<dynamic> route) => false);
+                            },
+                          ),
+                        )
+                      ],
+                    )
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+        transitionDuration: Duration(milliseconds: 200),
+        barrierDismissible: true,
+        barrierLabel: '',
+        context: context,
+        pageBuilder: (context, animation1, animation2) {});
   }
 
   @override
@@ -433,8 +541,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 borderRadius: BorderRadius.circular(40),
                                 border: Border.all(
                                     width: 2,
-                                    color:
-                                        user.isActive ? mainColor : Colors.grey),
+                                    color: user.isActive
+                                        ? mainColor
+                                        : Colors.grey),
                                 image: DecorationImage(
                                   image: user.profileImageUrl.isEmpty
                                       ? AssetImage(
@@ -484,16 +593,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       padding: const EdgeInsets.only(top: 50.0, right: 10.0),
                       child: GestureDetector(
                         onTap: () {
-                          AuthService.logout();
-                          DatabaseService.updateActive(
-                              themeStyle.currentUserId, false);
-                          DatabaseService.updateToken(
-                              themeStyle.currentUserId, '');
-                          Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (BuildContext context) =>
-                                      LoginScreen()));
+                          _showDialogLogout();
                         },
                         child: Icon(
                           Icons.exit_to_app,

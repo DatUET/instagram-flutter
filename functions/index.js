@@ -66,6 +66,7 @@ exports.onUploadPost = functions.region("asia-northeast1").firestore
         .doc(postId)
         .set(snapshot.data());
     });
+    admin.firestore().collection('trendingLike').doc(postId).set(snapshot.data())
   });
 
 exports.onUpdatePost = functions.region("asia-northeast1").firestore
@@ -92,6 +93,13 @@ exports.onUpdatePost = functions.region("asia-northeast1").firestore
         postDoc.ref.update(newPostData);
       }
     });
+    const trendingLikeRef = admin
+        .firestore()
+        .collection('trendingLike')
+      const trendingLikeDoc = await trendingLikeRef.doc(postId).get();
+      if (trendingLikeDoc.exists) {
+        trendingLikeDoc.ref.update(newPostData);
+      }
   });
 
 exports.sendNotification = functions.region("asia-northeast1").firestore
@@ -217,10 +225,4 @@ exports.sendNotifiVideoCall = functions.region("asia-northeast1").firestore
     return admin.messaging().sendToDevice(token, payload);
   }
   return;
-  });
-
-  exports.onEndCall = functions.region("asia-northeast1").firestore
-  .document("/call/{userId}")
-  .onDelete(async (snapshot, context) => {
-    
   });

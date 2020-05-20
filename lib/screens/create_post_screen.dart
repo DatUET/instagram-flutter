@@ -30,6 +30,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   TextEditingController _locationController = TextEditingController();
   String _caption = '';
   bool _isLoading = false;
+  bool _enableDownload = false;
   var themeStyle;
 
   Address _address;
@@ -124,7 +125,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     return croppedImage;
   }
 
-  _submit() async {
+  _submit(BuildContext context) async {
     if (!_isLoading && _image != null && _caption.isNotEmpty) {
       setState(() {
         _isLoading = true;
@@ -139,6 +140,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
         authorId: Provider.of<UserData>(context).currentUserId,
         timestamp: Timestamp.fromDate(DateTime.now()),
         location: _locationController.text,
+        enableDownload: _enableDownload,
       );
       DatabaseService.createPost(post);
 
@@ -149,7 +151,14 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
         _caption = '';
         _image = null;
         _isLoading = false;
+        _enableDownload = false;
       });
+    } else {
+      Scaffold.of(context).showSnackBar(SnackBar(
+          content: Text(_image == null
+              ? 'Please add photo for this post'
+              : _caption.isEmpty ? 'Please add Caption for this post' : null,
+          style: TextStyle(color: Colors.redAccent),)));
     }
   }
 
@@ -239,17 +248,13 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                       style: TextStyle(
                           fontSize: 18.0, color: themeStyle.primaryTextColor),
                       decoration: InputDecoration(
-                        filled: true,
-                        fillColor: themeStyle.primaryBackgroundColor,
-                        labelText: 'Caption',
-                        labelStyle:
-                            TextStyle(color: themeStyle.primaryTextColor),
-                          focusedBorder:
-                          UnderlineInputBorder(
-                              borderSide: BorderSide(
-                                  color:
-                                  mainColor))
-                      ),
+                          filled: true,
+                          fillColor: themeStyle.primaryBackgroundColor,
+                          labelText: 'Caption',
+                          labelStyle:
+                              TextStyle(color: themeStyle.primaryTextColor),
+                          focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: mainColor))),
                       onChanged: (input) => _caption = input,
                     ),
                   ),
@@ -297,6 +302,31 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                         ),
                   (_address == null) ? Container() : Divider(),
                   SizedBox(
+                    height: 20,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Text(
+                          'Enable Download',
+                          style: TextStyle(
+                              color: themeStyle.primaryTextColor,
+                              fontSize: 18.0),
+                        ),
+                      ),
+                      Switch(
+                          activeColor: mainColor,
+                          value: _enableDownload,
+                          onChanged: (value) {
+                            setState(() {
+                              _enableDownload = value;
+                            });
+                          })
+                    ],
+                  ),
+                  SizedBox(
                     height: 30,
                   ),
                   Container(
@@ -315,7 +345,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                                 offset: Offset(0, 10))
                           ]),
                       child: FlatButton(
-                        onPressed: () => _submit(),
+                        onPressed: () => _submit(context),
                         child: Center(
                           child: Text(
                             'Post',
@@ -353,7 +383,8 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                               height: 20,
                             ),
                             CircularProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation<Color>(mainColor),
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(mainColor),
                             ),
                             SizedBox(
                               height: 35,

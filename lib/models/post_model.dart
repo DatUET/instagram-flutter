@@ -8,6 +8,7 @@ class Post {
   final String authorId;
   final Timestamp timestamp;
   final String location;
+  final bool enableDownload;
 
   Post({
     this.id,
@@ -16,7 +17,8 @@ class Post {
     this.likeCount,
     this.authorId,
     this.timestamp,
-    this.location
+    this.location,
+    this.enableDownload,
   });
 
   factory Post.fromDoc(DocumentSnapshot doc) {
@@ -28,6 +30,7 @@ class Post {
       authorId: doc['authorId'],
       timestamp: doc['timestamp'],
       location: doc['location'],
+      enableDownload: doc['enableDownload'],
     );
   }
 }

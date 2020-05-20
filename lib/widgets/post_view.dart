@@ -147,10 +147,10 @@ class _PostViewState extends State<PostView>
                         image: DecorationImage(
                             image: widget.author.profileImageUrl.isEmpty
                                 ? AssetImage(
-                                    'assets/images/user_placeholder.jpg')
+                                'assets/images/user_placeholder.jpg')
                                 : CachedNetworkImageProvider(
-                                    widget.author.profileImageUrl,
-                                  ),
+                              widget.author.profileImageUrl,
+                            ),
                             fit: BoxFit.cover)),
                   ),
                   SizedBox(width: 8.0),
@@ -167,12 +167,12 @@ class _PostViewState extends State<PostView>
                       widget.post.location.isEmpty
                           ? Container()
                           : Text(
-                              widget.post.location,
-                              style: TextStyle(
-                                color: themeStyle.primaryTextColor,
-                                fontSize: 13.0,
-                              ),
-                            ),
+                        widget.post.location,
+                        style: TextStyle(
+                          color: themeStyle.primaryTextColor,
+                          fontSize: 13.0,
+                        ),
+                      ),
                     ],
                   ),
                 ],
@@ -202,18 +202,18 @@ class _PostViewState extends State<PostView>
                 ),
                 _heartAnim
                     ? Animator(
-                        duration: Duration(milliseconds: 300),
-                        tween: Tween(begin: 0.5, end: 1.4),
-                        curve: Curves.elasticOut,
-                        builder: (anim) => Transform.scale(
-                          scale: anim.value,
-                          child: Icon(
-                            Icons.favorite,
-                            size: 100.0,
-                            color: Colors.red[400],
-                          ),
-                        ),
-                      )
+                  duration: Duration(milliseconds: 300),
+                  tween: Tween(begin: 0.5, end: 1.4),
+                  curve: Curves.elasticOut,
+                  builder: (anim) => Transform.scale(
+                    scale: anim.value,
+                    child: Icon(
+                      Icons.favorite,
+                      size: 100.0,
+                      color: Colors.red[400],
+                    ),
+                  ),
+                )
                     : SizedBox.shrink(),
               ],
             ),
@@ -228,36 +228,36 @@ class _PostViewState extends State<PostView>
                     widget.isCommentScreen
                         ? Container()
                         : IconButton(
-                            icon: _isLiked
-                                ? Icon(
-                                    Icons.favorite,
-                                    color: Colors.red,
-                                  )
-                                : Icon(
-                                    Icons.favorite_border,
-                                    color: themeStyle.primaryIconColor,
-                                  ),
-                            iconSize: 30.0,
-                            onPressed: _likePost,
-                          ),
+                      icon: _isLiked
+                          ? Icon(
+                        Icons.favorite,
+                        color: Colors.red,
+                      )
+                          : Icon(
+                        Icons.favorite_border,
+                        color: themeStyle.primaryIconColor,
+                      ),
+                      iconSize: 30.0,
+                      onPressed: _likePost,
+                    ),
                     widget.isCommentScreen
                         ? Container()
                         : IconButton(
-                            icon: Icon(
-                              Icons.comment,
-                              color: themeStyle.primaryIconColor,
-                            ),
-                            iconSize: 30.0,
-                            onPressed: () => Navigator.push(
-                              context,
-                              BouncyPageRoute(
-                                widget: CommentsScreen(
-                                  post: widget.post,
-                                ),
-                              ),
-                            ),
+                      icon: Icon(
+                        Icons.comment,
+                        color: themeStyle.primaryIconColor,
+                      ),
+                      iconSize: 30.0,
+                      onPressed: () => Navigator.push(
+                        context,
+                        BouncyPageRoute(
+                          widget: CommentsScreen(
+                            post: widget.post,
                           ),
-                    IconButton(
+                        ),
+                      ),
+                    ),
+                    widget.post.enableDownload ? IconButton(
                         icon: Icon(
                           Icons.file_download,
                           color: themeStyle.primaryIconColor,
@@ -270,7 +270,7 @@ class _PostViewState extends State<PostView>
                           } else {
                             _askPermission();
                           }
-                        })
+                        }) : Container()
                   ],
                 ),
                 Padding(

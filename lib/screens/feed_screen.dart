@@ -25,7 +25,7 @@ class _FeedScreenState extends State<FeedScreen> {
   List<Post> _posts = [];
   bool _isLoading = true;
   RefreshController _refreshController =
-      RefreshController(initialRefresh: false);
+  RefreshController(initialRefresh: false);
   var themeStyle;
 
   @override
@@ -35,6 +35,11 @@ class _FeedScreenState extends State<FeedScreen> {
   }
 
   _setupFeed() async {
+    _isLoading = true;
+    _posts.clear();
+    setState(() {
+
+    });
     _refreshController.loadComplete();
     List<Post> posts = await DatabaseService.getFeedPosts(widget.currentUserId);
     setState(() {
@@ -56,35 +61,35 @@ class _FeedScreenState extends State<FeedScreen> {
         valueColor: AlwaysStoppedAnimation<Color>(mainColor),
       ))
           : (_posts.isEmpty
-              ? Center(
-                  child: Text(
-                    'Data is empty',
-                    style: TextStyle(
-                        fontSize: 30, color: themeStyle.primaryTextColor),
-                  ),
-                )
-              : ListView.builder(
-                  addAutomaticKeepAlives: true,
-                  itemCount: _posts.length,
-                  itemBuilder: (context, index) {
-                    Post post = _posts[index];
-                    return FutureBuilder(
-                      future: DatabaseService.getUserWithId(post.authorId),
-                      builder: (BuildContext context, AsyncSnapshot snapshot) {
-                        if (!snapshot.hasData) {
-                          return SizedBox.shrink();
-                        }
-                        User author = snapshot.data;
-                        return PostView(
-                          currentUserId: widget.currentUserId,
-                          post: post,
-                          author: author,
-                          isCommentScreen: false,
-                        );
-                      },
-                    );
-                  },
-                )),
+          ? Center(
+        child: Text(
+          'Data is empty',
+          style: TextStyle(
+              fontSize: 30, color: themeStyle.primaryTextColor),
+        ),
+      )
+          : ListView.builder(
+        addAutomaticKeepAlives: true,
+        itemCount: _posts.length,
+        itemBuilder: (context, index) {
+          Post post = _posts[index];
+          return FutureBuilder(
+            future: DatabaseService.getUserWithId(post.authorId),
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              if (!snapshot.hasData) {
+                return SizedBox.shrink();
+              }
+              User author = snapshot.data;
+              return PostView(
+                currentUserId: widget.currentUserId,
+                post: post,
+                author: author,
+                isCommentScreen: false,
+              );
+            },
+          );
+        },
+      )),
     );
   }
 }

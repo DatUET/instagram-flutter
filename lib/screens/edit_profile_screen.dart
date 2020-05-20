@@ -82,6 +82,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         _profileImageUrl = await StorageService.uploadUserProfileImage(
           widget.user.profileImageUrl,
           _profileImage,
+          widget.user.type
         );
       }
 
@@ -271,35 +272,39 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           )
                         ],
                       ),
-                      onTap: () =>
-                          widget.user.type == 'Custom' ? Navigator.of(context).push(MaterialPageRoute(builder: (_) => ChangePassScreen(user: widget.user,)))
-                      : Fluttertoast.showToast(msg: "This is Google Account.\nYou can't change password", toastLength: Toast.LENGTH_LONG),
+                      onTap: () => widget.user.type == 'Custom'
+                          ? Navigator.of(context).push(MaterialPageRoute(
+                              builder: (_) => ChangePassScreen(
+                                    user: widget.user,
+                                  )))
+                          : Fluttertoast.showToast(
+                              msg:
+                                  "This is Google Account.\nYou can't change password",
+                              toastLength: Toast.LENGTH_LONG),
                     ),
                     SizedBox(
                       height: 16,
                     ),
                     InkWell(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Text(
-                            'QR Code',
-                            style: TextStyle(
-                                color: themeStyle.primaryTextColor,
-                                fontSize: 18.0),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Icon(
-                              OMIcons.arrowForwardIos,
-                              color: themeStyle.primaryIconColor,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Text(
+                              'QR Code',
+                              style: TextStyle(
+                                  color: themeStyle.primaryTextColor,
+                                  fontSize: 18.0),
                             ),
-                          )
-                        ],
-                      ),
-                      onTap: () =>
-                      _showQRDialog()
-                    ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Icon(
+                                OMIcons.arrowForwardIos,
+                                color: themeStyle.primaryIconColor,
+                              ),
+                            )
+                          ],
+                        ),
+                        onTap: () => _showQRDialog()),
                     SizedBox(
                       height: 16,
                     ),
@@ -309,7 +314,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         Text(
                           'Dark Theme',
                           style: TextStyle(
-                              color: themeStyle.primaryTextColor, fontSize: 18.0),
+                              color: themeStyle.primaryTextColor,
+                              fontSize: 18.0),
                         ),
                         Switch(
                             activeColor: mainColor,
