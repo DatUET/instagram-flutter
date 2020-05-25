@@ -194,13 +194,13 @@ class _ChatScreenState extends State<ChatScreen> {
                 InkWell(
                   child: Container(
                       height: 24,
-                      width: 100,
+                      width: 120,
                       decoration: BoxDecoration(
                           color: Colors.white54,
                           borderRadius: BorderRadius.all(Radius.circular(12))),
                       child: Center(
                         child: Text(
-                          'Call Again',
+                          message.type == 'video call' ? 'Video Call Again' : 'Voice Call Again',
                           textAlign: TextAlign.right,
                           style: TextStyle(
                               color: isMe ? Colors.white70 : themeStyle.mode == 1 ? Colors.white70 : Colors.black45,
@@ -213,7 +213,8 @@ class _ChatScreenState extends State<ChatScreen> {
                           ? CallUtils.dial(
                               from: _currentUser,
                               to: widget.chatWithUser,
-                              context: context)
+                              context: context,
+                      type: message.type == 'video call' ? 'Video' : 'Voice')
                           : {},
                 )
               ],
@@ -486,14 +487,19 @@ class _ChatScreenState extends State<ChatScreen> {
                                 widget.chatWithUser.profileImageUrl),
                         fit: BoxFit.cover)),
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  widget.chatWithUser.name,
-                  style: TextStyle(
-                    fontSize: 28.0,
-                    fontWeight: FontWeight.bold,
-                    color: themeStyle.primaryTextColor,
+              Flexible(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: RichText(
+                    overflow: TextOverflow.ellipsis,
+                    text: TextSpan(
+                      text: widget.chatWithUser.name,
+                      style: TextStyle(
+                        fontSize: 24.0,
+                        fontWeight: FontWeight.bold,
+                        color: themeStyle.primaryTextColor,
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -501,6 +507,19 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
           elevation: 0.0,
           actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.call),
+              iconSize: 25.0,
+              color: mainColor,
+              onPressed: () async =>
+              await Permissions.cameraAndMicrophonePermissionsGranted()
+                  ? CallUtils.dial(
+                  from: _currentUser,
+                  to: widget.chatWithUser,
+                  context: context,
+                  type: 'Voice')
+                  : {},
+            ),
             IconButton(
               icon: Icon(Icons.video_call),
               iconSize: 30.0,
@@ -510,7 +529,8 @@ class _ChatScreenState extends State<ChatScreen> {
                       ? CallUtils.dial(
                           from: _currentUser,
                           to: widget.chatWithUser,
-                          context: context)
+                          context: context,
+                  type: 'Video')
                       : {},
             ),
           ],
@@ -555,7 +575,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                   ? _buildTextMessage(message, isMe)
                                   : message.type == 'photo'
                                       ? _buildImageMessage(message, isMe)
-                                      : message.type == 'video call'
+                                      : (message.type == 'video call' || message.type == 'voice call')
                                           ? _buildVideoCallMessage(
                                               message, isMe)
                                           : _buildDeleteMessage(message, isMe);

@@ -201,7 +201,8 @@ exports.sendNotifiVideoCall = functions.region("asia-northeast1").firestore
     }
     const callerName = call['callerName'];
     var token;
-    var avatar = call['callerPic'];
+    const avatar = call['callerPic'];
+    const type = call['type'] + ' Call';
     const tokenRef = admin
       .firestore()
       .collection("tokens");
@@ -218,7 +219,7 @@ exports.sendNotifiVideoCall = functions.region("asia-northeast1").firestore
           clickAction: "FLUTTER_NOTIFICATION_CLICK",
       },
       data: {
-        type: 'video call',
+        type: type,
       }
   }
   if (token !== '') {

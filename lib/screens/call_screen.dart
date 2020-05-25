@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -55,7 +56,12 @@ class _CallScreenState extends State<CallScreen> {
 
   Future<void> _initAgoraRtcEngine() async {
     await AgoraRtcEngine.create(APP_ID_AGORA);
-    await AgoraRtcEngine.enableVideo();
+    if (widget.call.type == 'Video') {
+      await AgoraRtcEngine.enableVideo();
+    } else {
+      await AgoraRtcEngine.disableVideo();
+      await AgoraRtcEngine.setEnableSpeakerphone(false);
+    }
   }
 
   void _addAgoraEventHandlers() {
@@ -93,7 +99,7 @@ class _CallScreenState extends State<CallScreen> {
     };
 
     AgoraRtcEngine.onUserOffline = (int uid, int reason) {
-      CallService.endCall(widget.call );
+      CallService.endCall(widget.call);
       setState(() {
         final info = 'userOffline: $uid';
         _infoStrings.add(info);
@@ -127,17 +133,14 @@ class _CallScreenState extends State<CallScreen> {
   _addPostFrameCallback() {
     SchedulerBinding.instance.addPostFrameCallback((_) {
       userProvider = Provider.of<UserData>(context, listen: false);
-
       callStreamSubscription =
           CallService.callStream(userProvider.currentUserId)
               .listen((DocumentSnapshot ds) {
         // defining the logic
         switch (ds.data) {
           case null:
-            // snapshot is null which means that call is hanged and documents are deleted
             Navigator.pop(context);
             break;
-
           default:
             break;
         }
@@ -153,10 +156,6 @@ class _CallScreenState extends State<CallScreen> {
     return list;
   }
 
-  Widget _videoView(view) {
-    return Expanded(child: Container(child: view));
-  }
-
   void _onToggleMute() {
     setState(() {
       muted = !muted;
@@ -168,13 +167,13 @@ class _CallScreenState extends State<CallScreen> {
     AgoraRtcEngine.switchCamera();
   }
 
-  Widget _viewRows() {
+  Widget _buildVideoView() {
     final views = _getRenderViews();
     switch (views.length) {
       case 1:
         return Container(
             child: Stack(
-          children: <Widget>[_videoView(views[0])],
+          children: <Widget>[views[0]],
         ));
       case 2:
         return Container(
@@ -195,8 +194,30 @@ class _CallScreenState extends State<CallScreen> {
     return Container();
   }
 
+  _buildVoiceView() {
+    return Container(
+      child: Stack(
+        children: <Widget>[
+          userProvider == null
+              ? Container()
+              : CachedNetworkImage(
+            height: MediaQuery.of(context).size.height,
+                  imageUrl: userProvider.currentUserId == widget.call.callerId
+                      ? widget.call.receiverPic
+                      : widget.call.callerPic,
+                  fit: BoxFit.cover,
+                ),
+          Container(
+            color: Colors.black.withOpacity(.3),
+          )
+        ],
+      ),
+    );
+  }
+
   _toolbar() {
     return Container(
+      width: MediaQuery.of(context).size.width,
       alignment: Alignment.bottomCenter,
       padding: const EdgeInsets.symmetric(vertical: 48),
       child: Row(
@@ -226,18 +247,22 @@ class _CallScreenState extends State<CallScreen> {
             fillColor: Colors.redAccent,
             padding: const EdgeInsets.all(15.0),
           ),
-          RawMaterialButton(
-            onPressed: _onSwitchCamera,
-            child: Icon(
-              Icons.switch_camera,
-              color: Colors.blueAccent,
-              size: 20.0,
-            ),
-            shape: CircleBorder(),
-            elevation: 2.0,
-            fillColor: Colors.white,
-            padding: const EdgeInsets.all(12.0),
-          )
+          widget.call.type == 'Video'
+              ? RawMaterialButton(
+                  onPressed: _onSwitchCamera,
+                  child: Icon(
+                    Icons.switch_camera,
+                    color: Colors.blueAccent,
+                    size: 20.0,
+                  ),
+                  shape: CircleBorder(),
+                  elevation: 2.0,
+                  fillColor: Colors.white,
+                  padding: const EdgeInsets.all(12.0),
+                )
+              : Container(
+            margin: EdgeInsets.all(12.0),
+            width: 40.0, height: 40,)
         ],
       ),
     );
@@ -249,9 +274,14 @@ class _CallScreenState extends State<CallScreen> {
       body: Center(
         child: Stack(
           children: <Widget>[
-            _viewRows(),
+            widget.call.type == 'Video' ? _buildVideoView() : _buildVoiceView(),
             //_panel(),
-            _toolbar(),
+            Positioned(
+              bottom: 0.0,
+              child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: _toolbar()),
+            ),
           ],
         ),
       ),

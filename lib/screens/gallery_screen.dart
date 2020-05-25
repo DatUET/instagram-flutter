@@ -115,7 +115,7 @@ class _GalleyScreenState extends State<GalleyScreen>
   _buildGridTile() {
     List<GridTile> tiles = [];
     for (int i = 0; i < _allUri.length; i++) {
-      if (i < 100) {
+      if (i < 50) {
         var tile = _buildTilePost(i);
         tiles.add(tile);
       }

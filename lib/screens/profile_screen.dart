@@ -595,10 +595,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         onTap: () {
                           _showDialogLogout();
                         },
-                        child: Icon(
+                        child:widget.currentUserId ==  widget.userId ? Icon(
                           Icons.exit_to_app,
                           color: themeStyle.primaryIconColor,
-                        ),
+                        ) : Container(),
                       ),
                     ),
                   ),
