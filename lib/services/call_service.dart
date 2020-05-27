@@ -28,20 +28,21 @@ class CallService {
 
   static Future<bool> endCall(Call call) async {
     try {
-      Message message = Message(
-        id: call.channelId,
-        senderUid: call.callerId,
-        receiverUid: call.receiverId,
-        type: call.type == 'Video' ? 'video call' : 'voice call',
-        message: call.type == 'Video' ? 'Video Call' : 'Voice Call',
-        timestamp:
-            Timestamp.fromMillisecondsSinceEpoch(int.parse(call.channelId)),
-        isSeen: false,
-        photoUrl: '',
-      );
-      await DatabaseService.sendMessage(message);
       await callRef.document(call.callerId).delete();
-      await callRef.document(call.receiverId).delete();
+      await callRef.document(call.receiverId).delete().then((value) async {
+        Message message = Message(
+          id: call.channelId,
+          senderUid: call.callerId,
+          receiverUid: call.receiverId,
+          type: call.type == 'Video' ? 'video call' : 'voice call',
+          message: call.type == 'Video' ? 'Video Call' : 'Voice Call',
+          timestamp:
+          Timestamp.fromMillisecondsSinceEpoch(int.parse(call.channelId)),
+          isSeen: false,
+          photoUrl: '',
+        );
+        await DatabaseService.sendMessage(message);
+      });
       return true;
     } catch (e) {
       print(e);

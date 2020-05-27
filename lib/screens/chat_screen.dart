@@ -6,9 +6,12 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:instagram_v2/models/call_model.dart';
 import 'package:instagram_v2/models/message_model.dart';
 import 'package:instagram_v2/models/user_data.dart';
 import 'package:instagram_v2/models/user_model.dart';
+import 'package:instagram_v2/screens/pickup_screen.dart';
+import 'package:instagram_v2/services/call_service.dart';
 import 'package:instagram_v2/services/database_service.dart';
 import 'package:instagram_v2/services/photo_service.dart';
 import 'package:instagram_v2/services/storage_service.dart';
@@ -461,144 +464,153 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     themeStyle = Provider.of<UserData>(context);
-    return PickupLayout(
-      scaffold: Scaffold(
-        backgroundColor: themeStyle.primaryBackgroundColor,
-        appBar: AppBar(
-          iconTheme: IconThemeData(color: themeStyle.primaryIconColor),
-          backgroundColor: themeStyle.primaryBackgroundColor,
-          title: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(12.0)),
-                    border: Border.all(
-                        width: 1.5,
-                        color: widget.chatWithUser.isActive
-                            ? mainColor
-                            : Colors.grey),
-                    image: DecorationImage(
-                        image: widget.chatWithUser.profileImageUrl.isEmpty
-                            ? AssetImage('assets/images/user_placeholder.jpg')
-                            : CachedNetworkImageProvider(
-                                widget.chatWithUser.profileImageUrl),
-                        fit: BoxFit.cover)),
-              ),
-              Flexible(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: RichText(
-                    overflow: TextOverflow.ellipsis,
-                    text: TextSpan(
-                      text: widget.chatWithUser.name,
-                      style: TextStyle(
-                        fontSize: 24.0,
-                        fontWeight: FontWeight.bold,
-                        color: themeStyle.primaryTextColor,
+    return StreamBuilder(
+        stream: CallService.callStream(themeStyle.currentUserId),
+        builder: (context, snapshot) {
+          if (snapshot.hasData && snapshot.data.data != null) {
+            Call call = Call.fromMap(snapshot.data.data);
+            if (!call.hasDialled) {
+              return PickUpScreen(call: call,);
+            }
+          }
+        return Scaffold(
+            backgroundColor: themeStyle.primaryBackgroundColor,
+            appBar: AppBar(
+              iconTheme: IconThemeData(color: themeStyle.primaryIconColor),
+              backgroundColor: themeStyle.primaryBackgroundColor,
+              title: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                        border: Border.all(
+                            width: 1.5,
+                            color: widget.chatWithUser.isActive
+                                ? mainColor
+                                : Colors.grey),
+                        image: DecorationImage(
+                            image: widget.chatWithUser.profileImageUrl.isEmpty
+                                ? AssetImage('assets/images/user_placeholder.jpg')
+                                : CachedNetworkImageProvider(
+                                    widget.chatWithUser.profileImageUrl),
+                            fit: BoxFit.cover)),
+                  ),
+                  Flexible(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: RichText(
+                        overflow: TextOverflow.ellipsis,
+                        text: TextSpan(
+                          text: widget.chatWithUser.name,
+                          style: TextStyle(
+                            fontSize: 24.0,
+                            fontWeight: FontWeight.bold,
+                            color: themeStyle.primaryTextColor,
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ),
+                ],
               ),
-            ],
-          ),
-          elevation: 0.0,
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(Icons.call),
-              iconSize: 25.0,
-              color: mainColor,
-              onPressed: () async =>
-              await Permissions.cameraAndMicrophonePermissionsGranted()
-                  ? CallUtils.dial(
-                  from: _currentUser,
-                  to: widget.chatWithUser,
-                  context: context,
-                  type: 'Voice')
-                  : {},
-            ),
-            IconButton(
-              icon: Icon(Icons.video_call),
-              iconSize: 30.0,
-              color: mainColor,
-              onPressed: () async =>
+              elevation: 0.0,
+              actions: <Widget>[
+                IconButton(
+                  icon: Icon(Icons.call),
+                  iconSize: 25.0,
+                  color: mainColor,
+                  onPressed: () async =>
                   await Permissions.cameraAndMicrophonePermissionsGranted()
                       ? CallUtils.dial(
-                          from: _currentUser,
-                          to: widget.chatWithUser,
-                          context: context,
-                  type: 'Video')
+                      from: _currentUser,
+                      to: widget.chatWithUser,
+                      context: context,
+                      type: 'Voice')
                       : {},
+                ),
+                IconButton(
+                  icon: Icon(Icons.video_call),
+                  iconSize: 30.0,
+                  color: mainColor,
+                  onPressed: () async =>
+                      await Permissions.cameraAndMicrophonePermissionsGranted()
+                          ? CallUtils.dial(
+                              from: _currentUser,
+                              to: widget.chatWithUser,
+                              context: context,
+                      type: 'Video')
+                          : {},
+                ),
+              ],
             ),
-          ],
-        ),
-        body: GestureDetector(
-          onTap: () => FocusScope.of(context).unfocus(),
-          child: Column(
-            children: <Widget>[
-              Expanded(
-                child: StreamBuilder(
-                    stream: DatabaseService.getAllMessage(
-                        widget.currentUserId, widget.chatWithUser.id),
-                    builder: (context, snapshot) {
-                      _messageList = snapshot.data;
-                      if (!snapshot.hasData) {
-                        return Center(
-                          child: CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation<Color>(mainColor),
-                          ),
-                        );
-                      }
-                      if (_messageList.length > 0) {
-                        if (_messageList[0].receiverUid ==
-                            widget.currentUserId) {
-                          DatabaseService.updateIsSeen(
-                              widget.currentUserId, widget.chatWithUser.id);
-                        }
-                        return Container(
-                          decoration: BoxDecoration(
-                            color: themeStyle.primaryBackgroundColor,
-                          ),
-                          child: ListView.builder(
-                            controller: _listController,
-                            reverse: true,
-                            padding: EdgeInsets.only(top: 15.0),
-                            itemCount: _messageList.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              final Message message = _messageList[index];
-                              final bool isMe =
-                                  message.senderUid == widget.currentUserId;
-                              return message.type == 'text'
-                                  ? _buildTextMessage(message, isMe)
-                                  : message.type == 'photo'
-                                      ? _buildImageMessage(message, isMe)
-                                      : (message.type == 'video call' || message.type == 'voice call')
-                                          ? _buildVideoCallMessage(
-                                              message, isMe)
-                                          : _buildDeleteMessage(message, isMe);
-                            },
-                          ),
-                        );
-                      } else {
-                        return Center(
-                          child: Text(
-                            'No Message',
-                            style: TextStyle(
-                                fontSize: 30,
-                                color: themeStyle.primaryTextColor),
-                          ),
-                        );
-                      }
-                    }),
+            body: GestureDetector(
+              onTap: () => FocusScope.of(context).unfocus(),
+              child: Column(
+                children: <Widget>[
+                  Expanded(
+                    child: StreamBuilder(
+                        stream: DatabaseService.getAllMessage(
+                            widget.currentUserId, widget.chatWithUser.id),
+                        builder: (context, snapshot) {
+                          _messageList = snapshot.data;
+                          if (!snapshot.hasData) {
+                            return Center(
+                              child: CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<Color>(mainColor),
+                              ),
+                            );
+                          }
+                          if (_messageList.length > 0) {
+                            if (_messageList[0].receiverUid ==
+                                widget.currentUserId) {
+                              DatabaseService.updateIsSeen(
+                                  widget.currentUserId, widget.chatWithUser.id);
+                            }
+                            return Container(
+                              decoration: BoxDecoration(
+                                color: themeStyle.primaryBackgroundColor,
+                              ),
+                              child: ListView.builder(
+                                controller: _listController,
+                                reverse: true,
+                                padding: EdgeInsets.only(top: 15.0),
+                                itemCount: _messageList.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  final Message message = _messageList[index];
+                                  final bool isMe =
+                                      message.senderUid == widget.currentUserId;
+                                  return message.type == 'text'
+                                      ? _buildTextMessage(message, isMe)
+                                      : message.type == 'photo'
+                                          ? _buildImageMessage(message, isMe)
+                                          : (message.type == 'video call' || message.type == 'voice call')
+                                              ? _buildVideoCallMessage(
+                                                  message, isMe)
+                                              : _buildDeleteMessage(message, isMe);
+                                },
+                              ),
+                            );
+                          } else {
+                            return Center(
+                              child: Text(
+                                'No Message',
+                                style: TextStyle(
+                                    fontSize: 30,
+                                    color: themeStyle.primaryTextColor),
+                              ),
+                            );
+                          }
+                        }),
+                  ),
+                  _buildMessageComposer(),
+                ],
               ),
-              _buildMessageComposer(),
-            ],
           ),
-        ),
-      ),
+        );
+      }
     );
   }
 }

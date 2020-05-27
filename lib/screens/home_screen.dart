@@ -36,7 +36,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   PageController _pageController;
   FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
+  FlutterLocalNotificationsPlugin();
 
   _setUpFCM() {
     _firebaseMessaging.requestNotificationPermissions();
@@ -68,19 +68,19 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   _navigateToChatOrComment(Map<String, dynamic> message) async {
     if (message['data']['type'] == 'chat') {
       User sender =
-          await DatabaseService.getUserWithId(message['data']['senderUid']);
+      await DatabaseService.getUserWithId(message['data']['senderUid']);
       navigatorKey.currentState.push(MaterialPageRoute(
           builder: (_) => ChatScreen(
-                currentUserId: message['data']['receiverUid'],
-                chatWithUser: sender,
-              )));
+            currentUserId: message['data']['receiverUid'],
+            chatWithUser: sender,
+          )));
     } else if (message['data']['type'] == 'post') {
       Post post = await DatabaseService.getUserPost(
           widget.currentUserId, message['data']['postId']);
       navigatorKey.currentState.push(MaterialPageRoute(
           builder: (_) => CommentsScreen(
-                post: post,
-              )));
+            post: post,
+          )));
     }
     return;
   }
@@ -125,17 +125,17 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     var platformChannelSpecifics = new NotificationDetails(
         androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
     await flutterLocalNotificationsPlugin.show(
-      0,
-      message['notification']['title'].toString(),
-      message['notification']['body'].toString(),
-      platformChannelSpecifics,
-      payload: 'default_sound'
+        0,
+        message['notification']['title'].toString(),
+        message['notification']['body'].toString(),
+        platformChannelSpecifics,
+        payload: 'default_sound'
     );
   }
 
   void configLocalNotification() {
     var initializationSettingsAndroid =
-        new AndroidInitializationSettings('@mipmap/ic_launcher');
+    new AndroidInitializationSettings('@mipmap/ic_launcher');
     var initializationSettingsIOS = new IOSInitializationSettings();
     var initializationSettings = new InitializationSettings(
         initializationSettingsAndroid, initializationSettingsIOS);
