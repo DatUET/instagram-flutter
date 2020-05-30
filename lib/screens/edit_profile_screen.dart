@@ -7,6 +7,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:instagram_v2/models/user_data.dart';
 import 'package:instagram_v2/models/user_model.dart';
 import 'package:instagram_v2/screens/change_password_screen.dart';
+import 'package:instagram_v2/screens/login_screen.dart';
+import 'package:instagram_v2/services/auth_service.dart';
 import 'package:instagram_v2/services/database_service.dart';
 import 'package:instagram_v2/services/storage_service.dart';
 import 'package:instagram_v2/utilities/constants.dart';
@@ -110,6 +112,120 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         imageUrl: widget.user.profileImageUrl,
       ),
     );
+  }
+
+  _showDialogLogout() {
+    showGeneralDialog(
+        barrierColor: Colors.black.withOpacity(0.5),
+        transitionBuilder: (context, a1, a2, widget) {
+          return Transform.scale(
+            scale: a1.value,
+            child: Opacity(
+              opacity: a1.value,
+              child: AlertDialog(
+                contentPadding: EdgeInsets.only(top: 20.0),
+                backgroundColor: themeStyle.primaryBackgroundColor,
+                shape: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12.0),
+                ),
+                title: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Icon(
+                      Icons.warning,
+                      color: Colors.redAccent,
+                      size: 32,
+                    ),
+                    Text(
+                      'Logout',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.redAccent, fontSize: 24),
+                    ),
+                  ],
+                ),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Text(
+                      'Are you sure?',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          color: themeStyle.primaryTextColor,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500),
+                    ),
+                    SizedBox(
+                      height: 8,
+                    ),
+                    Divider(),
+                    Row(
+                      children: <Widget>[
+                        Expanded(
+                          flex: 1,
+                          child: GestureDetector(
+                            child: Container(
+                                height: 48.0,
+                                child: Center(
+                                  child: Text(
+                                    'No',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        color: themeStyle.primaryTextColor,
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 16),
+                                  ),
+                                )),
+                            onTap: () {
+                              Navigator.pop(context);
+                            },
+                          ),
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: GestureDetector(
+                            child: Container(
+                                height: 48.0,
+                                decoration: BoxDecoration(
+                                    color: Colors.redAccent,
+                                    borderRadius: BorderRadius.only(
+                                        bottomRight: Radius.circular(12.0))),
+                                child: Center(
+                                  child: Text(
+                                    'Yes',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 16),
+                                  ),
+                                )),
+                            onTap: () {
+                              AuthService.logout();
+                              DatabaseService.updateActive(
+                                  themeStyle.currentUserId, false);
+                              DatabaseService.updateToken(
+                                  themeStyle.currentUserId, '');
+                              Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (BuildContext context) =>
+                                          LoginScreen()), (Route<dynamic> route) => false);
+                            },
+                          ),
+                        )
+                      ],
+                    )
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+        transitionDuration: Duration(milliseconds: 200),
+        barrierDismissible: true,
+        barrierLabel: '',
+        context: context,
+        pageBuilder: (context, animation1, animation2) {});
   }
 
   @override
@@ -266,8 +382,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Icon(
-                              OMIcons.arrowForwardIos,
-                              color: themeStyle.primaryIconColor,
+                              OMIcons.edit,
+                              color: mainColor,
                             ),
                           )
                         ],
@@ -298,8 +414,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Icon(
-                                OMIcons.arrowForwardIos,
-                                color: themeStyle.primaryIconColor,
+                                Icons.border_horizontal,
+                                color:mainColor,
                               ),
                             )
                           ],
@@ -325,6 +441,29 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             })
                       ],
                     ),
+                    SizedBox(
+                      height: 16,
+                    ),
+                    InkWell(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Text(
+                              'Log Out',
+                              style: TextStyle(
+                                  color: themeStyle.primaryTextColor,
+                                  fontSize: 18.0),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Icon(
+                                OMIcons.exitToApp,
+                                color: mainColor,
+                              ),
+                            )
+                          ],
+                        ),
+                        onTap: () => _showDialogLogout()),
                   ],
                 ),
               )
