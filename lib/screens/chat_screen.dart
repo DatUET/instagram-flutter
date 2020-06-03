@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
@@ -18,11 +17,7 @@ import 'package:instagram_v2/services/storage_service.dart';
 import 'package:instagram_v2/utilities/call_utils.dart';
 import 'package:instagram_v2/utilities/constants.dart';
 import 'package:instagram_v2/utilities/permisstions.dart';
-import 'package:instagram_v2/widgets/pickup_layout.dart';
-import 'package:intl/intl.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class ChatScreen extends StatefulWidget {
   final String currentUserId;
@@ -41,12 +36,14 @@ class _ChatScreenState extends State<ChatScreen> {
   ScrollController _listController = ScrollController();
   File _image;
   User _currentUser;
+  String _blocker;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     _setUpChat();
+    _checkBlockMessage();
   }
 
   _setUpChat() async {
@@ -54,6 +51,13 @@ class _ChatScreenState extends State<ChatScreen> {
         await DatabaseService.getUserWithId(widget.currentUserId);
     setState(() {
       _currentUser = currentUser;
+    });
+  }
+  
+  _checkBlockMessage() async {
+    String blocker = await DatabaseService.isBlockMessage(widget.currentUserId, widget.chatWithUser.id);
+    setState(() {
+      _blocker = blocker;
     });
   }
 
@@ -271,7 +275,7 @@ class _ChatScreenState extends State<ChatScreen> {
   _buildMessageComposer() {
     return Container(
       color: themeStyle.primaryBackgroundColor,
-      child: Row(
+      child: _blocker == 'none' ? Row(
         children: <Widget>[
           Flexible(
             child: Container(
@@ -313,7 +317,13 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
               onPressed: _sendMessageText),
         ],
-      ),
+      )
+      : Center(child: Padding(
+        padding: EdgeInsets.only(top: 15.0, bottom: 15.0, left: 15.0),
+        child: Text(_blocker == widget.currentUserId ? 'You cannot send messages now.\nPlease unblock to continue messaging' : 'You cannot send messages now',
+        style: TextStyle(color: themeStyle.primaryTextColorDark),
+        textAlign: TextAlign.center,),
+      ),),
       width: double.infinity,
     );
   }
@@ -521,28 +531,47 @@ class _ChatScreenState extends State<ChatScreen> {
                 IconButton(
                   icon: Icon(Icons.call),
                   iconSize: 25.0,
-                  color: mainColor,
+                  color: _blocker == 'none' ? mainColor : themeStyle.primaryIconColor,
                   onPressed: () async =>
-                  await Permissions.cameraAndMicrophonePermissionsGranted()
+                  _blocker == 'none' ? await Permissions.cameraAndMicrophonePermissionsGranted()
                       ? CallUtils.dial(
                       from: _currentUser,
                       to: widget.chatWithUser,
                       context: context,
                       type: 'Voice')
-                      : {},
+                      : {} : {},
                 ),
                 IconButton(
                   icon: Icon(Icons.video_call),
                   iconSize: 30.0,
-                  color: mainColor,
+                  color: _blocker == 'none' ? mainColor : themeStyle.primaryIconColor,
                   onPressed: () async =>
-                      await Permissions.cameraAndMicrophonePermissionsGranted()
+                      _blocker == 'none' ? await Permissions.cameraAndMicrophonePermissionsGranted()
                           ? CallUtils.dial(
                               from: _currentUser,
                               to: widget.chatWithUser,
                               context: context,
                       type: 'Video')
-                          : {},
+                          : {} : {},
+                ),
+                IconButton(
+                  icon: _blocker == widget.currentUserId ? Icon(Icons.lock_open) : Icon(Icons.lock_outline),
+                  iconSize: 25.0,
+                  color: (_blocker == widget.currentUserId || _blocker == 'none') ? mainColor : themeStyle.primaryIconColor,
+                  onPressed: () async {
+                    if (_blocker == 'none') {
+                      await DatabaseService.blockMessage(widget.currentUserId, widget.chatWithUser.id);
+                      setState(() {
+                        _blocker = widget.currentUserId;
+                      });
+                    } else if (_blocker == widget.currentUserId) {
+                      await DatabaseService.deleteBlockMessage(widget.currentUserId, widget.chatWithUser.id);
+                      setState(() {
+                        _blocker = 'none';
+                      });
+                    }
+                  }
+                  ,
                 ),
               ],
             ),

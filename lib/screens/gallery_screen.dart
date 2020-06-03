@@ -168,7 +168,7 @@ class _GalleyScreenState extends State<GalleyScreen>
       file.absolute.path,
       targetPath,
       quality: file.lengthSync() > 1000000
-          ? (1000000 / file.lengthSync() * 100).toInt()
+          ? (40000 / file.lengthSync() * 100).toInt()
           : file.lengthSync() > 300000
               ? (300000 / file.lengthSync() * 100).toInt()
               : 20,

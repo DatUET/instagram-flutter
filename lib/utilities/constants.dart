@@ -17,6 +17,9 @@ final recentChatRef = _firestore.collection('recentChat');
 final tokenRef = _firestore.collection('tokens');
 final callRef = _firestore.collection('call');
 final trendingLikeRef = _firestore.collection('trendingLike');
+final blockMessageRef = _firestore.collection('blockMessage');
+final locationRef = _firestore.collection('location');
+final distanceRef = _firestore.collection('distance');
 
 final Color mainColor = Color(0xFFFE8057);
 const String APP_ID_AGORA = 'c508bbcd84b44fdeabd52a9cb8acf00a';

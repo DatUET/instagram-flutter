@@ -117,44 +117,53 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   _displayButton(User user) {
     return user.id == Provider.of<UserData>(context).currentUserId
-        ? Container(
-            width: 200.0,
-            child: FlatButton(
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => EditProfileScreen(
-                    user: user,
-                  ),
+        ? GestureDetector(
+            child: Container(
+              padding: EdgeInsets.symmetric(vertical: 8.0),
+              decoration: BoxDecoration(
+                  color: mainColor,
+                  borderRadius: BorderRadius.all(Radius.circular(8.0))),
+              width: 200.0,
+              child: Center(
+                child: Text(
+                  'Setting',
+                  style: TextStyle(fontSize: 18.0, color: Colors.white),
                 ),
               ),
-              color: mainColor,
-              textColor: Colors.white,
-              child: Text(
-                'Edit Profile',
-                style: TextStyle(fontSize: 18.0),
+            ),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => EditProfileScreen(
+                  user: user,
+                ),
               ),
             ),
           )
-        : Container(
-            width: 200.0,
-            child: FlatButton(
-              onPressed: _followOrUnfollow,
-              color: _isFollowing ? Colors.grey[200] : mainColor,
-              textColor: _isFollowing ? Colors.black : Colors.white,
-              child: Text(
+        : GestureDetector(
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 8.0),
+        width: 200.0,
+        decoration: BoxDecoration(
+            color: _isFollowing ? Colors.grey[200] : mainColor,
+          borderRadius: BorderRadius.all(Radius.circular(8.0))
+        ),
+        child: Center(
+          child: Text(
                 _isFollowing ? 'Unfollow' : 'Follow',
-                style: TextStyle(fontSize: 18.0),
+                style: TextStyle(fontSize: 18.0, color: _isFollowing ? Colors.black : Colors.white),
               ),
-            ),
-          );
+        ),
+      ),
+      onTap: _followOrUnfollow,
+    );
   }
 
   _buildButtonChat(User user) {
     return user.id == Provider.of<UserData>(context).currentUserId
         ? Container()
         : Container(
-            width: 145,
+            width: 150,
             height: 40,
             decoration: BoxDecoration(
                 color: themeStyle.primaryBackgroundColor,
@@ -462,6 +471,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                               ),
                               _displayButton(user),
+                              SizedBox(height: 8.0,),
                               _buildButtonChat(user),
                               _buildProfileInfo(user),
                               _buildToggleButtons(),

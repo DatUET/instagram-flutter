@@ -82,10 +82,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         _profileImageUrl = widget.user.profileImageUrl;
       } else {
         _profileImageUrl = await StorageService.uploadUserProfileImage(
-          widget.user.profileImageUrl,
-          _profileImage,
-          widget.user.type
-        );
+            widget.user.profileImageUrl, _profileImage, widget.user.type);
       }
 
       User user = User(
@@ -162,57 +159,46 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       children: <Widget>[
                         Expanded(
                           flex: 1,
-                          child: GestureDetector(
-                            child: Container(
-                                height: 48.0,
-                                child: Center(
-                                  child: Text(
-                                    'No',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        color: themeStyle.primaryTextColor,
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 16),
-                                  ),
-                                )),
-                            onTap: () {
-                              Navigator.pop(context);
-                            },
+                          child: FlatButton(
+                            child: Text(
+                              'No',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  color: themeStyle.primaryTextColor,
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 16),
+                            ),
+                            onPressed: () => Navigator.pop(context),
                           ),
                         ),
                         Expanded(
                           flex: 1,
-                          child: GestureDetector(
-                            child: Container(
-                                height: 48.0,
-                                decoration: BoxDecoration(
-                                    color: Colors.redAccent,
-                                    borderRadius: BorderRadius.only(
-                                        bottomRight: Radius.circular(12.0))),
-                                child: Center(
-                                  child: Text(
-                                    'Yes',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 16),
-                                  ),
-                                )),
-                            onTap: () {
-                              AuthService.logout();
-                              DatabaseService.updateActive(
-                                  themeStyle.currentUserId, false);
-                              DatabaseService.updateToken(
-                                  themeStyle.currentUserId, '');
-                              Navigator.pushAndRemoveUntil(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (BuildContext context) =>
-                                          LoginScreen()), (Route<dynamic> route) => false);
+                          child: FlatButton(
+                            child: Text(
+                              'Yes',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  color: Colors.redAccent,
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 16),
+                            ),
+                            onPressed: () {
+                              {
+                                AuthService.logout();
+                                DatabaseService.updateActive(
+                                    themeStyle.currentUserId, false);
+                                DatabaseService.updateToken(
+                                    themeStyle.currentUserId, '');
+                                Navigator.pushAndRemoveUntil(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (BuildContext context) =>
+                                            LoginScreen()),
+                                    (Route<dynamic> route) => false);
+                              }
                             },
                           ),
-                        )
+                        ),
                       ],
                     )
                   ],
@@ -291,6 +277,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       ),
                       TextFormField(
                         initialValue: _name,
+                        cursorColor: mainColor,
                         style: TextStyle(
                             fontSize: 18.0, color: themeStyle.primaryTextColor),
                         decoration: InputDecoration(
@@ -311,6 +298,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       ),
                       TextFormField(
                         initialValue: _bio,
+                        cursorColor: mainColor,
                         style: TextStyle(
                             fontSize: 18.0, color: themeStyle.primaryTextColor),
                         decoration: InputDecoration(
@@ -415,7 +403,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               padding: const EdgeInsets.all(8.0),
                               child: Icon(
                                 Icons.border_horizontal,
-                                color:mainColor,
+                                color: mainColor,
                               ),
                             )
                           ],

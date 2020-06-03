@@ -1,15 +1,14 @@
+import 'package:bubble_tab_indicator/bubble_tab_indicator.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:instagram_v2/animations/bouncy_page_route.dart';
-import 'package:instagram_v2/animations/fadeanimationup.dart';
-import 'package:instagram_v2/models/post_model.dart';
 import 'package:instagram_v2/models/user_data.dart';
 import 'package:instagram_v2/models/user_model.dart';
-import 'package:instagram_v2/screens/comments_screen.dart';
+import 'package:instagram_v2/screens/nearly_screen.dart';
 import 'package:instagram_v2/screens/profile_screen.dart';
+import 'package:instagram_v2/screens/trending_screen.dart';
 import 'package:instagram_v2/services/database_service.dart';
 import 'package:instagram_v2/utilities/constants.dart';
 import 'package:instagram_v2/widgets/pickup_layout.dart';
@@ -20,23 +19,29 @@ class SearchScreen extends StatefulWidget {
   _SearchScreenState createState() => _SearchScreenState();
 }
 
-class _SearchScreenState extends State<SearchScreen> {
+class _SearchScreenState extends State<SearchScreen>
+    with SingleTickerProviderStateMixin {
   TextEditingController _searchController = TextEditingController();
   Future<QuerySnapshot> _users;
   var themeStyle;
-  List<Post> _trendingLike = [];
+  int _currentIndexTab = 0;
+  TabController _tabController;
 
   @override
   void initState() {
     super.initState();
-    _initTrending();
+    _tabController = new TabController(vsync: this, length: 2);
+    _tabController.addListener(() {
+      setState(() {
+        _currentIndexTab = _tabController.index;
+      });
+    });
   }
 
-  _initTrending() async {
-    List<Post> trendingLike = await DatabaseService.getTrendingLike();
-    setState(() {
-      _trendingLike = trendingLike;
-    });
+  @override
+  void dispose() {
+    super.dispose();
+    _tabController.dispose();
   }
 
   _buildUserTile(User user) {
@@ -103,149 +108,36 @@ class _SearchScreenState extends State<SearchScreen> {
     }
   }
 
-  _buildTrending() {
-    return Container(
-      color: themeStyle.primaryBackgroundColor,
-      padding: EdgeInsets.all(8.0),
-      child: StaggeredGridView.countBuilder(
-        crossAxisCount: 2,
-        itemCount: _trendingLike.length,
-        mainAxisSpacing: 12.0,
-        crossAxisSpacing: 12.0,
-        shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
-        itemBuilder: (context, index) =>
-            _buildTilePost(_trendingLike[index], index),
-        staggeredTileBuilder: (index) {
-          return StaggeredTile.count(1, index.isEven ? 2 : 1.5);
-        },
+  _buildRegionTabBar() {
+    return TabBar(
+      labelPadding: EdgeInsets.symmetric(vertical: 8.0),
+      indicator: BubbleTabIndicator(
+        tabBarIndicatorSize: TabBarIndicatorSize.tab,
+        indicatorHeight: 40.0,
+        indicatorColor: mainColor,
       ),
-    );
-  }
-
-  _buildTilePost(Post post, int index) {
-    return Container(
-      child: FadeAnimationUp(
-        (index * 2) / 10.0,
-        GestureDetector(
-            onTap: () => Navigator.push(
-                  context,
-                  BouncyPageRoute(
-                    widget: CommentsScreen(
-                      post: post,
-                    ),
-                  ),
-                ),
-            child: Stack(
-              children: <Widget>[
-                Container(
-                  decoration: BoxDecoration(
-                      image: DecorationImage(
-                          image: CachedNetworkImageProvider(post.imageUrl),
-                          fit: BoxFit.cover),
-                      borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(20.0),
-                          bottomRight: Radius.circular(20.0),
-                      topRight: Radius.circular(20.0)),
-                      boxShadow: [
-                        BoxShadow(
-                            color: Colors.grey[600],
-                            blurRadius: 10.0,
-                            offset: Offset(0, 5))
-                      ]),
-                ),
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Container(
-                    height: 64.0,
-                    decoration: BoxDecoration(
-                        color: themeStyle.primaryBackgroundColor,
-                        borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(20.0),
-                            bottomRight: Radius.circular(20.0)),
-                        boxShadow: [
-                          BoxShadow(
-                              color: Colors.grey[600],
-                              blurRadius: 10.0,
-                              offset: Offset(0, -5))
-                        ]),
-                    child: FutureBuilder(
-                        future: DatabaseService.getUserWithId(post.authorId),
-                        builder: (context, snapshot) {
-                          if (!snapshot.hasData) return Container();
-                          User author = snapshot.data;
-                          return Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 8.0),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: <Widget>[
-                                Container(
-                                  width: 40,
-                                  height: 40,
-                                  decoration: BoxDecoration(
-                                      color: Colors.grey,
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(12)),
-                                      border: Border.all(
-                                          width: 1.5,
-                                          color: author.isActive
-                                              ? mainColor
-                                              : Colors.grey),
-                                      image: DecorationImage(
-                                          image: author.profileImageUrl.isEmpty
-                                              ? AssetImage(
-                                                  'assets/images/user_placeholder.jpg')
-                                              : CachedNetworkImageProvider(
-                                                  author.profileImageUrl,
-                                                ),
-                                          fit: BoxFit.cover)),
-                                ),
-                                SizedBox(
-                                  width: 10,
-                                ),
-                                Flexible(
-                                  child: RichText(
-                                    overflow: TextOverflow.ellipsis,
-                                    strutStyle:
-                                        StrutStyle(fontWeight: FontWeight.w500),
-                                    text: TextSpan(
-                                        style: TextStyle(
-                                            color: themeStyle.primaryTextColor,
-                                            fontSize: 18.0,
-                                            fontWeight: FontWeight.w500),
-                                        text: author.name),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: <Widget>[
-                                      Text(
-                                        post.likeCount.toString(),
-                                        style: TextStyle(
-                                            color: themeStyle.primaryTextColor,
-                                            fontSize: 18.0,
-                                            fontWeight: FontWeight.w500),
-                                      ),
-                                      Icon(
-                                        Icons.favorite,
-                                        color: Colors.red,
-                                        size: 15,
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        }),
-                  ),
-                )
-              ],
-            )),
+      labelStyle: TextStyle(
+        fontSize: 16.0,
+        fontWeight: FontWeight.w600,
       ),
+      labelColor: themeStyle.primaryTextColor,
+      unselectedLabelColor: themeStyle.primaryTextColor,
+      tabs: <Widget>[
+        Text(
+          'Trending',
+          style: TextStyle(color: themeStyle.primaryTextColor),
+        ),
+        Text(
+          'Nearly',
+          style: TextStyle(color: themeStyle.primaryTextColor),
+        ),
+      ],
+      controller: _tabController,
+      onTap: (index) {
+        setState(() {
+          _currentIndexTab = index;
+        });
+      },
     );
   }
 
@@ -256,6 +148,7 @@ class _SearchScreenState extends State<SearchScreen> {
       scaffold: Scaffold(
         backgroundColor: themeStyle.primaryBackgroundColor,
         appBar: AppBar(
+          elevation: 0.0,
           iconTheme: IconThemeData(color: themeStyle.primaryIconColor),
           backgroundColor: themeStyle.primaryBackgroundColor,
           title: TextField(
@@ -306,17 +199,16 @@ class _SearchScreenState extends State<SearchScreen> {
                 ),
                 onPressed: () => _scanQRCodeId())
           ],
+          bottom: _users == null ? _buildRegionTabBar() : null,
         ),
         body: _users == null
-            ? _trendingLike.isEmpty
-                ? Center(
-                    child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(mainColor),
-                    ),
-                  )
-                : SingleChildScrollView(
-                    child: _buildTrending(),
-                  )
+            ? Padding(
+                padding: EdgeInsets.symmetric(vertical: 8.0),
+                child: TabBarView(
+                  children: <Widget>[TrendingScreen(), NearlyScreen(currentUserId: themeStyle.currentUserId,)],
+                  controller: _tabController,
+                ),
+              )
             : FutureBuilder(
                 future: _users,
                 builder: (context, snapshot) {
@@ -329,7 +221,10 @@ class _SearchScreenState extends State<SearchScreen> {
                   }
                   if (snapshot.data.documents.length == 0) {
                     return Center(
-                      child: Text('No users found! Please try again.'),
+                      child: Text(
+                        'No users found! Please try again.',
+                        style: TextStyle(color: themeStyle.primaryTextColor),
+                      ),
                     );
                   }
                   return ListView.builder(

@@ -104,6 +104,7 @@ class _PostViewState extends State<PostView>
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
     themeStyle = Provider.of<UserData>(context);
@@ -155,6 +156,7 @@ class _PostViewState extends State<PostView>
                   ),
                   SizedBox(width: 8.0),
                   Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(
                         widget.author.name,
@@ -270,7 +272,7 @@ class _PostViewState extends State<PostView>
                           } else {
                             _askPermission();
                           }
-                        }) : Container()
+                        }) : Container(),
                   ],
                 ),
                 Padding(

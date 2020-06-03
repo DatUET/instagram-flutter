@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:instagram_v2/models/user_data.dart';
 import 'package:instagram_v2/screens/feed_screen.dart';
 import 'package:instagram_v2/screens/home_screen.dart';
@@ -27,6 +28,7 @@ class MyApp extends StatelessWidget {
           primaryIconTheme: Theme.of(context).primaryIconTheme.copyWith(
                 color: Colors.black,
               ),
+          textTheme: GoogleFonts.notoSansTextTheme()
         ),
         home: SplashScreen(),
         routes: {

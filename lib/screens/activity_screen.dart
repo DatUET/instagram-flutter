@@ -1,15 +1,10 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:instagram_v2/animations/bouncy_page_route.dart';
 import 'package:instagram_v2/models/activity_model.dart';
-import 'package:instagram_v2/models/post_model.dart';
 import 'package:instagram_v2/models/user_data.dart';
-import 'package:instagram_v2/models/user_model.dart';
-import 'package:instagram_v2/screens/comments_screen.dart';
 import 'package:instagram_v2/services/database_service.dart';
 import 'package:instagram_v2/utilities/constants.dart';
 import 'package:instagram_v2/widgets/activity_view.dart';
-import 'package:intl/intl.dart';
+import 'package:outline_material_icons/outline_material_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
@@ -53,7 +48,9 @@ class _ActivityScreenState extends State<ActivityScreen> {
   Widget build(BuildContext context) {
     themeStyle = Provider.of<UserData>(context);
     return SmartRefresher(
-      header: WaterDropMaterialHeader(backgroundColor: mainColor,),
+      header: WaterDropMaterialHeader(
+        backgroundColor: mainColor,
+      ),
       controller: _refreshController,
       onRefresh: () => _setupActivities(),
       child: _isLoading
@@ -71,11 +68,32 @@ class _ActivityScreenState extends State<ActivityScreen> {
                   ),
                 )
               : ListView.builder(
-        addAutomaticKeepAlives: true,
+                  addAutomaticKeepAlives: true,
                   itemCount: _activities.length,
                   itemBuilder: (BuildContext context, int index) {
                     Activity activity = _activities[index];
-                    return ActivityView(activity: activity);
+                    return Dismissible(
+                        key: ValueKey(_activities.elementAt(index)),
+                        onDismissed: (direction) async {
+                          setState(() {
+                            _activities.removeAt(index);
+                          });
+                          await DatabaseService.deleteActivity(
+                              currentUserId: widget.currentUserId,
+                              activity: activity);
+                        },
+                        background: Container(
+                          color: Colors.red,
+                          child: Icon(
+                            OMIcons.delete,
+                            color: Colors.white,
+                          ),
+                        ),
+                        secondaryBackground: Container(
+                          color: Colors.red,
+                          child: Icon(OMIcons.delete, color: Colors.white),
+                        ),
+                        child: ActivityView(activity: activity));
                   },
                 ),
     );

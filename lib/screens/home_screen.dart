@@ -7,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
+import 'package:instagram_v2/main.dart';
 import 'package:instagram_v2/models/post_model.dart';
 import 'package:instagram_v2/models/user_data.dart';
 import 'package:instagram_v2/models/user_model.dart';
@@ -19,6 +20,7 @@ import 'package:instagram_v2/screens/splash_screen.dart';
 import 'package:instagram_v2/services/database_service.dart';
 import 'package:instagram_v2/utilities/constants.dart';
 import 'package:instagram_v2/widgets/pickup_layout.dart';
+import 'package:location/location.dart';
 import 'package:outline_material_icons/outline_material_icons.dart';
 import 'package:provider/provider.dart';
 
@@ -36,7 +38,36 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   PageController _pageController;
   FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-  FlutterLocalNotificationsPlugin();
+      FlutterLocalNotificationsPlugin();
+
+  Location location = new Location();
+
+  bool _serviceEnabled;
+  PermissionStatus _permissionGranted;
+
+  _setUpLocation() async {
+    _serviceEnabled = await location.serviceEnabled();
+    if (!_serviceEnabled) {
+      _serviceEnabled = await location.requestService();
+      if (!_serviceEnabled) {
+        return;
+      }
+    }
+
+    _permissionGranted = await location.hasPermission();
+    if (_permissionGranted == PermissionStatus.denied) {
+      _permissionGranted = await location.requestPermission();
+      if (_permissionGranted != PermissionStatus.granted) {
+        return;
+      }
+    }
+
+    location.onLocationChanged.listen((LocationData currentLocation) async {
+      await DatabaseService.updateLocation(currentUserId: widget.currentUserId,
+      latitude: currentLocation.latitude,
+      longitude: currentLocation.longitude);
+    });
+  }
 
   _setUpFCM() {
     _firebaseMessaging.requestNotificationPermissions();
@@ -68,19 +99,19 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   _navigateToChatOrComment(Map<String, dynamic> message) async {
     if (message['data']['type'] == 'chat') {
       User sender =
-      await DatabaseService.getUserWithId(message['data']['senderUid']);
+          await DatabaseService.getUserWithId(message['data']['senderUid']);
       navigatorKey.currentState.push(MaterialPageRoute(
           builder: (_) => ChatScreen(
-            currentUserId: message['data']['receiverUid'],
-            chatWithUser: sender,
-          )));
+                currentUserId: message['data']['receiverUid'],
+                chatWithUser: sender,
+              )));
     } else if (message['data']['type'] == 'post') {
       Post post = await DatabaseService.getUserPost(
           widget.currentUserId, message['data']['postId']);
       navigatorKey.currentState.push(MaterialPageRoute(
           builder: (_) => CommentsScreen(
-            post: post,
-          )));
+                post: post,
+              )));
     }
     return;
   }
@@ -91,6 +122,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     DatabaseService.updateActive(widget.currentUserId, true);
     _pageController = PageController();
     _setUpFCM();
+    _setUpLocation();
     configLocalNotification();
     WidgetsBinding.instance.addObserver(this);
   }
@@ -129,13 +161,12 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         message['notification']['title'].toString(),
         message['notification']['body'].toString(),
         platformChannelSpecifics,
-        payload: 'default_sound'
-    );
+        payload: 'default_sound');
   }
 
   void configLocalNotification() {
     var initializationSettingsAndroid =
-    new AndroidInitializationSettings('@mipmap/ic_launcher');
+        new AndroidInitializationSettings('@mipmap/ic_launcher');
     var initializationSettingsIOS = new IOSInitializationSettings();
     var initializationSettings = new InitializationSettings(
         initializationSettingsAndroid, initializationSettingsIOS);
@@ -186,24 +217,60 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           activeColor: Colors.black,
           items: [
             BottomNavigationBarItem(
-              icon: Icon(
-                OMIcons.home,
-                size: 32.0,
-                color: _currentTab == 0 ? mainColor : themeStyle.primaryIconColor,
+              icon: Container(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 3.0,
+                  horizontal: 40.0,
+                ),
+                decoration: BoxDecoration(
+                  color: _currentTab == 0 ? mainColor : Colors.transparent,
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+                child: Icon(
+                  OMIcons.home,
+                  size: 32.0,
+                  color: _currentTab == 0
+                      ? Colors.white
+                      : Colors.grey,
+                ),
               ),
             ),
             BottomNavigationBarItem(
-              icon: Icon(
-                OMIcons.photoAlbum,
-                size: 32.0,
-                color: _currentTab == 1 ? mainColor : themeStyle.primaryIconColor,
+              icon: Container(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 3.0,
+                  horizontal: 40.0,
+                ),
+                decoration: BoxDecoration(
+                  color: _currentTab == 1 ? mainColor : Colors.transparent,
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+                child: Icon(
+                  OMIcons.photoAlbum,
+                  size: 32.0,
+                  color: _currentTab == 1
+                      ? Colors.white
+                      : Colors.grey,
+                ),
               ),
             ),
             BottomNavigationBarItem(
-              icon: Icon(
-                OMIcons.cameraEnhance,
-                size: 32.0,
-                color: _currentTab == 2 ? mainColor : themeStyle.primaryIconColor,
+              icon: Container(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 3.0,
+                  horizontal: 40.0,
+                ),
+                decoration: BoxDecoration(
+                  color: _currentTab == 2 ? mainColor : Colors.transparent,
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+                child: Icon(
+                  OMIcons.cameraEnhance,
+                  size: 32.0,
+                  color: _currentTab == 2
+                      ? Colors.white
+                      : Colors.grey,
+                ),
               ),
             ),
           ],

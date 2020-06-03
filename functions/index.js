@@ -227,3 +227,58 @@ exports.sendNotifiVideoCall = functions.region("asia-northeast1").firestore
   }
   return;
   });
+
+exports.onUpdateLocation = functions.region("asia-northeast1").firestore
+.document("/location/{userId}")
+.onUpdate(async (snapshot, context) => {
+  const location = snapshot.after.data();
+  const userID = context.params.userId;
+  const distanceRef = admin
+    .firestore()
+    .collection('distance')
+    .doc(userID)
+    .collection('userDistances');
+  const locationRef = admin
+  .firestore()
+  .collection('location');
+  const loactionSnapshot = await locationRef.get();
+  loactionSnapshot.forEach(async (doc) => {
+    const locationOther = doc.data();
+      const latitude1 = location['latitude'];
+      const latitude2 = locationOther['latitude'];
+      const longitude1 = location['longitude'];
+      const longitude2 = locationOther['longitude'];
+      const distance = calculateDistance(latitude1, longitude1, latitude2, longitude2);
+    if (doc.exists) {
+      if (doc.id !== userID) {
+        if (!distanceRef.doc(doc.id).exists) {
+          const userDoc = await admin
+        .firestore()
+        .collection("users")
+        .doc(doc.id).get();
+          distanceRef.doc(doc.id).set({
+            'name': userDoc.get('name'),
+            'bio': userDoc.get('bio'),
+            'email': userDoc.get('email'),
+            'profileImageUrl': userDoc.get('profileImageUrl'),
+            'isActive': userDoc.get('isActive'),
+            'type': userDoc.get('type'),
+            'distance': distance,
+          });
+        } else {
+          distanceRef.doc(doc.id).update({
+            'distance': distance,
+          });
+        }
+      }
+    }
+  });
+});
+
+function calculateDistance(lat1, lon1, lat2, lon2){
+  var p = 0.017453292519943295;
+  var a = 0.5 - Math.cos((lat2 - lat1) * p)/2 +
+  Math.cos(lat1 * p) * Math.cos(lat2 * p) *
+  (1 - Math.cos((lon2 - lon1) * p))/2;
+  return 12742 * Math.asin(Math.sqrt(a));
+  }
