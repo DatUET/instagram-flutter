@@ -5,6 +5,7 @@ import 'package:instagram_v2/models/post_model.dart';
 import 'package:instagram_v2/models/user_data.dart';
 import 'package:instagram_v2/models/user_model.dart';
 import 'package:instagram_v2/screens/chat_screen.dart';
+import 'package:instagram_v2/screens/profile_screen.dart';
 import 'package:instagram_v2/services/database_service.dart';
 import 'package:instagram_v2/utilities/constants.dart';
 import 'package:provider/provider.dart';
@@ -245,95 +246,104 @@ class _NearlyUserViewState extends State<NearlyUserView> with AutomaticKeepAlive
   @override
   Widget build(BuildContext context) {
     themeStyle = Provider.of<UserData>(context);
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
-      margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
-      decoration: BoxDecoration(
-        color: themeStyle.primaryBackgroundColor,
-        borderRadius: BorderRadius.all(Radius.circular(12.0)),
-        boxShadow: [
-          BoxShadow(
-              color: Colors.grey[600], blurRadius: 5.0, offset: Offset(3, 3))
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          _buildHeader(),
-          _buildIconFollowAndChat(),
-          SizedBox(
-            height: 8.0,
-          ),
-          Row(
-            children: <Widget>[
-              Text(
-                'Contact: ',
-                style: TextStyle(color: themeStyle.primaryTextColor),
-              ),
-              Text(
-                '${widget.distance.email}',
-                style: TextStyle(
-                    color: themeStyle.primaryTextColor,
-                    fontWeight: FontWeight.bold),
-              ),
-            ],
-          ),
-          SizedBox(
-            height: 8.0,
-          ),
-          Row(
-            children: <Widget>[
-              Text(
-                '${_postCount.toString()} ',
-                style: TextStyle(
-                    color: themeStyle.primaryTextColor,
-                    fontWeight: FontWeight.bold),
-              ),
-              Text(
-                'Posts',
-                style: TextStyle(color: themeStyle.primaryTextColor),
-              ),
-            ],
-          ),
-          SizedBox(
-            height: 8.0,
-          ),
-          Row(
-            children: <Widget>[
-              Text(
-                '${_followingCount.toString()} ',
-                style: TextStyle(
-                    color: themeStyle.primaryTextColor,
-                    fontWeight: FontWeight.bold),
-              ),
-              Text(
-                'Followings',
-                style: TextStyle(color: themeStyle.primaryTextColor),
-              ),
-            ],
-          ),
-          SizedBox(
-            height: 8.0,
-          ),
-          Row(
-            children: <Widget>[
-              Text(
-                '${_followerCount.toString()} ',
-                style: TextStyle(
-                    color: themeStyle.primaryTextColor,
-                    fontWeight: FontWeight.bold),
-              ),
-              Text(
-                'Followers',
-                style: TextStyle(color: themeStyle.primaryTextColor),
-              ),
-            ],
-          ),
-          SizedBox(
-            height: 8.0,
-          ),
-          _postCount == 0 ? Container() : _buildListImagePost()
-        ],
+    return GestureDetector(
+      onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (_) => ProfileScreen(
+                currentUserId: widget.currentUserId,
+                userId: widget.distance.id,
+              ))),
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
+        margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
+        decoration: BoxDecoration(
+          color: themeStyle.primaryBackgroundColor,
+          borderRadius: BorderRadius.all(Radius.circular(12.0)),
+          boxShadow: [
+            BoxShadow(
+                color: Colors.grey[600], blurRadius: 5.0, offset: Offset(3, 3))
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            _buildHeader(),
+            _buildIconFollowAndChat(),
+            SizedBox(
+              height: 8.0,
+            ),
+            Row(
+              children: <Widget>[
+                Text(
+                  'Contact: ',
+                  style: TextStyle(color: themeStyle.primaryTextColor),
+                ),
+                Text(
+                  '${widget.distance.email}',
+                  style: TextStyle(
+                      color: themeStyle.primaryTextColor,
+                      fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            SizedBox(
+              height: 8.0,
+            ),
+            Row(
+              children: <Widget>[
+                Text(
+                  '${_postCount.toString()} ',
+                  style: TextStyle(
+                      color: themeStyle.primaryTextColor,
+                      fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  'Posts',
+                  style: TextStyle(color: themeStyle.primaryTextColor),
+                ),
+              ],
+            ),
+            SizedBox(
+              height: 8.0,
+            ),
+            Row(
+              children: <Widget>[
+                Text(
+                  '${_followingCount.toString()} ',
+                  style: TextStyle(
+                      color: themeStyle.primaryTextColor,
+                      fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  'Followings',
+                  style: TextStyle(color: themeStyle.primaryTextColor),
+                ),
+              ],
+            ),
+            SizedBox(
+              height: 8.0,
+            ),
+            Row(
+              children: <Widget>[
+                Text(
+                  '${_followerCount.toString()} ',
+                  style: TextStyle(
+                      color: themeStyle.primaryTextColor,
+                      fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  'Followers',
+                  style: TextStyle(color: themeStyle.primaryTextColor),
+                ),
+              ],
+            ),
+            SizedBox(
+              height: 8.0,
+            ),
+            _postCount == 0 ? Container() : _buildListImagePost()
+          ],
+        ),
       ),
     );
   }

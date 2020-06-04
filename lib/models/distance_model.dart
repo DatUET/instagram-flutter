@@ -27,7 +27,7 @@ class Distance {
   }
 
   factory Distance.fromMap(DocumentSnapshot doc) {
-    double distance = doc['distance'];
+    double distance = double.parse(doc['distance'].toString());
     String distanceFormat = distance.toStringAsFixed(distance.truncateToDouble() == distance ? 0 : 2);
     return Distance(
         id: doc.documentID,

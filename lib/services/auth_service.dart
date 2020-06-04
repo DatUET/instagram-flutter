@@ -29,6 +29,7 @@ class AuthService {
       if (signedInUser != null) {
         _firestore.collection('/users').document(signedInUser.uid).setData({
           'name': name,
+          'bio': "",
           'email': email,
           'profileImageUrl': '',
           'type': 'Custom',
@@ -107,6 +108,7 @@ class AuthService {
         if (authResult.additionalUserInfo.isNewUser) {
           await _firestore.collection('/users').document(user.uid).setData({
             'name': user.displayName,
+            'bio': "",
             'email': user.email,
             'profileImageUrl': user.photoUrl,
             'type': 'Google',
