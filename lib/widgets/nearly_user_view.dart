@@ -20,7 +20,7 @@ class NearlyUserView extends StatefulWidget {
   _NearlyUserViewState createState() => _NearlyUserViewState();
 }
 
-class _NearlyUserViewState extends State<NearlyUserView> with AutomaticKeepAliveClientMixin<NearlyUserView> {
+class _NearlyUserViewState extends State<NearlyUserView> {
   bool _isFollowing = false;
   int _followerCount = 0;
   int _followingCount = 0;
@@ -74,7 +74,7 @@ class _NearlyUserViewState extends State<NearlyUserView> with AutomaticKeepAlive
   }
 
   _setupPosts() async {
-    List<Post> posts = await DatabaseService.getThreePost(widget.distance.id);
+    List<Post> posts = await DatabaseService.getSixPost(widget.distance.id);
     setState(() {
       _posts = posts;
     });
@@ -130,57 +130,24 @@ class _NearlyUserViewState extends State<NearlyUserView> with AutomaticKeepAlive
   }
 
   _buildHeader() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        Container(
-          width: 70,
-          height: 70,
-          decoration: BoxDecoration(
-              color: Colors.grey,
-              borderRadius: BorderRadius.all(Radius.circular(20)),
-              border: Border.all(
-                  width: 1.5,
-                  color: widget.distance.isActive ? mainColor : Colors.grey),
-              boxShadow: [
-                BoxShadow(
-                    color: Colors.grey[600],
-                    blurRadius: 5.0,
-                    offset: Offset(3, 3))
-              ],
-              image: DecorationImage(
-                  image: widget.distance.profileImageUrl.isEmpty
-                      ? AssetImage('assets/images/user_placeholder.jpg')
-                      : CachedNetworkImageProvider(
-                          widget.distance.profileImageUrl,
-                        ),
-                  fit: BoxFit.cover)),
-        ),
-        SizedBox(
-          width: 8.0,
-        ),
-        Flexible(
-          child: RichText(
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.start,
-            text: TextSpan(
-              text: widget.distance.name,
-              style: TextStyle(
-                fontSize: 22.0,
-                fontWeight: FontWeight.bold,
-                color: themeStyle.primaryTextColor,
-              ),
-            ),
-          ),
-        ),
-        Spacer(),
-        Text(
-          '${widget.distance.distance} km',
+        Center(
+            child: Text(
+          widget.distance.name,
           style: TextStyle(
-            color: mainColor,
-            fontWeight: FontWeight.bold,
-            fontSize: 18.0,
-          ),
+              color: themeStyle.primaryTextColor,
+              fontSize: 22.0,
+              fontWeight: FontWeight.bold),
+        )),
+        SizedBox(
+          height: 8.0,
+        ),
+        Text(
+          widget.distance.bio,
+          style: TextStyle(color: themeStyle.primaryTextColor),
+          textAlign: TextAlign.center,
         )
       ],
     );
@@ -217,13 +184,75 @@ class _NearlyUserViewState extends State<NearlyUserView> with AutomaticKeepAlive
     );
   }
 
+  _buildInfoUser() {
+    return Container(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: <Widget>[
+          Column(
+            children: <Widget>[
+              Text(
+                _posts.length.toString(),
+                style: TextStyle(
+                  color: themeStyle.primaryTextColor,
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              Text(
+                'posts',
+                style: TextStyle(color: themeStyle.primaryTextColor),
+              ),
+            ],
+          ),
+          Column(
+            children: <Widget>[
+              Text(
+                _followerCount.toString(),
+                style: TextStyle(
+                  color: themeStyle.primaryTextColor,
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              Text(
+                'followers',
+                style: TextStyle(color: themeStyle.primaryTextColor),
+              ),
+            ],
+          ),
+          Column(
+            children: <Widget>[
+              Text(
+                _followingCount.toString(),
+                style: TextStyle(
+                  color: themeStyle.primaryTextColor,
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              Text(
+                'following',
+                style: TextStyle(color: themeStyle.primaryTextColor),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   _buildListImagePost() {
     List<Widget> listImageBuilt = [];
-    for (int i = 0; i < _posts.length; i++) {
-      listImageBuilt.add(_buildImagePost(_posts[i].imageUrl));
+    for (Post post in _posts) {
+      listImageBuilt.add(_buildImagePost(post.imageUrl));
     }
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
+    return GridView.count(
+      crossAxisCount: 3,
+      childAspectRatio: 1.0,
+      mainAxisSpacing: 8.0,
+      crossAxisSpacing: 8.0,
+      shrinkWrap: true,
       children: listImageBuilt,
     );
   }
@@ -251,104 +280,118 @@ class _NearlyUserViewState extends State<NearlyUserView> with AutomaticKeepAlive
           context,
           MaterialPageRoute(
               builder: (_) => ProfileScreen(
-                currentUserId: widget.currentUserId,
-                userId: widget.distance.id,
-              ))),
-      child: Container(
-        padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
-        margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
-        decoration: BoxDecoration(
-          color: themeStyle.primaryBackgroundColor,
-          borderRadius: BorderRadius.all(Radius.circular(12.0)),
-          boxShadow: [
-            BoxShadow(
-                color: Colors.grey[600], blurRadius: 5.0, offset: Offset(3, 3))
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            _buildHeader(),
-            _buildIconFollowAndChat(),
-            SizedBox(
-              height: 8.0,
+                    currentUserId: widget.currentUserId,
+                    userId: widget.distance.id,
+                  ))),
+      child: Stack(
+        children: <Widget>[
+          Container(
+            padding: EdgeInsets.only(
+              top: 100,
+              bottom: 0.0,
+              left: 16.0,
+              right: 16.0,
             ),
-            Row(
-              children: <Widget>[
-                Text(
-                  'Contact: ',
-                  style: TextStyle(color: themeStyle.primaryTextColor),
-                ),
-                Text(
-                  '${widget.distance.email}',
-                  style: TextStyle(
-                      color: themeStyle.primaryTextColor,
-                      fontWeight: FontWeight.bold),
-                ),
+            margin: EdgeInsets.only(
+                top: 30.0, left: 12.0, right: 12.0, bottom: 12.0),
+            decoration: BoxDecoration(
+              color: themeStyle.primaryBackgroundColor,
+              borderRadius: BorderRadius.all(Radius.circular(12.0)),
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.grey[600],
+                    blurRadius: 5.0,
+                    offset: Offset(3, 3))
               ],
             ),
-            SizedBox(
-              height: 8.0,
-            ),
-            Row(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text(
-                  '${_postCount.toString()} ',
-                  style: TextStyle(
-                      color: themeStyle.primaryTextColor,
-                      fontWeight: FontWeight.bold),
+                _buildHeader(),
+                _buildIconFollowAndChat(),
+                SizedBox(
+                  height: 8.0,
                 ),
-                Text(
-                  'Posts',
-                  style: TextStyle(color: themeStyle.primaryTextColor),
+                _buildInfoUser(),
+                SizedBox(
+                  height: 16.0,
                 ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text(
+                      'Contact: ',
+                      style: TextStyle(color: themeStyle.primaryTextColor),
+                    ),
+                    Text(
+                      '${widget.distance.email}',
+                      style: TextStyle(
+                          color: themeStyle.primaryTextColor,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: 16.0,
+                ),
+                _postCount == 0
+                    ? Container(
+                        padding: EdgeInsets.only(top: 16.0),
+                        child: Center(
+                          child: Text(
+                            'The List Post Is Empty',
+                            style: TextStyle(
+                                fontSize: 24,
+                                color: themeStyle.primaryTextColor),
+                          ),
+                        ),
+                      )
+                    : _buildListImagePost()
               ],
             ),
-            SizedBox(
-              height: 8.0,
+          ),
+          Align(
+            alignment: Alignment.topCenter,
+            child: Container(
+              margin: EdgeInsets.only(top: 10.0),
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                  color: Colors.grey,
+                  borderRadius: BorderRadius.all(Radius.circular(25)),
+                  border: Border.all(
+                      width: 1.5,
+                      color:
+                          widget.distance.isActive ? mainColor : Colors.grey),
+                  boxShadow: [
+                    BoxShadow(
+                        color: Colors.grey[600],
+                        blurRadius: 10.0,
+                        offset: Offset(0, 5))
+                  ],
+                  image: DecorationImage(
+                      image: widget.distance.profileImageUrl.isEmpty
+                          ? AssetImage('assets/images/user_placeholder.jpg')
+                          : CachedNetworkImageProvider(
+                              widget.distance.profileImageUrl,
+                            ),
+                      fit: BoxFit.cover)),
             ),
-            Row(
-              children: <Widget>[
-                Text(
-                  '${_followingCount.toString()} ',
-                  style: TextStyle(
-                      color: themeStyle.primaryTextColor,
-                      fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  'Followings',
-                  style: TextStyle(color: themeStyle.primaryTextColor),
-                ),
-              ],
+          ),
+          Positioned(
+            top: 40.0,
+            right: 20.0,
+            child: Text(
+              '${widget.distance.distance} km',
+              style: TextStyle(
+                color: mainColor,
+                fontWeight: FontWeight.bold,
+                fontSize: 20.0,
+              ),
             ),
-            SizedBox(
-              height: 8.0,
-            ),
-            Row(
-              children: <Widget>[
-                Text(
-                  '${_followerCount.toString()} ',
-                  style: TextStyle(
-                      color: themeStyle.primaryTextColor,
-                      fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  'Followers',
-                  style: TextStyle(color: themeStyle.primaryTextColor),
-                ),
-              ],
-            ),
-            SizedBox(
-              height: 8.0,
-            ),
-            _postCount == 0 ? Container() : _buildListImagePost()
-          ],
-        ),
+          )
+        ],
       ),
     );
   }
-
-  @override
-  // TODO: implement wantKeepAlive
-  bool get wantKeepAlive => true;
 }

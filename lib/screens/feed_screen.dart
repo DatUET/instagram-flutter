@@ -81,10 +81,15 @@ class _FeedScreenState extends State<FeedScreen> {
               }
               User author = snapshot.data;
               return PostView(
-                currentUserId: widget.currentUserId,
-                post: post,
-                author: author,
-                isCommentScreen: false,
+                  currentUserId: widget.currentUserId,
+                  post: post,
+                  author: author,
+                  isCommentScreen: false,
+                  updateAfterDelete: () {
+                    setState(() {
+                      _posts.removeAt(index);
+                    });
+                  }
               );
             },
           );

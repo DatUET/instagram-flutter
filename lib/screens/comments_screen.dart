@@ -170,6 +170,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
                             post: widget.post,
                             author: snapshot.data,
                             isCommentScreen: true,
+
                           );
                         }),
                     StreamBuilder(

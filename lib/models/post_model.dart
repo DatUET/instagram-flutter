@@ -9,6 +9,7 @@ class Post {
   final Timestamp timestamp;
   final String location;
   final bool enableDownload;
+  final bool delete;
 
   Post({
     this.id,
@@ -19,6 +20,7 @@ class Post {
     this.timestamp,
     this.location,
     this.enableDownload,
+    this.delete
   });
 
   factory Post.fromDoc(DocumentSnapshot doc) {
@@ -31,6 +33,7 @@ class Post {
       timestamp: doc['timestamp'],
       location: doc['location'],
       enableDownload: doc['enableDownload'],
+      delete: doc['delete'],
     );
   }
 }

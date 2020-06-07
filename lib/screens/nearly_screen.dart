@@ -115,9 +115,18 @@ class _NearlyScreenState extends State<NearlyScreen> {
                           ),
                         ),
                       )
-                    : Column(
-                        children: _nearlyList,
-                      )
+                    : SizedBox.fromSize(
+                  size: Size.fromHeight(550.0),
+                      child: PageView.builder(
+                      itemCount: _nearlyList.length,
+                      controller: PageController(viewportFraction: 0.8),
+                      itemBuilder: (context, index) {
+                  return _nearlyList[index];
+                }),
+                    )
+//                Column(
+//                        children: _nearlyList,
+//                      )
               ],
             ),
           );

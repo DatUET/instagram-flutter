@@ -141,22 +141,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           )
         : GestureDetector(
-      child: Container(
-        padding: EdgeInsets.symmetric(vertical: 8.0),
-        width: 200.0,
-        decoration: BoxDecoration(
-            color: _isFollowing ? Colors.grey[200] : mainColor,
-          borderRadius: BorderRadius.all(Radius.circular(8.0))
-        ),
-        child: Center(
-          child: Text(
-                _isFollowing ? 'Unfollow' : 'Follow',
-                style: TextStyle(fontSize: 18.0, color: _isFollowing ? Colors.black : Colors.white),
+            child: Container(
+              padding: EdgeInsets.symmetric(vertical: 8.0),
+              width: 200.0,
+              decoration: BoxDecoration(
+                  color: _isFollowing ? Colors.grey[200] : mainColor,
+                  borderRadius: BorderRadius.all(Radius.circular(8.0))),
+              child: Center(
+                child: Text(
+                  _isFollowing ? 'Unfollow' : 'Follow',
+                  style: TextStyle(
+                      fontSize: 18.0,
+                      color: _isFollowing ? Colors.black : Colors.white),
+                ),
               ),
-        ),
-      ),
-      onTap: _followOrUnfollow,
-    );
+            ),
+            onTap: _followOrUnfollow,
+          );
   }
 
   _buildButtonChat(User user) {
@@ -348,6 +349,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             post: _posts[i],
             author: _profileUser,
             isCommentScreen: false,
+            updateAfterDelete: () {
+              setState(() {
+                _posts.removeAt(i);
+              });
+            },
           ),
         );
       }
@@ -471,7 +477,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                               ),
                               _displayButton(user),
-                              SizedBox(height: 8.0,),
+                              SizedBox(
+                                height: 8.0,
+                              ),
                               _buildButtonChat(user),
                               _buildProfileInfo(user),
                               _buildToggleButtons(),

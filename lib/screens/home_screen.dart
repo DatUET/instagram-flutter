@@ -186,6 +186,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     final themeStyle = Provider.of<UserData>(context);
     return PickupLayout(
       scaffold: Scaffold(
+        key: key,
         body: PageView(
           controller: _pageController,
           children: <Widget>[

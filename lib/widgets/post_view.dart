@@ -22,8 +22,9 @@ class PostView extends StatefulWidget {
   final Post post;
   final User author;
   final bool isCommentScreen;
+  final Function updateAfterDelete;
 
-  PostView({this.currentUserId, this.post, this.author, this.isCommentScreen});
+  PostView({this.currentUserId, this.post, this.author, this.isCommentScreen, this.updateAfterDelete});
 
   @override
   _PostViewState createState() => _PostViewState();
@@ -104,6 +105,69 @@ class _PostViewState extends State<PostView>
     }
   }
 
+  _showOptionPost() {
+    showModalBottomSheet(
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        context: key.currentContext,
+        builder: (context) {
+          return AnimatedPadding(
+            duration: const Duration(milliseconds: 100),
+            padding: MediaQuery.of(context).viewInsets,
+            child: Container(
+              height: 80,
+              decoration: BoxDecoration(
+                  color: themeStyle.primaryBackgroundColor,
+                  borderRadius: BorderRadius.only(
+                      topLeft: const Radius.circular(16),
+                      topRight: const Radius.circular(16))),
+              child: widget.post.authorId == widget.currentUserId ?
+              _buildDeletePost() : _buildReportPost(context),
+            ),
+          );
+        });
+  }
+
+  _buildDeletePost() {
+    return GestureDetector(
+      onTap: () {
+
+        Navigator.pop(context);
+        DatabaseService.deletePost(widget.post);
+        widget.updateAfterDelete();
+      },
+      child: Container(
+        color: themeStyle.primaryBackgroundColor,
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          mainAxisSize: MainAxisSize.max,
+          children: <Widget>[
+            Icon(OMIcons.cancel, color: Colors.redAccent, size: 32.0,),
+            SizedBox(width: 16.0,),
+            Text('DELETE POST', style: TextStyle(color: Colors.redAccent, fontSize: 16.0, fontWeight: FontWeight.w700))
+          ],
+        ),
+      ),
+    );
+  }
+
+  _buildReportPost(BuildContext context) {
+    return GestureDetector(
+      onTap: () => Navigator.pop(context),
+      child: Container(
+        color: themeStyle.primaryBackgroundColor,
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          mainAxisSize: MainAxisSize.max,
+          children: <Widget>[
+            Icon(OMIcons.cancel, color: Colors.redAccent, size: 32.0,),
+            SizedBox(width: 16.0,),
+        Text('DELETE POST', style: TextStyle(color: Colors.redAccent, fontSize: 16.0, fontWeight: FontWeight.w700))
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -182,6 +246,7 @@ class _PostViewState extends State<PostView>
             ),
           ),
           GestureDetector(
+            onLongPress: () => widget.isCommentScreen ? (){} : _showOptionPost(),
             onDoubleTap: !widget.isCommentScreen ? _likePost : () {},
             child: Stack(
               alignment: Alignment.center,

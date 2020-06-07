@@ -23,3 +23,5 @@ final distanceRef = _firestore.collection('distance');
 
 final Color mainColor = Color(0xFFFE8057);
 const String APP_ID_AGORA = 'c508bbcd84b44fdeabd52a9cb8acf00a';
+
+final key = new GlobalKey<ScaffoldState>();

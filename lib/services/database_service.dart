@@ -31,6 +31,17 @@ class DatabaseService {
       'timestamp': post.timestamp,
       'location': post.location,
       'enableDownload': post.enableDownload,
+      'delete': false,
+    });
+  }
+
+  static void deletePost(Post post) {
+    DocumentReference postRef = postsRef
+        .document(post.authorId)
+        .collection('userPosts')
+        .document(post.id);
+    postRef.get().then((doc) {
+      postRef.updateData({'delete': true});
     });
   }
 
@@ -104,6 +115,7 @@ class DatabaseService {
     QuerySnapshot feedSnapshot = await feedsRef
         .document(userId)
         .collection('userFeed')
+        .where('delete', isEqualTo: false)
         .orderBy('timestamp', descending: true)
         .getDocuments();
     List<Post> posts =
@@ -115,6 +127,7 @@ class DatabaseService {
     QuerySnapshot userPostsSnapshot = await postsRef
         .document(userId)
         .collection('userPosts')
+        .where('delete', isEqualTo: false)
         .orderBy('timestamp', descending: true)
         .getDocuments();
     List<Post> posts =
@@ -211,10 +224,10 @@ class DatabaseService {
     return activity;
   }
 
-  static Future<void> deleteActivity(
-      {String currentUserId, Activity activity}) async {
+  static void deleteActivity(
+      {String currentUserId, Activity activity}) {
     try {
-      DocumentReference userActivitiesRef = await activitiesRef
+      DocumentReference userActivitiesRef = activitiesRef
           .document(currentUserId)
           .collection('userActivities')
           .document(activity.id);
@@ -434,8 +447,12 @@ class DatabaseService {
     return posts;
   }
 
-  static Future<void> updateLocation({@required String currentUserId, double latitude, double longitude}) async {
-    DocumentSnapshot locationSnapshot = await locationRef.document(currentUserId).get();
+  static Future<void> updateLocation(
+      {@required String currentUserId,
+      double latitude,
+      double longitude}) async {
+    DocumentSnapshot locationSnapshot =
+        await locationRef.document(currentUserId).get();
     if (locationSnapshot.exists) {
       locationRef.document(currentUserId).updateData({
         'latitude': latitude,
@@ -449,27 +466,29 @@ class DatabaseService {
     }
   }
 
-  static Future<List<Distance>> getUsersNearly({String currentUserId, int radius}) async {
+  static Future<List<Distance>> getUsersNearly(
+      {String currentUserId, int radius}) async {
     QuerySnapshot distanceSnapshot = await distanceRef
         .document(currentUserId)
         .collection('userDistances')
         .where('distance', isLessThan: radius)
         .orderBy('distance', descending: false)
         .getDocuments();
-    List<Distance> usersNearly = distanceSnapshot.documents.map((doc) => Distance.fromMap(doc)).toList();
+    List<Distance> usersNearly =
+        distanceSnapshot.documents.map((doc) => Distance.fromMap(doc)).toList();
 
     return usersNearly;
   }
 
-  static Future<List<Post>> getThreePost(String userId) async {
+  static Future<List<Post>> getSixPost(String userId) async {
     QuerySnapshot userPostsSnapshot = await postsRef
         .document(userId)
         .collection('userPosts')
         .orderBy('timestamp', descending: true)
-        .limit(3)
+        .limit(6)
         .getDocuments();
     List<Post> posts =
-    userPostsSnapshot.documents.map((doc) => Post.fromDoc(doc)).toList();
+        userPostsSnapshot.documents.map((doc) => Post.fromDoc(doc)).toList();
     return posts;
   }
 }

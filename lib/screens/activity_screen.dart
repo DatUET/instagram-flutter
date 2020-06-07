@@ -74,11 +74,11 @@ class _ActivityScreenState extends State<ActivityScreen> {
                     Activity activity = _activities[index];
                     return Dismissible(
                         key: ValueKey(_activities.elementAt(index)),
-                        onDismissed: (direction) async {
+                        onDismissed: (direction) {
                           setState(() {
                             _activities.removeAt(index);
                           });
-                          await DatabaseService.deleteActivity(
+                          DatabaseService.deleteActivity(
                               currentUserId: widget.currentUserId,
                               activity: activity);
                         },
