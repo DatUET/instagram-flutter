@@ -4,6 +4,7 @@ import 'package:instagram_v2/models/activity_model.dart';
 import 'package:instagram_v2/models/distance_model.dart';
 import 'package:instagram_v2/models/message_model.dart';
 import 'package:instagram_v2/models/post_model.dart';
+import 'package:instagram_v2/models/report_model.dart';
 import 'package:instagram_v2/models/user_model.dart';
 import 'package:instagram_v2/utilities/constants.dart';
 
@@ -224,8 +225,7 @@ class DatabaseService {
     return activity;
   }
 
-  static void deleteActivity(
-      {String currentUserId, Activity activity}) {
+  static void deleteActivity({String currentUserId, Activity activity}) {
     try {
       DocumentReference userActivitiesRef = activitiesRef
           .document(currentUserId)
@@ -440,6 +440,7 @@ class DatabaseService {
 
   static Future<List<Post>> getTrendingLike() async {
     QuerySnapshot trendingLikeSnapshot = await trendingLikeRef
+        .where('delete', isEqualTo: false)
         .orderBy('likeCount', descending: true)
         .getDocuments();
     List<Post> posts =
@@ -484,11 +485,36 @@ class DatabaseService {
     QuerySnapshot userPostsSnapshot = await postsRef
         .document(userId)
         .collection('userPosts')
+        .where('delete', isEqualTo: false)
         .orderBy('timestamp', descending: true)
         .limit(6)
         .getDocuments();
     List<Post> posts =
         userPostsSnapshot.documents.map((doc) => Post.fromDoc(doc)).toList();
     return posts;
+  }
+
+  static Future<bool> sendReportPost(String postId, Report report) async {
+    try {
+      await reportRef
+          .document(postId)
+          .collection('userReport')
+          .document(report.userId)
+          .setData(report.toMap());
+      return true;
+    } catch (e) {
+      print(e);
+      return false;
+    }
+  }
+
+  static Future<bool> didReportedPost(
+      String currentUserId, String postId) async {
+    DocumentSnapshot reportDoc = await reportRef
+        .document(postId)
+        .collection('userReport')
+        .document(currentUserId)
+        .get();
+    return reportDoc.exists;
   }
 }

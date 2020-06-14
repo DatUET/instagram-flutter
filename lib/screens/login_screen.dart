@@ -49,7 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
       bool isSent = await AuthService.sendEmailResetPassword(_emailForgot);
       if (isSent) {
         setState(() {
-          Navigator.pop(context);
+         Navigator.pop(context);
           _scaffoldKey.currentState.showSnackBar(SnackBar(
             content: Text('Please check email $_emailForgot.'),
             action: SnackBarAction(label: 'Ok', onPressed: () {}),

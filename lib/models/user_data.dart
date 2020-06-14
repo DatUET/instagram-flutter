@@ -29,12 +29,6 @@ class UserData extends ChangeNotifier {
   Color primaryMessageTextColor;
   Color secondaryMessageTextColor;
 
-//  Color primaryBackgroundColor = Colors.grey[900];
-//  Color primaryTextColorDark = Colors.grey[100];
-//  Color primaryTextColorLight = Colors.grey;
-//  Color primaryTextColor = Colors.grey[300];
-//  Color primaryIconColor = Colors.grey[100];
-//  Color typeMessageBoxColor = Colors.grey[800];
   _getColor() async {
     final prefs = await SharedPreferences.getInstance();
     mode = prefs.getInt('mode');
