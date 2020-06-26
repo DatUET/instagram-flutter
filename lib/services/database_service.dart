@@ -517,4 +517,20 @@ class DatabaseService {
         .get();
     return reportDoc.exists;
   }
+
+  static Future<void> updatePost(Post post) {
+    DocumentReference postRef = postsRef
+        .document(post.authorId)
+        .collection('userPosts')
+        .document(post.id);
+    postRef.get().then((doc) {
+      postRef.updateData({
+        'imageUrl': post.imageUrl,
+        'caption': post.caption,
+        'location': post.location,
+        'enableDownload': post.enableDownload,
+        'delete': false,
+      });
+    });
+  }
 }

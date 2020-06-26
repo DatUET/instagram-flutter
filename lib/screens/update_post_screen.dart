@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -14,17 +15,16 @@ import 'package:instagram_v2/services/storage_service.dart';
 import 'package:instagram_v2/utilities/constants.dart';
 import 'package:provider/provider.dart';
 
-class CreatePostScreen extends StatefulWidget {
-  final File imagePost;
-  final bool haveScaffold;
+class UpdatePostScreen extends StatefulWidget {
+  final Post post;
 
-  CreatePostScreen({this.imagePost, this.haveScaffold});
+  UpdatePostScreen({this.post});
 
   @override
-  _CreatePostScreenState createState() => _CreatePostScreenState();
+  _UpdatePostScreenState createState() => _UpdatePostScreenState();
 }
 
-class _CreatePostScreenState extends State<CreatePostScreen> {
+class _UpdatePostScreenState extends State<UpdatePostScreen> {
   File _image;
   TextEditingController _captionController = TextEditingController();
   TextEditingController _locationController = TextEditingController();
@@ -46,7 +46,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
       context: context,
       builder: (BuildContext context) {
         return CupertinoActionSheet(
-          title: Text('Add Photo'),
+          title: Text('Change Photo'),
           actions: <Widget>[
             CupertinoActionSheetAction(
               child: Text('Take Photo'),
@@ -73,7 +73,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
         return SimpleDialog(
           backgroundColor: themeStyle.primaryBackgroundColor,
           title: Text(
-            'Add Photo',
+            'Change Photo',
             style: TextStyle(color: themeStyle.primaryTextColor),
           ),
           children: <Widget>[
@@ -126,39 +126,27 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   }
 
   _submit(BuildContext context) async {
-    if (!_isLoading && _image != null && _caption.isNotEmpty) {
+    if (!_isLoading && _caption.isNotEmpty) {
       setState(() {
         _isLoading = true;
       });
 
-      // Create post
-      String imageUrl = await StorageService.uploadPost(_image);
+      String imageUrl = _image == null ? widget.post.imageUrl : await StorageService.uploadPost(_image);
       Post post = Post(
+        id: widget.post.id,
         imageUrl: imageUrl,
+        authorId: widget.post.authorId,
         caption: _caption,
-        likeCount: 0,
-        authorId: Provider.of<UserData>(context).currentUserId,
-        timestamp: Timestamp.fromDate(DateTime.now()),
         location: _locationController.text,
         enableDownload: _enableDownload,
       );
-      DatabaseService.createPost(post);
+      await DatabaseService.updatePost(post);
 
-      // Reset data
-      _captionController.clear();
-
-      setState(() {
-        _caption = '';
-        _image = null;
-        _isLoading = false;
-        _enableDownload = false;
-      });
+      Navigator.pop(context);
     } else {
       Scaffold.of(context).showSnackBar(SnackBar(
-          content: Text(_image == null
-              ? 'Please add photo for this post'
-              : _caption.isEmpty ? 'Please add Caption for this post' : null,
-          style: TextStyle(color: Colors.redAccent),)));
+          content: Text(_caption.isEmpty ? 'Please add Caption for this post' : null,
+            style: TextStyle(color: Colors.redAccent),)));
     }
   }
 
@@ -207,7 +195,10 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     _currentLocation['latitude'] = 0.0;
     _currentLocation['longitude'] = 0.0;
     _initPlatformState();
-    _image = widget.imagePost;
+    _captionController.text = widget.post.caption;
+    _locationController.text = widget.post.location;
+    _enableDownload = widget.post.enableDownload;
+    _caption = widget.post.caption;
   }
 
   _buildBodyScreen(double height, double width, BuildContext rootContext) {
@@ -228,15 +219,12 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                       width: width,
                       color: themeStyle.typeMessageBoxColor,
                       child: _image == null
-                          ? Icon(
-                              Icons.add_a_photo,
-                              color: themeStyle.primaryIconColor,
-                              size: 150.0,
-                            )
+                          ? CachedNetworkImage(
+                          imageUrl: widget.post.imageUrl)
                           : Image(
-                              image: FileImage(_image),
-                              fit: BoxFit.cover,
-                            ),
+                        image: FileImage(_image),
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                   SizedBox(height: 20.0),
@@ -252,7 +240,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                           fillColor: themeStyle.primaryBackgroundColor,
                           labelText: 'Caption',
                           labelStyle:
-                              TextStyle(color: themeStyle.primaryTextColor),
+                          TextStyle(color: themeStyle.primaryTextColor),
                           focusedBorder: UnderlineInputBorder(
                               borderSide: BorderSide(color: mainColor))),
                       onChanged: (input) => _caption = input,
@@ -276,7 +264,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                             fillColor: themeStyle.primaryBackgroundColor,
                             hintText: "Where was this photo taken?",
                             hintStyle:
-                                TextStyle(color: themeStyle.primaryTextColor),
+                            TextStyle(color: themeStyle.primaryTextColor),
                             border: InputBorder.none),
                       ),
                     ),
@@ -287,19 +275,19 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                   (_address == null)
                       ? Container()
                       : SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          padding: EdgeInsets.only(right: 5.0, left: 5.0),
-                          child: Row(
-                            children: <Widget>[
-                              buildLocationButton(_address.featureName),
-                              buildLocationButton(_address.subLocality),
-                              buildLocationButton(_address.locality),
-                              buildLocationButton(_address.subAdminArea),
-                              buildLocationButton(_address.adminArea),
-                              buildLocationButton(_address.countryName),
-                            ],
-                          ),
-                        ),
+                    scrollDirection: Axis.horizontal,
+                    padding: EdgeInsets.only(right: 5.0, left: 5.0),
+                    child: Row(
+                      children: <Widget>[
+                        buildLocationButton(_address.featureName),
+                        buildLocationButton(_address.subLocality),
+                        buildLocationButton(_address.locality),
+                        buildLocationButton(_address.subAdminArea),
+                        buildLocationButton(_address.adminArea),
+                        buildLocationButton(_address.countryName),
+                      ],
+                    ),
+                  ),
                   (_address == null) ? Container() : Divider(),
                   SizedBox(
                     height: 20,
@@ -348,7 +336,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                         onPressed: () => _submit(rootContext),
                         child: Center(
                           child: Text(
-                            'Post',
+                            'Update Post',
                             style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold),
@@ -361,48 +349,48 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
           ),
           _isLoading
               ? Container(
-                  width: double.infinity,
-                  height: double.infinity,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.withOpacity(.5),
-                  ),
-                  child: Center(
-                    child: Container(
-                      height: 180,
-                      width: 180,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        color: themeStyle.primaryBackgroundColor,
+            width: double.infinity,
+            height: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.grey.withOpacity(.5),
+            ),
+            child: Center(
+              child: Container(
+                height: 180,
+                width: 180,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: themeStyle.primaryBackgroundColor,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                      left: 20.0, right: 20, bottom: 15, top: 15),
+                  child: Column(
+                    children: <Widget>[
+                      SizedBox(
+                        height: 20,
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                            left: 20.0, right: 20, bottom: 15, top: 15),
-                        child: Column(
-                          children: <Widget>[
-                            SizedBox(
-                              height: 20,
-                            ),
-                            CircularProgressIndicator(
-                              valueColor:
-                                  AlwaysStoppedAnimation<Color>(mainColor),
-                            ),
-                            SizedBox(
-                              height: 35,
-                            ),
-                            Center(
-                                child: Text(
-                              'Uploading!\n Please wait....',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  fontSize: 20,
-                                  color: themeStyle.primaryTextColor),
-                            ))
-                          ],
-                        ),
+                      CircularProgressIndicator(
+                        valueColor:
+                        AlwaysStoppedAnimation<Color>(mainColor),
                       ),
-                    ),
+                      SizedBox(
+                        height: 35,
+                      ),
+                      Center(
+                          child: Text(
+                            'Updating!\n Please wait....',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                fontSize: 20,
+                                color: themeStyle.primaryTextColor),
+                          ))
+                    ],
                   ),
-                )
+                ),
+              ),
+            ),
+          )
               : Container(),
         ],
       ),
@@ -414,19 +402,17 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
     themeStyle = Provider.of<UserData>(context);
-    return widget.haveScaffold
-        ? Scaffold(
-            backgroundColor: themeStyle.primaryBackgroundColor,
-            appBar: AppBar(
-              iconTheme: IconThemeData(color: themeStyle.primaryIconColor),
-              title: Text(
-                'Create New Post',
-                style: TextStyle(color: themeStyle.primaryTextColor),
-              ),
-              backgroundColor: themeStyle.primaryBackgroundColor,
-            ),
-            body: Builder(builder: (contextBuilder) =>_buildBodyScreen(height, width, contextBuilder)),
-          )
-        : _buildBodyScreen(height, width, context);
+    return Scaffold(
+      backgroundColor: themeStyle.primaryBackgroundColor,
+      appBar: AppBar(
+        iconTheme: IconThemeData(color: themeStyle.primaryIconColor),
+        title: Text(
+          'Update Post',
+          style: TextStyle(color: themeStyle.primaryTextColor),
+        ),
+        backgroundColor: themeStyle.primaryBackgroundColor,
+      ),
+      body: Builder(builder: (contextBuilder) => _buildBodyScreen(height, width, contextBuilder)),
+    );
   }
 }

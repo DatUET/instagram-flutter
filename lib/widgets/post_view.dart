@@ -11,6 +11,7 @@ import 'package:instagram_v2/models/user_data.dart';
 import 'package:instagram_v2/models/user_model.dart';
 import 'package:instagram_v2/screens/comments_screen.dart';
 import 'package:instagram_v2/screens/profile_screen.dart';
+import 'package:instagram_v2/screens/update_post_screen.dart';
 import 'package:instagram_v2/services/database_service.dart';
 import 'package:instagram_v2/services/photo_service.dart';
 import 'package:instagram_v2/utilities/constants.dart';
@@ -162,40 +163,77 @@ class _PostViewState extends State<PostView>
         duration: const Duration(milliseconds: 100),
         padding: MediaQuery.of(context).viewInsets,
         child: Container(
-          height: 80,
+          height: 150,
           decoration: BoxDecoration(
               color: themeStyle.primaryBackgroundColor,
               borderRadius: BorderRadius.only(
                   topLeft: const Radius.circular(16),
                   topRight: const Radius.circular(16))),
-          child: GestureDetector(
-            onTap: () {
-              Navigator.pop(context);
-              DatabaseService.deletePost(widget.post);
-              widget.updateAfterDelete();
-            },
-            child: Container(
-              color: themeStyle.primaryBackgroundColor,
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                mainAxisSize: MainAxisSize.max,
-                children: <Widget>[
-                  Icon(
-                    OMIcons.cancel,
-                    color: Colors.redAccent,
-                    size: 32.0,
+          child: Column(
+            children: <Widget>[
+              GestureDetector(
+                onTap: () {
+                  //Navigator.pop(context);
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => UpdatePostScreen(post: widget.post,)));
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(16.0),
+                  decoration: BoxDecoration(
+                      color: themeStyle.primaryBackgroundColor,
+                      borderRadius: BorderRadius.only(
+                          topLeft: const Radius.circular(16),
+                          topRight: const Radius.circular(16))),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    children: <Widget>[
+                      Icon(
+                        Icons.update,
+                        color: themeStyle.primaryIconColor,
+                        size: 32.0,
+                      ),
+                      SizedBox(
+                        width: 16.0,
+                      ),
+                      Text('Update Post',
+                          style: TextStyle(
+                              color: themeStyle.primaryTextColor,
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.w700))
+                    ],
                   ),
-                  SizedBox(
-                    width: 16.0,
-                  ),
-                  Text('DELETE POST',
-                      style: TextStyle(
-                          color: Colors.redAccent,
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.w700))
-                ],
+                ),
               ),
-            ),
+              SizedBox(height: 10,),
+              GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                  DatabaseService.deletePost(widget.post);
+                  widget.updateAfterDelete();
+                },
+                child: Container(
+                  color: themeStyle.primaryBackgroundColor,
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    children: <Widget>[
+                      Icon(
+                        OMIcons.cancel,
+                        color: Colors.redAccent,
+                        size: 32.0,
+                      ),
+                      SizedBox(
+                        width: 16.0,
+                      ),
+                      Text('DELETE POST',
+                          style: TextStyle(
+                              color: Colors.redAccent,
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.w700))
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         ));
   }
