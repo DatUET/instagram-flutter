@@ -1,6 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:instagram_v2/animations/bouncy_page_route.dart';
 import 'package:instagram_v2/models/activity_model.dart';
 import 'package:instagram_v2/models/post_model.dart';
 import 'package:instagram_v2/models/user_data.dart';
@@ -80,8 +79,8 @@ class _ActivityViewState extends State<ActivityView>
               );
               Navigator.push(
                 context,
-                BouncyPageRoute(
-                  widget: CommentsScreen(
+                MaterialPageRoute(
+                  builder: (_) => CommentsScreen(
                     post: post,
                   ),
                 ),

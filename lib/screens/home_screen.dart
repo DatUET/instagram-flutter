@@ -127,6 +127,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   _updateStatus(permission.PermissionStatus status) {
     if (status != permission.PermissionStatus.granted) {
       _askPermission();
+    } else {
+      _setUpLocation();
     }
   }
 

@@ -2,7 +2,6 @@ import 'package:bubble_tab_indicator/bubble_tab_indicator.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:instagram_v2/animations/bouncy_page_route.dart';
 import 'package:instagram_v2/animations/fadeanimationup.dart';
 import 'package:instagram_v2/models/post_model.dart';
 import 'package:instagram_v2/models/user_data.dart';
@@ -79,8 +78,8 @@ class _TrendingScreenState extends State<TrendingScreen> {
         GestureDetector(
             onTap: () => Navigator.push(
                   context,
-                  BouncyPageRoute(
-                    widget: CommentsScreen(
+                  MaterialPageRoute(
+                    builder: (_) => CommentsScreen(
                       post: post,
                     ),
                   ),
