@@ -1,0 +1,42 @@
+* Hiếu
+	- Đăng nhập, đăng ký
+	- Đăng nhập với google
+	- Logout
+	- Quên mật khẩu
+	- Đổi pass
+	- Chỉnh sửa thông tin cá nhân
+	
+* Hoàng
+	- Lấy ảnh tử thư viện
+	- Chụp ảnh
+	- Đăng bài
+	- Xóa bài
+	- Sửa bài
+	- Đổi giao diện (Sáng/Tối)
+	
+* Hùng
+	- Show bài đăng
+	- Profile
+	- Like/Comment
+	- Thông báo (Phần activity trong app)
+	- Tải ảnh
+	
+* Duy
+	- Tìm kiếm người dùng (Tìm theo text, quét qr)
+	- Top like
+	- Quét user ở gần
+	- Làm Firebase Function
+	- Tạo qr code
+	- Review + Chỉnh sửa UI
+	
+* Đạt
+	- Nhắn tin (text, image)
+	- Xóa tin nhắn
+	- Video call
+	- Voice call
+	- Theo dõi + Bỏ theo dõi
+	- Thông báo đẩy
+Firebase Function: Đạt
+Phân tích yêu cầu: cả nhóm
+Thiết kế db: Đạt
+Làm báo cáo: Hoàng
