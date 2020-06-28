@@ -57,11 +57,10 @@ class _ChatListScreenState extends State<ChatListScreen> {
                         width: 1.5,
                         color: user.isActive ? mainColor : Colors.grey),
                     image: DecorationImage(
-                      image: user.profileImageUrl.isEmpty
-                          ? AssetImage('assets/images/user_placeholder.jpg')
-                          : CachedNetworkImageProvider(user.profileImageUrl),
-                      fit: BoxFit.cover
-                    )),
+                        image: user.profileImageUrl.isEmpty
+                            ? AssetImage('assets/images/user_placeholder.jpg')
+                            : CachedNetworkImageProvider(user.profileImageUrl),
+                        fit: BoxFit.cover)),
               ),
               title: Text(
                 '${user.name} - ${DateFormat.yMd().add_jm().format(
@@ -134,47 +133,50 @@ class _ChatListScreenState extends State<ChatListScreen> {
           ),
         ),
         body: StreamBuilder(
-          stream: CallService.callStream(widget.currentUserId),
-          builder: (context, snapshot) {
-            if (snapshot.hasData && snapshot.data.data != null) {
-              Call call = Call.fromMap(snapshot.data.data);
-              if (!call.hasDialled) {
-                return PickUpScreen(call: call,);
+            stream: CallService.callStream(widget.currentUserId),
+            builder: (context, snapshot) {
+              if (snapshot.hasData && snapshot.data.data != null) {
+                Call call = Call.fromMap(snapshot.data.data);
+                if (!call.hasDialled) {
+                  return PickUpScreen(
+                    call: call,
+                  );
+                }
               }
-            }
-            return StreamBuilder<List<Message>>(
-                stream: DatabaseService.getAllRecentChat(widget.currentUserId),
-                builder: (context, snapshot) {
-                  if (!snapshot.hasData) {
-                    return Container(
-                      child: Center(
-                        child: CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(mainColor),
+              return StreamBuilder<List<Message>>(
+                  stream:
+                      DatabaseService.getAllRecentChat(widget.currentUserId),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return Container(
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(mainColor),
+                          ),
                         ),
+                      );
+                    }
+                    _recentChatList = snapshot.data;
+                    return Container(
+                      child: ListView.separated(
+                        itemCount: _recentChatList.length,
+                        separatorBuilder: (context, index) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            child: Divider(
+                              color: Colors.grey,
+                            ),
+                          );
+                        },
+                        itemBuilder: (BuildContext context, int index) {
+                          Message message = _recentChatList[index];
+                          return _buildRecentChat(message);
+                        },
                       ),
                     );
-                  }
-                  _recentChatList = snapshot.data;
-                  return Container(
-                    child: ListView.separated(
-                      itemCount: _recentChatList.length,
-                      separatorBuilder: (context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          child: Divider(
-                            color: Colors.grey,
-                          ),
-                        );
-                      },
-                      itemBuilder: (BuildContext context, int index) {
-                        Message message = _recentChatList[index];
-                        return _buildRecentChat(message);
-                      },
-                    ),
-                  );
-                });
-          }
-        ),
+                  });
+            }),
       ),
     );
   }

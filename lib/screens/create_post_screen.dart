@@ -16,9 +16,8 @@ import 'package:provider/provider.dart';
 
 class CreatePostScreen extends StatefulWidget {
   final File imagePost;
-  final bool haveScaffold;
 
-  CreatePostScreen({this.imagePost, this.haveScaffold});
+  CreatePostScreen({this.imagePost});
 
   @override
   _CreatePostScreenState createState() => _CreatePostScreenState();
@@ -155,18 +154,22 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
       });
     } else {
       Scaffold.of(context).showSnackBar(SnackBar(
-          content: Text(_image == null
-              ? 'Please add photo for this post'
-              : _caption.isEmpty ? 'Please add Caption for this post' : null,
-          style: TextStyle(color: Colors.redAccent),)));
+          content: Text(
+        _image == null
+            ? 'Please add photo for this post'
+            : _caption.isEmpty ? 'Please add Caption for this post' : null,
+        style: TextStyle(color: Colors.redAccent),
+      )));
     }
   }
 
   _initPlatformState() async {
     Address first = await getUserLocation();
-    setState(() {
-      _address = first;
-    });
+    if (mounted) {
+      setState(() {
+        _address = first;
+      });
+    }
   }
 
   buildLocationButton(String locationName) {
@@ -414,19 +417,19 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
     themeStyle = Provider.of<UserData>(context);
-    return widget.haveScaffold
-        ? Scaffold(
-            backgroundColor: themeStyle.primaryBackgroundColor,
-            appBar: AppBar(
-              iconTheme: IconThemeData(color: themeStyle.primaryIconColor),
-              title: Text(
-                'Create New Post',
-                style: TextStyle(color: themeStyle.primaryTextColor),
-              ),
-              backgroundColor: themeStyle.primaryBackgroundColor,
-            ),
-            body: Builder(builder: (contextBuilder) =>_buildBodyScreen(height, width, contextBuilder)),
-          )
-        : _buildBodyScreen(height, width, context);
+    return Scaffold(
+      backgroundColor: themeStyle.primaryBackgroundColor,
+      appBar: AppBar(
+        iconTheme: IconThemeData(color: themeStyle.primaryIconColor),
+        title: Text(
+          'Create New Post',
+          style: TextStyle(color: themeStyle.primaryTextColor),
+        ),
+        backgroundColor: themeStyle.primaryBackgroundColor,
+      ),
+      body: Builder(
+          builder: (contextBuilder) =>
+              _buildBodyScreen(height, width, contextBuilder)),
+    );
   }
 }

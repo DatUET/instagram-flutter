@@ -31,7 +31,9 @@ class _SignupScreenState extends State<SignupScreen> {
   bool _hidePassword = true;
 
   _submit() async {
-    if (_formKeyName.currentState.validate() && _formKeyEmail.currentState.validate() && _formKeyPass.currentState.validate()) {
+    if (_formKeyName.currentState.validate() &&
+        _formKeyEmail.currentState.validate() &&
+        _formKeyPass.currentState.validate()) {
       setState(() {
         _isLoading = true;
         _isValid = true;
@@ -72,12 +74,11 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   void _onFocusChange() async {
-    if (!_focusEmailInput.hasFocus ) {
+    if (!_focusEmailInput.hasFocus) {
       _isExistEmail =
           await AuthService.checkExistEmail(_emailInputController.text);
       _formKeyEmail.currentState.validate();
     }
-
   }
 
   @override
@@ -141,167 +142,154 @@ class _SignupScreenState extends State<SignupScreen> {
                       SizedBox(
                         height: 30,
                       ),
-                      FadeAnimation(1.8, Container(
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                            color: themeStyle.typeMessageBoxColor,
-                            boxShadow: [
-                              BoxShadow(
-                                color: mainColor.withOpacity(.13),
-                                blurRadius: 15,
-                                offset: Offset(0, 10),
-                              )
-                            ]),
-                        child: Form(
-                          key: _formKeyName,
-                          child: Padding(
-                          padding: EdgeInsets.only(
-                            left: 15.0,
-                            right: 15,
-                            bottom: 3.0,
-                          ),
-                          child: TextFormField(
-                            cursorColor: mainColor,
-                            keyboardType:
-                            TextInputType.text,
-                            style: TextStyle(
-                                color: themeStyle
-                                    .primaryTextColor),
-                            decoration: InputDecoration(
-                              labelText: 'Name',
-                              labelStyle: TextStyle(
-                                  color: themeStyle
-                                      .primaryTextColor),
-                              focusedBorder:
-                              UnderlineInputBorder(
-                                  borderSide: BorderSide(
-                                      color:
-                                      mainColor)),
-                            ),
-                            validator: (input) => input
-                                .trim()
-                                .isEmpty
-                                ? 'Please enter a valid name'
-                                : null,
-                            onSaved: (input) =>
-                            _name = input,
-                          ),
-                        ),),
-                      )),
-                      SizedBox(height: 30,),
-                      FadeAnimation(1.8, Container(
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                            color: themeStyle.typeMessageBoxColor,
-                            boxShadow: [
-                              BoxShadow(
-                                color: mainColor.withOpacity(.13),
-                                blurRadius: 15,
-                                offset: Offset(0, 10),
-                              )
-                            ]),
-                        child: Form(
-                          key: _formKeyEmail,
-                          child: Padding(
-                          padding: EdgeInsets.only(
-                            left: 15.0,
-                            right: 15,
-                            bottom: 3.0,
-                          ),
-                          child: TextFormField(
-                            cursorColor: mainColor,
-                            controller:
-                            _emailInputController,
-                            focusNode: _focusEmailInput,
-                            keyboardType:
-                            TextInputType.emailAddress,
-                            style: TextStyle(
-                                color: themeStyle
-                                    .primaryTextColor),
-                            decoration: InputDecoration(
-                              labelText: 'Email',
-                              labelStyle: TextStyle(
-                                  color: themeStyle
-                                      .primaryTextColor),
-                              focusedBorder:
-                              UnderlineInputBorder(
-                                  borderSide: BorderSide(
-                                      color:
-                                      mainColor)),
-                            ),
-                            validator: (input) => !input
-                                .contains('@')
-                                ? 'Please enter a valid email'
-                                : _isExistEmail
-                                ? 'This email is being used'
-                                : null,
-                            onSaved: (input) =>
-                            _email = input,
-                          ),
-                        ),),
-                      )),
-                      SizedBox(height: 30,),
-                      FadeAnimation(1.8, Container(
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                            color: themeStyle.typeMessageBoxColor,
-                            boxShadow: [
-                              BoxShadow(
-                                color: mainColor.withOpacity(.13),
-                                blurRadius: 15,
-                                offset: Offset(0, 10),
-                              )
-                            ]),
-                        child: Form(
-                          key: _formKeyPass,
-                          child: Padding(
-                          padding: EdgeInsets.only(
-                            left: 15.0,
-                            right: 15,
-                            bottom: 3.0,
-                          ),
-                          child: TextFormField(
-                            cursorColor: mainColor,
-                            style: TextStyle(
-                                color: themeStyle
-                                    .primaryTextColor),
-                            decoration: InputDecoration(
-                                labelText: 'Password',
-                                labelStyle: TextStyle(
-                                    color: themeStyle
-                                        .primaryTextColor),
-                                focusedBorder:
-                                UnderlineInputBorder(
-                                    borderSide: BorderSide(
-                                        color:
-                                        mainColor)),
-                                suffixIcon: GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      _hidePassword =
-                                      !_hidePassword;
-                                    });
-                                  },
-                                  child: Icon(
-                                    _hidePassword
-                                        ? OMIcons.visibility
-                                        : OMIcons
-                                        .visibilityOff,
-                                    color: themeStyle
-                                        .primaryIconColor,
+                      FadeAnimation(
+                          1.8,
+                          Container(
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                color: themeStyle.typeMessageBoxColor,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: mainColor.withOpacity(.13),
+                                    blurRadius: 15,
+                                    offset: Offset(0, 10),
+                                  )
+                                ]),
+                            child: Form(
+                              key: _formKeyName,
+                              child: Padding(
+                                padding: EdgeInsets.only(
+                                  left: 15.0,
+                                  right: 15,
+                                  bottom: 3.0,
+                                ),
+                                child: TextFormField(
+                                  cursorColor: mainColor,
+                                  keyboardType: TextInputType.text,
+                                  style: TextStyle(
+                                      color: themeStyle.primaryTextColor),
+                                  decoration: InputDecoration(
+                                    labelText: 'Name',
+                                    labelStyle: TextStyle(
+                                        color: themeStyle.primaryTextColor),
+                                    focusedBorder: UnderlineInputBorder(
+                                        borderSide:
+                                            BorderSide(color: mainColor)),
                                   ),
-                                )),
-                            validator: (input) => input
-                                .length <
-                                6
-                                ? 'Must be at least 6 characters'
-                                : null,
-                            onSaved: (input) =>
-                            _password = input,
-                            obscureText: _hidePassword,
-                          ),
-                        ),),
-                      )),
+                                  validator: (input) => input.trim().isEmpty
+                                      ? 'Please enter a valid name'
+                                      : null,
+                                  onSaved: (input) => _name = input,
+                                ),
+                              ),
+                            ),
+                          )),
+                      SizedBox(
+                        height: 30,
+                      ),
+                      FadeAnimation(
+                          1.8,
+                          Container(
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                color: themeStyle.typeMessageBoxColor,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: mainColor.withOpacity(.13),
+                                    blurRadius: 15,
+                                    offset: Offset(0, 10),
+                                  )
+                                ]),
+                            child: Form(
+                              key: _formKeyEmail,
+                              child: Padding(
+                                padding: EdgeInsets.only(
+                                  left: 15.0,
+                                  right: 15,
+                                  bottom: 3.0,
+                                ),
+                                child: TextFormField(
+                                  cursorColor: mainColor,
+                                  controller: _emailInputController,
+                                  focusNode: _focusEmailInput,
+                                  keyboardType: TextInputType.emailAddress,
+                                  style: TextStyle(
+                                      color: themeStyle.primaryTextColor),
+                                  decoration: InputDecoration(
+                                    labelText: 'Email',
+                                    labelStyle: TextStyle(
+                                        color: themeStyle.primaryTextColor),
+                                    focusedBorder: UnderlineInputBorder(
+                                        borderSide:
+                                            BorderSide(color: mainColor)),
+                                  ),
+                                  validator: (input) => !input.contains('@')
+                                      ? 'Please enter a valid email'
+                                      : _isExistEmail
+                                          ? 'This email is being used'
+                                          : null,
+                                  onSaved: (input) => _email = input,
+                                ),
+                              ),
+                            ),
+                          )),
+                      SizedBox(
+                        height: 30,
+                      ),
+                      FadeAnimation(
+                          1.8,
+                          Container(
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                color: themeStyle.typeMessageBoxColor,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: mainColor.withOpacity(.13),
+                                    blurRadius: 15,
+                                    offset: Offset(0, 10),
+                                  )
+                                ]),
+                            child: Form(
+                              key: _formKeyPass,
+                              child: Padding(
+                                padding: EdgeInsets.only(
+                                  left: 15.0,
+                                  right: 15,
+                                  bottom: 3.0,
+                                ),
+                                child: TextFormField(
+                                  cursorColor: mainColor,
+                                  style: TextStyle(
+                                      color: themeStyle.primaryTextColor),
+                                  decoration: InputDecoration(
+                                      labelText: 'Password',
+                                      labelStyle: TextStyle(
+                                          color: themeStyle.primaryTextColor),
+                                      focusedBorder: UnderlineInputBorder(
+                                          borderSide:
+                                              BorderSide(color: mainColor)),
+                                      suffixIcon: GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            _hidePassword = !_hidePassword;
+                                          });
+                                        },
+                                        child: Icon(
+                                          _hidePassword
+                                              ? OMIcons.visibility
+                                              : OMIcons.visibilityOff,
+                                          color: themeStyle.primaryIconColor,
+                                        ),
+                                      )),
+                                  validator: (input) => input.length < 6
+                                      ? 'Must be at least 6 characters'
+                                      : null,
+                                  onSaved: (input) => _password = input,
+                                  obscureText: _hidePassword,
+                                ),
+                              ),
+                            ),
+                          )),
                       SizedBox(
                         height: 30,
                       ),
@@ -405,7 +393,8 @@ class _SignupScreenState extends State<SignupScreen> {
                                       height: 20,
                                     ),
                                     CircularProgressIndicator(
-                                      valueColor: AlwaysStoppedAnimation<Color>(mainColor),
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                          mainColor),
                                     ),
                                     SizedBox(
                                       height: 35,

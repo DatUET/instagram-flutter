@@ -9,8 +9,16 @@ class Call {
   String channelId;
   bool hasDialled;
 
-  Call({this.callerId, this.callerName, this.callerPic, this.receiverId,
-      this.receiverName, this.receiverPic, this.type, this.channelId, this.hasDialled});
+  Call(
+      {this.callerId,
+      this.callerName,
+      this.callerPic,
+      this.receiverId,
+      this.receiverName,
+      this.receiverPic,
+      this.type,
+      this.channelId,
+      this.hasDialled});
 
   Map<String, dynamic> toMap(Call call) {
     Map<String, dynamic> callMap = Map();

@@ -23,11 +23,27 @@ class _ActivityScreenState extends State<ActivityScreen> {
   RefreshController _refreshController =
       RefreshController(initialRefresh: false);
   var themeStyle;
+  ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
     _setupActivities();
+    _scrollController.addListener(() {
+      double maxScroll = _scrollController.position.maxScrollExtent;
+      double currentScroll = _scrollController.position.pixels;
+      if (maxScroll == currentScroll) {
+        _getMoreActivities();
+      }
+    });
+  }
+
+  _getMoreActivities() async {
+    List<Activity> moreActivities = await DatabaseService.getMoreActivities(
+        widget.currentUserId, _activities[_activities.length - 1].timestamp);
+    setState(() {
+      _activities.addAll(moreActivities);
+    });
   }
 
   _setupActivities() async {
@@ -47,55 +63,70 @@ class _ActivityScreenState extends State<ActivityScreen> {
   @override
   Widget build(BuildContext context) {
     themeStyle = Provider.of<UserData>(context);
-    return SmartRefresher(
-      header: WaterDropMaterialHeader(
-        backgroundColor: mainColor,
+    return Scaffold(
+      backgroundColor: themeStyle.primaryBackgroundColor,
+      appBar: AppBar(
+        iconTheme: IconThemeData(color: themeStyle.primaryIconColor),
+        backgroundColor: themeStyle.primaryBackgroundColor,
+        title: Text(
+          'Photogram',
+          style: TextStyle(
+            color: themeStyle.primaryTextColor,
+            fontFamily: 'Billabong',
+            fontSize: 35.0,
+          ),
+        ),
       ),
-      controller: _refreshController,
-      onRefresh: () => _setupActivities(),
-      child: _isLoading
-          ? Center(
-              child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(mainColor),
-              ),
-            )
-          : _activities.isEmpty
-              ? Center(
-                  child: Text(
-                    'Data is empty',
-                    style: TextStyle(
-                        fontSize: 30, color: themeStyle.primaryTextColor),
-                  ),
-                )
-              : ListView.builder(
-                  addAutomaticKeepAlives: true,
-                  itemCount: _activities.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    Activity activity = _activities[index];
-                    return Dismissible(
-                        key: ValueKey(_activities.elementAt(index)),
-                        onDismissed: (direction) {
-                          setState(() {
-                            _activities.removeAt(index);
-                          });
-                          DatabaseService.deleteActivity(
-                              currentUserId: widget.currentUserId,
-                              activity: activity);
-                        },
-                        background: Container(
-                          color: Colors.red,
-                          child: Icon(
-                            OMIcons.delete,
-                            color: Colors.white,
-                          ),
-                        ),
-                        secondaryBackground: Container(
-                          color: Colors.red,
-                          child: Icon(OMIcons.delete, color: Colors.white),
-                        ),
-                        child: ActivityView(activity: activity));
-                  },
+      body: SmartRefresher(
+        header: WaterDropMaterialHeader(
+          backgroundColor: mainColor,
+        ),
+        controller: _refreshController,
+        onRefresh: () => _setupActivities(),
+        child: _isLoading
+            ? Center(
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(mainColor),
                 ),
+              )
+            : _activities.isEmpty
+                ? Center(
+                    child: Text(
+                      'Data is empty',
+                      style: TextStyle(
+                          fontSize: 30, color: themeStyle.primaryTextColor),
+                    ),
+                  )
+                : ListView.builder(
+                    addAutomaticKeepAlives: true,
+                    itemCount: _activities.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      Activity activity = _activities[index];
+                      return Dismissible(
+                          key: ValueKey(_activities.elementAt(index)),
+                          onDismissed: (direction) {
+                            setState(() {
+                              _activities.removeAt(index);
+                            });
+                            DatabaseService.deleteActivity(
+                                currentUserId: widget.currentUserId,
+                                activity: activity);
+                          },
+                          background: Container(
+                            color: Colors.red,
+                            child: Icon(
+                              OMIcons.delete,
+                              color: Colors.white,
+                            ),
+                          ),
+                          secondaryBackground: Container(
+                            color: Colors.red,
+                            child: Icon(OMIcons.delete, color: Colors.white),
+                          ),
+                          child: ActivityView(activity: activity));
+                    },
+                  ),
+      ),
     );
   }
 }

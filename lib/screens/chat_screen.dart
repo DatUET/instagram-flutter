@@ -37,6 +37,7 @@ class _ChatScreenState extends State<ChatScreen> {
   File _image;
   User _currentUser;
   String _blocker;
+  int _page = 1;
 
   @override
   void initState() {
@@ -44,6 +45,21 @@ class _ChatScreenState extends State<ChatScreen> {
     super.initState();
     _setUpChat();
     _checkBlockMessage();
+    _listController.addListener(() {
+      double maxScroll = _listController.position.maxScrollExtent;
+      double currentScroll = _listController.position.pixels;
+      if (maxScroll == currentScroll) {
+        setState(() {
+          _page++;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _listController.dispose();
+    super.dispose();
   }
 
   _setUpChat() async {
@@ -53,9 +69,10 @@ class _ChatScreenState extends State<ChatScreen> {
       _currentUser = currentUser;
     });
   }
-  
+
   _checkBlockMessage() async {
-    String blocker = await DatabaseService.isBlockMessage(widget.currentUserId, widget.chatWithUser.id);
+    String blocker = await DatabaseService.isBlockMessage(
+        widget.currentUserId, widget.chatWithUser.id);
     setState(() {
       _blocker = blocker;
     });
@@ -207,12 +224,17 @@ class _ChatScreenState extends State<ChatScreen> {
                           borderRadius: BorderRadius.all(Radius.circular(12))),
                       child: Center(
                         child: Text(
-                          message.type == 'video call' ? 'Video Call Again' : 'Voice Call Again',
+                          message.type == 'video call'
+                              ? 'Video Call Again'
+                              : 'Voice Call Again',
                           textAlign: TextAlign.right,
                           style: TextStyle(
-                              color: isMe ? Colors.white70 : themeStyle.mode == 1 ? Colors.white70 : Colors.black45,
-                            fontWeight: FontWeight.w500
-                          ),
+                              color: isMe
+                                  ? Colors.white70
+                                  : themeStyle.mode == 1
+                                      ? Colors.white70
+                                      : Colors.black45,
+                              fontWeight: FontWeight.w500),
                         ),
                       )),
                   onTap: () async =>
@@ -221,7 +243,9 @@ class _ChatScreenState extends State<ChatScreen> {
                               from: _currentUser,
                               to: widget.chatWithUser,
                               context: context,
-                      type: message.type == 'video call' ? 'Video' : 'Voice')
+                              type: message.type == 'video call'
+                                  ? 'Video'
+                                  : 'Voice')
                           : {},
                 )
               ],
@@ -275,55 +299,62 @@ class _ChatScreenState extends State<ChatScreen> {
   _buildMessageComposer() {
     return Container(
       color: themeStyle.primaryBackgroundColor,
-      child: _blocker == 'none' ? Row(
-        children: <Widget>[
-          Flexible(
-            child: Container(
-              margin: EdgeInsets.only(top: 5.0, bottom: 5.0, left: 15.0),
-              decoration: BoxDecoration(
-                  color: themeStyle.secondaryMessageBoxColor,
-                  borderRadius: BorderRadius.all(Radius.circular(24.0))),
-              child: Row(
-                children: <Widget>[
-                  IconButton(
-                      icon: Icon(
-                        Icons.add_circle,
-                        color: themeStyle.primaryIconColor,
-                      ),
-                      onPressed: _androidDialog),
-                  Flexible(
-                    child: Container(
-                      margin: EdgeInsets.only(right: 5.0),
-                      child: TextField(
-                        cursorColor: mainColor,
-                        controller: _textEditingController,
-                        style:
-                            TextStyle(color: themeStyle.primaryTextColorDark),
-                        decoration: InputDecoration.collapsed(
-                            hintText: 'Type message...',
-                            hintStyle: TextStyle(
-                                color: themeStyle.primaryTextColorLight)),
-                      ),
+      child: _blocker == 'none'
+          ? Row(
+              children: <Widget>[
+                Flexible(
+                  child: Container(
+                    margin: EdgeInsets.only(top: 5.0, bottom: 5.0, left: 15.0),
+                    decoration: BoxDecoration(
+                        color: themeStyle.secondaryMessageBoxColor,
+                        borderRadius: BorderRadius.all(Radius.circular(24.0))),
+                    child: Row(
+                      children: <Widget>[
+                        IconButton(
+                            icon: Icon(
+                              Icons.add_circle,
+                              color: themeStyle.primaryIconColor,
+                            ),
+                            onPressed: _androidDialog),
+                        Flexible(
+                          child: Container(
+                            margin: EdgeInsets.only(right: 5.0),
+                            child: TextField(
+                              cursorColor: mainColor,
+                              controller: _textEditingController,
+                              style: TextStyle(
+                                  color: themeStyle.primaryTextColorDark),
+                              decoration: InputDecoration.collapsed(
+                                  hintText: 'Type message...',
+                                  hintStyle: TextStyle(
+                                      color: themeStyle.primaryTextColorLight)),
+                            ),
+                          ),
+                        )
+                      ],
                     ),
-                  )
-                ],
+                  ),
+                ),
+                IconButton(
+                    icon: Icon(
+                      Icons.send,
+                      color: themeStyle.primaryIconColor,
+                    ),
+                    onPressed: _sendMessageText),
+              ],
+            )
+          : Center(
+              child: Padding(
+                padding: EdgeInsets.only(top: 15.0, bottom: 15.0, left: 15.0),
+                child: Text(
+                  _blocker == widget.currentUserId
+                      ? 'You cannot send messages now.\nPlease unblock to continue messaging'
+                      : 'You cannot send messages now',
+                  style: TextStyle(color: themeStyle.primaryTextColorDark),
+                  textAlign: TextAlign.center,
+                ),
               ),
             ),
-          ),
-          IconButton(
-              icon: Icon(
-                Icons.send,
-                color: themeStyle.primaryIconColor,
-              ),
-              onPressed: _sendMessageText),
-        ],
-      )
-      : Center(child: Padding(
-        padding: EdgeInsets.only(top: 15.0, bottom: 15.0, left: 15.0),
-        child: Text(_blocker == widget.currentUserId ? 'You cannot send messages now.\nPlease unblock to continue messaging' : 'You cannot send messages now',
-        style: TextStyle(color: themeStyle.primaryTextColorDark),
-        textAlign: TextAlign.center,),
-      ),),
       width: double.infinity,
     );
   }
@@ -480,10 +511,12 @@ class _ChatScreenState extends State<ChatScreen> {
           if (snapshot.hasData && snapshot.data.data != null) {
             Call call = Call.fromMap(snapshot.data.data);
             if (!call.hasDialled) {
-              return PickUpScreen(call: call,);
+              return PickUpScreen(
+                call: call,
+              );
             }
           }
-        return Scaffold(
+          return Scaffold(
             backgroundColor: themeStyle.primaryBackgroundColor,
             appBar: AppBar(
               iconTheme: IconThemeData(color: themeStyle.primaryIconColor),
@@ -503,7 +536,8 @@ class _ChatScreenState extends State<ChatScreen> {
                                 : Colors.grey),
                         image: DecorationImage(
                             image: widget.chatWithUser.profileImageUrl.isEmpty
-                                ? AssetImage('assets/images/user_placeholder.jpg')
+                                ? AssetImage(
+                                    'assets/images/user_placeholder.jpg')
                                 : CachedNetworkImageProvider(
                                     widget.chatWithUser.profileImageUrl),
                             fit: BoxFit.cover)),
@@ -531,47 +565,61 @@ class _ChatScreenState extends State<ChatScreen> {
                 IconButton(
                   icon: Icon(Icons.call),
                   iconSize: 25.0,
-                  color: _blocker == 'none' ? mainColor : themeStyle.primaryIconColor,
-                  onPressed: () async =>
-                  _blocker == 'none' ? await Permissions.cameraAndMicrophonePermissionsGranted()
-                      ? CallUtils.dial(
-                      from: _currentUser,
-                      to: widget.chatWithUser,
-                      context: context,
-                      type: 'Voice')
-                      : {} : {},
-                ),
-                IconButton(
-                  icon: Icon(Icons.video_call),
-                  iconSize: 30.0,
-                  color: _blocker == 'none' ? mainColor : themeStyle.primaryIconColor,
-                  onPressed: () async =>
-                      _blocker == 'none' ? await Permissions.cameraAndMicrophonePermissionsGranted()
+                  color: _blocker == 'none'
+                      ? mainColor
+                      : themeStyle.primaryIconColor,
+                  onPressed: () async => _blocker == 'none'
+                      ? await Permissions
+                              .cameraAndMicrophonePermissionsGranted()
                           ? CallUtils.dial(
                               from: _currentUser,
                               to: widget.chatWithUser,
                               context: context,
-                      type: 'Video')
-                          : {} : {},
+                              type: 'Voice')
+                          : {}
+                      : {},
                 ),
                 IconButton(
-                  icon: _blocker == widget.currentUserId ? Icon(Icons.lock_open) : Icon(Icons.lock_outline),
+                  icon: Icon(Icons.video_call),
+                  iconSize: 30.0,
+                  color: _blocker == 'none'
+                      ? mainColor
+                      : themeStyle.primaryIconColor,
+                  onPressed: () async => _blocker == 'none'
+                      ? await Permissions
+                              .cameraAndMicrophonePermissionsGranted()
+                          ? CallUtils.dial(
+                              from: _currentUser,
+                              to: widget.chatWithUser,
+                              context: context,
+                              type: 'Video')
+                          : {}
+                      : {},
+                ),
+                IconButton(
+                  icon: _blocker == widget.currentUserId
+                      ? Icon(Icons.lock_open)
+                      : Icon(Icons.lock_outline),
                   iconSize: 25.0,
-                  color: (_blocker == widget.currentUserId || _blocker == 'none') ? mainColor : themeStyle.primaryIconColor,
+                  color:
+                      (_blocker == widget.currentUserId || _blocker == 'none')
+                          ? mainColor
+                          : themeStyle.primaryIconColor,
                   onPressed: () async {
                     if (_blocker == 'none') {
-                      await DatabaseService.blockMessage(widget.currentUserId, widget.chatWithUser.id);
+                      await DatabaseService.blockMessage(
+                          widget.currentUserId, widget.chatWithUser.id);
                       setState(() {
                         _blocker = widget.currentUserId;
                       });
                     } else if (_blocker == widget.currentUserId) {
-                      await DatabaseService.deleteBlockMessage(widget.currentUserId, widget.chatWithUser.id);
+                      await DatabaseService.deleteBlockMessage(
+                          widget.currentUserId, widget.chatWithUser.id);
                       setState(() {
                         _blocker = 'none';
                       });
                     }
-                  }
-                  ,
+                  },
                 ),
               ],
             ),
@@ -582,13 +630,16 @@ class _ChatScreenState extends State<ChatScreen> {
                   Expanded(
                     child: StreamBuilder(
                         stream: DatabaseService.getAllMessage(
-                            widget.currentUserId, widget.chatWithUser.id),
+                            widget.currentUserId,
+                            widget.chatWithUser.id,
+                            _page),
                         builder: (context, snapshot) {
                           _messageList = snapshot.data;
                           if (!snapshot.hasData) {
                             return Center(
                               child: CircularProgressIndicator(
-                                valueColor: AlwaysStoppedAnimation<Color>(mainColor),
+                                valueColor:
+                                    AlwaysStoppedAnimation<Color>(mainColor),
                               ),
                             );
                           }
@@ -615,10 +666,12 @@ class _ChatScreenState extends State<ChatScreen> {
                                       ? _buildTextMessage(message, isMe)
                                       : message.type == 'photo'
                                           ? _buildImageMessage(message, isMe)
-                                          : (message.type == 'video call' || message.type == 'voice call')
+                                          : (message.type == 'video call' ||
+                                                  message.type == 'voice call')
                                               ? _buildVideoCallMessage(
                                                   message, isMe)
-                                              : _buildDeleteMessage(message, isMe);
+                                              : _buildDeleteMessage(
+                                                  message, isMe);
                                 },
                               ),
                             );
@@ -637,9 +690,8 @@ class _ChatScreenState extends State<ChatScreen> {
                   _buildMessageComposer(),
                 ],
               ),
-          ),
-        );
-      }
-    );
+            ),
+          );
+        });
   }
 }

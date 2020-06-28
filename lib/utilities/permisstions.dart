@@ -6,7 +6,7 @@ class Permissions {
   static Future<bool> cameraAndMicrophonePermissionsGranted() async {
     PermissionStatus cameraPermissionStatus = await _getCameraPermission();
     PermissionStatus microphonePermissionStatus =
-    await _getMicrophonePermission();
+        await _getMicrophonePermission();
 
     if (cameraPermissionStatus == PermissionStatus.granted &&
         microphonePermissionStatus == PermissionStatus.granted) {
@@ -20,12 +20,12 @@ class Permissions {
 
   static Future<PermissionStatus> _getCameraPermission() async {
     PermissionStatus permission =
-    await PermissionHandler().checkPermissionStatus(PermissionGroup.camera);
+        await PermissionHandler().checkPermissionStatus(PermissionGroup.camera);
     if (permission != PermissionStatus.granted &&
         permission != PermissionStatus.disabled) {
       Map<PermissionGroup, PermissionStatus> permissionStatus =
-      await PermissionHandler()
-          .requestPermissions([PermissionGroup.camera]);
+          await PermissionHandler()
+              .requestPermissions([PermissionGroup.camera]);
       return permissionStatus[PermissionGroup.camera] ??
           PermissionStatus.unknown;
     } else {
@@ -39,8 +39,8 @@ class Permissions {
     if (permission != PermissionStatus.granted &&
         permission != PermissionStatus.disabled) {
       Map<PermissionGroup, PermissionStatus> permissionStatus =
-      await PermissionHandler()
-          .requestPermissions([PermissionGroup.microphone]);
+          await PermissionHandler()
+              .requestPermissions([PermissionGroup.microphone]);
       return permissionStatus[PermissionGroup.microphone] ??
           PermissionStatus.unknown;
     } else {
@@ -49,9 +49,9 @@ class Permissions {
   }
 
   static void _handleInvalidPermissions(
-      PermissionStatus cameraPermissionStatus,
-      PermissionStatus microphonePermissionStatus,
-      ) {
+    PermissionStatus cameraPermissionStatus,
+    PermissionStatus microphonePermissionStatus,
+  ) {
     if (cameraPermissionStatus == PermissionStatus.denied &&
         microphonePermissionStatus == PermissionStatus.denied) {
       throw new PlatformException(

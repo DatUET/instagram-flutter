@@ -131,7 +131,9 @@ class _UpdatePostScreenState extends State<UpdatePostScreen> {
         _isLoading = true;
       });
 
-      String imageUrl = _image == null ? widget.post.imageUrl : await StorageService.uploadPost(_image);
+      String imageUrl = _image == null
+          ? widget.post.imageUrl
+          : await StorageService.uploadPost(_image);
       Post post = Post(
         id: widget.post.id,
         imageUrl: imageUrl,
@@ -145,8 +147,10 @@ class _UpdatePostScreenState extends State<UpdatePostScreen> {
       Navigator.pop(context);
     } else {
       Scaffold.of(context).showSnackBar(SnackBar(
-          content: Text(_caption.isEmpty ? 'Please add Caption for this post' : null,
-            style: TextStyle(color: Colors.redAccent),)));
+          content: Text(
+        _caption.isEmpty ? 'Please add Caption for this post' : null,
+        style: TextStyle(color: Colors.redAccent),
+      )));
     }
   }
 
@@ -219,12 +223,11 @@ class _UpdatePostScreenState extends State<UpdatePostScreen> {
                       width: width,
                       color: themeStyle.typeMessageBoxColor,
                       child: _image == null
-                          ? CachedNetworkImage(
-                          imageUrl: widget.post.imageUrl)
+                          ? CachedNetworkImage(imageUrl: widget.post.imageUrl)
                           : Image(
-                        image: FileImage(_image),
-                        fit: BoxFit.cover,
-                      ),
+                              image: FileImage(_image),
+                              fit: BoxFit.cover,
+                            ),
                     ),
                   ),
                   SizedBox(height: 20.0),
@@ -240,7 +243,7 @@ class _UpdatePostScreenState extends State<UpdatePostScreen> {
                           fillColor: themeStyle.primaryBackgroundColor,
                           labelText: 'Caption',
                           labelStyle:
-                          TextStyle(color: themeStyle.primaryTextColor),
+                              TextStyle(color: themeStyle.primaryTextColor),
                           focusedBorder: UnderlineInputBorder(
                               borderSide: BorderSide(color: mainColor))),
                       onChanged: (input) => _caption = input,
@@ -264,7 +267,7 @@ class _UpdatePostScreenState extends State<UpdatePostScreen> {
                             fillColor: themeStyle.primaryBackgroundColor,
                             hintText: "Where was this photo taken?",
                             hintStyle:
-                            TextStyle(color: themeStyle.primaryTextColor),
+                                TextStyle(color: themeStyle.primaryTextColor),
                             border: InputBorder.none),
                       ),
                     ),
@@ -275,19 +278,19 @@ class _UpdatePostScreenState extends State<UpdatePostScreen> {
                   (_address == null)
                       ? Container()
                       : SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    padding: EdgeInsets.only(right: 5.0, left: 5.0),
-                    child: Row(
-                      children: <Widget>[
-                        buildLocationButton(_address.featureName),
-                        buildLocationButton(_address.subLocality),
-                        buildLocationButton(_address.locality),
-                        buildLocationButton(_address.subAdminArea),
-                        buildLocationButton(_address.adminArea),
-                        buildLocationButton(_address.countryName),
-                      ],
-                    ),
-                  ),
+                          scrollDirection: Axis.horizontal,
+                          padding: EdgeInsets.only(right: 5.0, left: 5.0),
+                          child: Row(
+                            children: <Widget>[
+                              buildLocationButton(_address.featureName),
+                              buildLocationButton(_address.subLocality),
+                              buildLocationButton(_address.locality),
+                              buildLocationButton(_address.subAdminArea),
+                              buildLocationButton(_address.adminArea),
+                              buildLocationButton(_address.countryName),
+                            ],
+                          ),
+                        ),
                   (_address == null) ? Container() : Divider(),
                   SizedBox(
                     height: 20,
@@ -349,48 +352,48 @@ class _UpdatePostScreenState extends State<UpdatePostScreen> {
           ),
           _isLoading
               ? Container(
-            width: double.infinity,
-            height: double.infinity,
-            decoration: BoxDecoration(
-              color: Colors.grey.withOpacity(.5),
-            ),
-            child: Center(
-              child: Container(
-                height: 180,
-                width: 180,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: themeStyle.primaryBackgroundColor,
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                      left: 20.0, right: 20, bottom: 15, top: 15),
-                  child: Column(
-                    children: <Widget>[
-                      SizedBox(
-                        height: 20,
-                      ),
-                      CircularProgressIndicator(
-                        valueColor:
-                        AlwaysStoppedAnimation<Color>(mainColor),
-                      ),
-                      SizedBox(
-                        height: 35,
-                      ),
-                      Center(
-                          child: Text(
-                            'Updating!\n Please wait....',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                fontSize: 20,
-                                color: themeStyle.primaryTextColor),
-                          ))
-                    ],
+                  width: double.infinity,
+                  height: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withOpacity(.5),
                   ),
-                ),
-              ),
-            ),
-          )
+                  child: Center(
+                    child: Container(
+                      height: 180,
+                      width: 180,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: themeStyle.primaryBackgroundColor,
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                            left: 20.0, right: 20, bottom: 15, top: 15),
+                        child: Column(
+                          children: <Widget>[
+                            SizedBox(
+                              height: 20,
+                            ),
+                            CircularProgressIndicator(
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(mainColor),
+                            ),
+                            SizedBox(
+                              height: 35,
+                            ),
+                            Center(
+                                child: Text(
+                              'Updating!\n Please wait....',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  fontSize: 20,
+                                  color: themeStyle.primaryTextColor),
+                            ))
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                )
               : Container(),
         ],
       ),
@@ -412,7 +415,9 @@ class _UpdatePostScreenState extends State<UpdatePostScreen> {
         ),
         backgroundColor: themeStyle.primaryBackgroundColor,
       ),
-      body: Builder(builder: (contextBuilder) => _buildBodyScreen(height, width, contextBuilder)),
+      body: Builder(
+          builder: (contextBuilder) =>
+              _buildBodyScreen(height, width, contextBuilder)),
     );
   }
 }

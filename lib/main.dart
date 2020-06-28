@@ -14,8 +14,6 @@ void main() => runApp(MyApp());
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
 
-
-
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -25,11 +23,10 @@ class MyApp extends StatelessWidget {
         title: 'Photogram',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
-          primaryIconTheme: Theme.of(context).primaryIconTheme.copyWith(
-                color: Colors.black,
-              ),
-          textTheme: GoogleFonts.notoSansTextTheme()
-        ),
+            primaryIconTheme: Theme.of(context).primaryIconTheme.copyWith(
+                  color: Colors.black,
+                ),
+            textTheme: GoogleFonts.notoSansTextTheme()),
         home: SplashScreen(),
         routes: {
           LoginScreen.id: (context) => LoginScreen(),

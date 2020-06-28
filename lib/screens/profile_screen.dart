@@ -36,15 +36,42 @@ class _ProfileScreenState extends State<ProfileScreen> {
   int _displayPosts = 0; // 0 - grid, 1 - column
   User _profileUser;
   var themeStyle;
+  ScrollController _profileScrollController = ScrollController();
+  bool _isExistUser;
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
+    _checkUser();
     _setupIsFollowing();
     _setupFollowers();
     _setupFollowing();
     _setupPosts();
     _setupProfileUser();
+    _profileScrollController.addListener(() {
+      double maxScroll = _profileScrollController.position.maxScrollExtent;
+      double current = _profileScrollController.position.pixels;
+      if (maxScroll == current) {
+        _getMorePost();
+      }
+    });
+  }
+
+  _checkUser() async {
+    bool isExistUser = await DatabaseService.checkExitUser(widget.userId);
+    setState(() {
+      _isExistUser = isExistUser;
+      _isLoading = false;
+    });
+  }
+
+  _getMorePost() async {
+    List<Post> morePost = await DatabaseService.getMoreUserPosts(
+        widget.userId, _posts[_posts.length - 1].timestamp);
+    setState(() {
+      _posts.addAll(morePost);
+    });
   }
 
   _setupIsFollowing() async {
@@ -369,82 +396,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return PickupLayout(
       scaffold: Scaffold(
         backgroundColor: themeStyle.primaryBackgroundColor,
-        body: StreamBuilder(
-          stream: usersRef.document(widget.userId).snapshots(),
-          builder: (BuildContext context, AsyncSnapshot snapshot) {
-            if (!snapshot.hasData) {
-              return Center(
+        body: _isLoading
+            ? Center(
                 child: CircularProgressIndicator(
                   valueColor: AlwaysStoppedAnimation<Color>(mainColor),
                 ),
-              );
-            }
-            User user = User.fromDoc(snapshot.data);
-            return Container(
-              child: Stack(
-                children: <Widget>[
-                  Container(
-                    height: double.infinity,
-                  ),
-                  Container(
-                    height: 200,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: user.profileImageUrl.isEmpty
-                            ? AssetImage('assets/images/user_placeholder.jpg')
-                            : CachedNetworkImageProvider(user.profileImageUrl),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                  Container(
-                    height: double.infinity,
-                  ),
-                  Container(
-                    height: 200,
-                    decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                          Colors.white.withOpacity(.3),
-                          Colors.white.withOpacity(.5),
-                          Colors.white.withOpacity(.8)
-                        ])),
-                  ),
-                  SingleChildScrollView(
-                    child: Stack(
-                      children: <Widget>[
-                        Positioned(
-                          top: 150,
-                          left: 0.01,
-                          right: 0.01,
-                          child: Container(
-                            height: 700,
-                            width: MediaQuery.of(context).size.width,
-                            decoration: BoxDecoration(
-                              color: themeStyle.primaryBackgroundColor,
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(40),
-                                topRight: Radius.circular(40),
-                              ),
-                            ),
+              )
+            : !_isExistUser
+                ? Center(
+                    child: Text(
+                    '404 Not Found',
+                    style: TextStyle(
+                        fontSize: 30, color: themeStyle.primaryTextColor),
+                  ))
+                : StreamBuilder(
+                    stream: usersRef.document(widget.userId).snapshots(),
+                    builder: (BuildContext context, AsyncSnapshot snapshot) {
+                      if (!snapshot.hasData) {
+                        return Center(
+                          child: CircularProgressIndicator(
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(mainColor),
                           ),
-                        ),
-                        Align(
-                          alignment: Alignment.center,
-                          child: Padding(
-                            padding: const EdgeInsets.only(top: 90.0),
-                            child: Container(
-                              height: 150,
-                              width: 150,
+                        );
+                      }
+                      //print('data qr${snapshot.data}');
+                      User user = User.fromDoc(snapshot.data);
+//            if (user == null) {
+//              return Center(child: Text('404 Not Found'),);
+//            }
+                      return Container(
+                        child: Stack(
+                          children: <Widget>[
+                            Container(
+                              height: double.infinity,
+                            ),
+                            Container(
+                              height: 200,
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(40),
-                                border: Border.all(
-                                    width: 2,
-                                    color: user.isActive
-                                        ? mainColor
-                                        : Colors.grey),
                                 image: DecorationImage(
                                   image: user.profileImageUrl.isEmpty
                                       ? AssetImage(
@@ -455,64 +444,126 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                               ),
                             ),
-                          ),
-                        ),
-                        Align(
-                          alignment: Alignment.center,
-                          child: Padding(
-                            padding: const EdgeInsets.only(top: 260),
-                            child: Column(children: <Widget>[
-                              Text(
-                                user.name,
-                                style: TextStyle(
-                                  fontSize: 25,
-                                  color: themeStyle.primaryTextColor,
+                            Container(
+                              height: double.infinity,
+                            ),
+                            Container(
+                              height: 200,
+                              decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                      colors: [
+                                    Colors.white.withOpacity(.3),
+                                    Colors.white.withOpacity(.5),
+                                    Colors.white.withOpacity(.8)
+                                  ])),
+                            ),
+                            SingleChildScrollView(
+                              controller: _profileScrollController,
+                              child: Stack(
+                                children: <Widget>[
+                                  Positioned(
+                                    top: 150,
+                                    left: 0.01,
+                                    right: 0.01,
+                                    child: Container(
+                                      height: 700,
+                                      width: MediaQuery.of(context).size.width,
+                                      decoration: BoxDecoration(
+                                        color:
+                                            themeStyle.primaryBackgroundColor,
+                                        borderRadius: BorderRadius.only(
+                                          topLeft: Radius.circular(40),
+                                          topRight: Radius.circular(40),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Align(
+                                    alignment: Alignment.center,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(top: 90.0),
+                                      child: Container(
+                                        height: 150,
+                                        width: 150,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(40),
+                                          border: Border.all(
+                                              width: 2,
+                                              color: user.isActive
+                                                  ? mainColor
+                                                  : Colors.grey),
+                                          image: DecorationImage(
+                                            image: user.profileImageUrl.isEmpty
+                                                ? AssetImage(
+                                                    'assets/images/user_placeholder.jpg')
+                                                : CachedNetworkImageProvider(
+                                                    user.profileImageUrl),
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Align(
+                                    alignment: Alignment.center,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(top: 260),
+                                      child: Column(children: <Widget>[
+                                        Text(
+                                          user.name,
+                                          style: TextStyle(
+                                            fontSize: 25,
+                                            color: themeStyle.primaryTextColor,
+                                          ),
+                                        ),
+                                        Text(
+                                          user.bio,
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            color: themeStyle.primaryTextColor,
+                                          ),
+                                        ),
+                                        _displayButton(user),
+                                        SizedBox(
+                                          height: 8.0,
+                                        ),
+                                        _buildButtonChat(user),
+                                        _buildProfileInfo(user),
+                                        _buildToggleButtons(),
+                                        Divider(),
+                                        _buildDisplayPosts(),
+                                      ]),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Align(
+                              alignment: Alignment.topLeft,
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                    top: 50.0, left: 10.0),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: Container(
+                                    child: Icon(
+                                      Icons.arrow_back,
+                                      color: themeStyle.primaryIconColor,
+                                    ),
+                                  ),
                                 ),
                               ),
-                              Text(
-                                user.bio,
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  color: themeStyle.primaryTextColor,
-                                ),
-                              ),
-                              _displayButton(user),
-                              SizedBox(
-                                height: 8.0,
-                              ),
-                              _buildButtonChat(user),
-                              _buildProfileInfo(user),
-                              _buildToggleButtons(),
-                              Divider(),
-                              _buildDisplayPosts(),
-                            ]),
-                          ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                      );
+                    },
                   ),
-                  Align(
-                    alignment: Alignment.topLeft,
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 50.0, left: 10.0),
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
-                        child: Container(
-                          child: Icon(
-                            Icons.arrow_back,
-                            color: themeStyle.primaryIconColor,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
-        ),
       ),
     );
   }

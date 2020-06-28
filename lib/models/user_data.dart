@@ -6,7 +6,6 @@ import 'package:instagram_v2/utilities/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserData extends ChangeNotifier {
-
   String currentUserId;
 
   int mode;
@@ -16,7 +15,7 @@ class UserData extends ChangeNotifier {
 
   UserData() {
     _getColor();
-  }//0 for light and 1 for dark
+  } //0 for light and 1 for dark
 
   Color primaryBackgroundColor;
   Color primaryTextColorDark;
@@ -60,9 +59,8 @@ class UserData extends ChangeNotifier {
     }
   }
 
-  switchMode(){
-
-    if(mode == 0){
+  switchMode() {
+    if (mode == 0) {
       //if it is light mode currently switch to dark
       primaryBackgroundColor = Colors.grey[900];
       primaryTextColorDark = Colors.grey[100];
@@ -76,8 +74,7 @@ class UserData extends ChangeNotifier {
       secondaryMessageTextColor = Colors.white;
       mode = 1;
       _updateMode(mode);
-    }
-    else{
+    } else {
       //if it is dark mode currently switch to light
       primaryBackgroundColor = Colors.grey[100];
       primaryTextColorDark = Colors.grey[900];

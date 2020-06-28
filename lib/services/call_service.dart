@@ -37,7 +37,7 @@ class CallService {
           type: call.type == 'Video' ? 'video call' : 'voice call',
           message: call.type == 'Video' ? 'Video Call' : 'Voice Call',
           timestamp:
-          Timestamp.fromMillisecondsSinceEpoch(int.parse(call.channelId)),
+              Timestamp.fromMillisecondsSinceEpoch(int.parse(call.channelId)),
           isSeen: false,
           photoUrl: '',
         );

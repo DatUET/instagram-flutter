@@ -11,17 +11,16 @@ class Post {
   final bool enableDownload;
   final bool delete;
 
-  Post({
-    this.id,
-    this.imageUrl,
-    this.caption,
-    this.likeCount,
-    this.authorId,
-    this.timestamp,
-    this.location,
-    this.enableDownload,
-    this.delete
-  });
+  Post(
+      {this.id,
+      this.imageUrl,
+      this.caption,
+      this.likeCount,
+      this.authorId,
+      this.timestamp,
+      this.location,
+      this.enableDownload,
+      this.delete});
 
   factory Post.fromDoc(DocumentSnapshot doc) {
     return Post(

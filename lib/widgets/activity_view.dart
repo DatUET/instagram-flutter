@@ -14,14 +14,14 @@ import 'package:provider/provider.dart';
 class ActivityView extends StatefulWidget {
   final Activity activity;
 
-
   ActivityView({@required this.activity});
 
   @override
   _ActivityViewState createState() => _ActivityViewState();
 }
 
-class _ActivityViewState extends State<ActivityView> with AutomaticKeepAliveClientMixin<ActivityView> {
+class _ActivityViewState extends State<ActivityView>
+    with AutomaticKeepAliveClientMixin<ActivityView> {
   @override
   Widget build(BuildContext context) {
     final themeStyle = Provider.of<UserData>(context);
@@ -41,8 +41,7 @@ class _ActivityViewState extends State<ActivityView> with AutomaticKeepAliveClie
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
-                    color: user.isActive ? mainColor : Colors.grey,
-                    width: 1.5),
+                    color: user.isActive ? mainColor : Colors.grey, width: 1.5),
                 image: DecorationImage(
                     image: user.profileImageUrl.isEmpty
                         ? AssetImage('assets/images/user_placeholder.jpg')
@@ -52,17 +51,17 @@ class _ActivityViewState extends State<ActivityView> with AutomaticKeepAliveClie
             ),
             title: widget.activity.comment != null
                 ? Text('${user.name} commented: "${widget.activity.comment}"',
-                style: TextStyle(
-                  color: themeStyle.primaryTextColor,
-                ))
+                    style: TextStyle(
+                      color: themeStyle.primaryTextColor,
+                    ))
                 : Text('${user.name} liked your post',
-                style: TextStyle(
-                  color: themeStyle.primaryTextColor,
-                )),
+                    style: TextStyle(
+                      color: themeStyle.primaryTextColor,
+                    )),
             subtitle: Text(
                 DateFormat.yMd().add_jm().format(
-                  widget.activity.timestamp.toDate(),
-                ),
+                      widget.activity.timestamp.toDate(),
+                    ),
                 style: TextStyle(
                   color: themeStyle.primaryTextColor,
                 )),

@@ -29,7 +29,8 @@ class PickUpScreen extends StatelessWidget {
             children: <Widget>[
               Text(
                 'Incoming...',
-                style: TextStyle(fontSize: 30, color: themeStyle.primaryTextColor),
+                style:
+                    TextStyle(fontSize: 30, color: themeStyle.primaryTextColor),
               ),
               SizedBox(
                 height: 30,
@@ -54,7 +55,10 @@ class PickUpScreen extends StatelessWidget {
               ),
               Text(
                 call.callerName,
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: themeStyle.primaryTextColor),
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    color: themeStyle.primaryTextColor),
               ),
               SizedBox(
                 height: 75,
@@ -98,13 +102,13 @@ class PickUpScreen extends StatelessWidget {
                       onTap: () async {
                         await FlutterRingtonePlayer.stop();
                         await Permissions
-                              .cameraAndMicrophonePermissionsGranted()
-                          ?
-                      Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (_) => CallScreen(call: call)))
-                          : {};},
+                                .cameraAndMicrophonePermissionsGranted()
+                            ? Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => CallScreen(call: call)))
+                            : {};
+                      },
                     ),
                   )),
                 ],

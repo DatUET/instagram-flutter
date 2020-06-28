@@ -61,15 +61,12 @@ class AuthService {
       FirebaseUser user = authResult.user;
       if (user != null) {
         if (user.isEmailVerified) {
-          Provider
-              .of<UserData>(context)
-              .currentUserId = user.uid;
+          Provider.of<UserData>(context).currentUserId = user.uid;
           Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(builder: (_) => HomeScreen(user.uid)),
-                  (Route<dynamic> route) => false);
+              (Route<dynamic> route) => false);
           return 'done';
-        }
-        else {
+        } else {
           return 'Verification\nPlease check your email';
         }
       }
@@ -138,15 +135,16 @@ class AuthService {
   }
 
   static Future<bool> checkExistEmail(String email) async {
-    QuerySnapshot checkEmailSnapshot = await usersRef.where('email', isEqualTo: email).getDocuments();
+    QuerySnapshot checkEmailSnapshot =
+        await usersRef.where('email', isEqualTo: email).getDocuments();
     return checkEmailSnapshot.documents.isNotEmpty;
   }
 
   static Future<bool> checkLogin(String email, String password) async {
     try {
       FirebaseUser user = await _auth.currentUser();
-      AuthCredential credential = EmailAuthProvider.getCredential(
-          email: email, password: password);
+      AuthCredential credential =
+          EmailAuthProvider.getCredential(email: email, password: password);
       AuthResult result = await user.reauthenticateWithCredential(credential);
       if (result != null) {
         return true;

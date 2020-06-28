@@ -174,7 +174,12 @@ class _PostViewState extends State<PostView>
               GestureDetector(
                 onTap: () {
                   //Navigator.pop(context);
-                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => UpdatePostScreen(post: widget.post,)));
+                  Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => UpdatePostScreen(
+                                post: widget.post,
+                              )));
                 },
                 child: Container(
                   padding: const EdgeInsets.all(16.0),
@@ -203,7 +208,9 @@ class _PostViewState extends State<PostView>
                   ),
                 ),
               ),
-              SizedBox(height: 10,),
+              SizedBox(
+                height: 10,
+              ),
               GestureDetector(
                 onTap: () {
                   Navigator.pop(context);

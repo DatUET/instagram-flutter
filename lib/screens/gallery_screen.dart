@@ -4,13 +4,11 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:instagram_v2/models/user_data.dart';
 import 'package:instagram_v2/screens/preview_photo.dart';
 import 'package:instagram_v2/utilities/constants.dart';
 import 'package:media_gallery/media_gallery.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
@@ -49,9 +47,7 @@ class _GalleyScreenState extends State<GalleyScreen>
   void initState() {
     // TODO: implement initState
     super.initState();
-    PermissionHandler()
-        .checkPermissionStatus(PermissionGroup.storage)
-        .then(_updateStatus);
+    _getImagePath();
   }
 
   @override
@@ -62,27 +58,6 @@ class _GalleyScreenState extends State<GalleyScreen>
 
   _clearCache() async {
     await _dir.delete();
-  }
-
-  _updateStatus(PermissionStatus status) {
-    if (status == PermissionStatus.granted) {
-      if (themeStyle.gridTileImage.length == 0) _getImagePath();
-    } else {
-      _askPermission();
-    }
-  }
-
-  _askPermission() {
-    PermissionHandler()
-        .requestPermissions([PermissionGroup.storage]).then((statuses) {
-      final status = statuses[PermissionGroup.storage];
-      if (status != PermissionStatus.granted) {
-        Fluttertoast.showToast(
-            msg: 'Please allow permission!', toastLength: Toast.LENGTH_LONG);
-      } else {
-        _updateStatus(status);
-      }
-    });
   }
 
   @override

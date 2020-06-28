@@ -35,13 +35,17 @@ class SuccessScreen extends StatelessWidget {
               bottom: 160,
               left: 60,
               right: 60,
-              child: type == 0 ?Text(
-                'You have successfully registered. Please check your email $email',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                    color: themeStyle.primaryTextColor,
-                    fontStyle: FontStyle.italic, fontSize: 18, fontWeight: FontWeight.w600),
-              ) : Container()),
+              child: type == 0
+                  ? Text(
+                      'You have successfully registered. Please check your email $email',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          color: themeStyle.primaryTextColor,
+                          fontStyle: FontStyle.italic,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600),
+                    )
+                  : Container()),
           Positioned(
             bottom: 80,
             left: 100,

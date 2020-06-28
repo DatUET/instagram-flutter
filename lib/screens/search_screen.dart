@@ -100,11 +100,11 @@ class _SearchScreenState extends State<SearchScreen>
     if (barcodeResult != '-1') {
       Navigator.push(
           context,
-          BouncyPageRoute(
-              widget: ProfileScreen(
-            currentUserId: themeStyle.currentUserId,
-            userId: barcodeResult,
-          )));
+          MaterialPageRoute(
+              builder: (_) => ProfileScreen(
+                    currentUserId: themeStyle.currentUserId,
+                    userId: barcodeResult,
+                  )));
     }
   }
 
@@ -205,7 +205,12 @@ class _SearchScreenState extends State<SearchScreen>
             ? Padding(
                 padding: EdgeInsets.symmetric(vertical: 8.0),
                 child: TabBarView(
-                  children: <Widget>[TrendingScreen(), NearlyScreen(currentUserId: themeStyle.currentUserId,)],
+                  children: <Widget>[
+                    TrendingScreen(),
+                    NearlyScreen(
+                      currentUserId: themeStyle.currentUserId,
+                    )
+                  ],
                   controller: _tabController,
                 ),
               )

@@ -201,7 +201,7 @@ class _CallScreenState extends State<CallScreen> {
           userProvider == null
               ? Container()
               : CachedNetworkImage(
-            height: MediaQuery.of(context).size.height,
+                  height: MediaQuery.of(context).size.height,
                   imageUrl: userProvider.currentUserId == widget.call.callerId
                       ? widget.call.receiverPic
                       : widget.call.callerPic,
@@ -261,8 +261,10 @@ class _CallScreenState extends State<CallScreen> {
                   padding: const EdgeInsets.all(12.0),
                 )
               : Container(
-            margin: EdgeInsets.all(12.0),
-            width: 40.0, height: 40,)
+                  margin: EdgeInsets.all(12.0),
+                  width: 40.0,
+                  height: 40,
+                )
         ],
       ),
     );
@@ -278,9 +280,8 @@ class _CallScreenState extends State<CallScreen> {
             //_panel(),
             Positioned(
               bottom: 0.0,
-              child: Align(
-                  alignment: Alignment.bottomCenter,
-                  child: _toolbar()),
+              child:
+                  Align(alignment: Alignment.bottomCenter, child: _toolbar()),
             ),
           ],
         ),

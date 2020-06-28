@@ -23,6 +23,16 @@ class DatabaseService {
     return users;
   }
 
+  static Future<bool> checkExitUser(String userId) async {
+    try {
+      DocumentSnapshot checkExitSnapshot =
+          await usersRef.document(userId).get();
+      return checkExitSnapshot.exists;
+    } catch (e) {
+      return false;
+    }
+  }
+
   static void createPost(Post post) {
     postsRef.document(post.authorId).collection('userPosts').add({
       'imageUrl': post.imageUrl,
@@ -118,6 +128,22 @@ class DatabaseService {
         .collection('userFeed')
         .where('delete', isEqualTo: false)
         .orderBy('timestamp', descending: true)
+        .limit(per_page)
+        .getDocuments();
+    List<Post> posts =
+        feedSnapshot.documents.map((doc) => Post.fromDoc(doc)).toList();
+    return posts;
+  }
+
+  static Future<List<Post>> getMoreFeedPosts(
+      String userId, Timestamp timestamp) async {
+    QuerySnapshot feedSnapshot = await feedsRef
+        .document(userId)
+        .collection('userFeed')
+        .where('delete', isEqualTo: false)
+        .orderBy('timestamp', descending: true)
+        .startAfter([timestamp])
+        .limit(per_page)
         .getDocuments();
     List<Post> posts =
         feedSnapshot.documents.map((doc) => Post.fromDoc(doc)).toList();
@@ -130,6 +156,22 @@ class DatabaseService {
         .collection('userPosts')
         .where('delete', isEqualTo: false)
         .orderBy('timestamp', descending: true)
+        .limit(per_page)
+        .getDocuments();
+    List<Post> posts =
+        userPostsSnapshot.documents.map((doc) => Post.fromDoc(doc)).toList();
+    return posts;
+  }
+
+  static Future<List<Post>> getMoreUserPosts(
+      String userId, Timestamp timestamp) async {
+    QuerySnapshot userPostsSnapshot = await postsRef
+        .document(userId)
+        .collection('userPosts')
+        .where('delete', isEqualTo: false)
+        .orderBy('timestamp', descending: true)
+        .startAfter([timestamp])
+        .limit(per_page)
         .getDocuments();
     List<Post> posts =
         userPostsSnapshot.documents.map((doc) => Post.fromDoc(doc)).toList();
@@ -218,6 +260,22 @@ class DatabaseService {
         .document(userId)
         .collection('userActivities')
         .orderBy('timestamp', descending: true)
+        .limit(per_page)
+        .getDocuments();
+    List<Activity> activity = userActivitiesSnapshot.documents
+        .map((doc) => Activity.fromDoc(doc))
+        .toList();
+    return activity;
+  }
+
+  static Future<List<Activity>> getMoreActivities(
+      String userId, Timestamp timestamp) async {
+    QuerySnapshot userActivitiesSnapshot = await activitiesRef
+        .document(userId)
+        .collection('userActivities')
+        .orderBy('timestamp', descending: true)
+        .startAfter([timestamp])
+        .limit(per_page)
         .getDocuments();
     List<Activity> activity = userActivitiesSnapshot.documents
         .map((doc) => Activity.fromDoc(doc))
@@ -251,7 +309,7 @@ class DatabaseService {
   }
 
   static Stream<List<Message>> getAllMessage(
-      String fromUserId, String toUserId) async* {
+      String fromUserId, String toUserId, int page) async* {
     await for (QuerySnapshot snap in messageRef
         .where("groupId",
             isEqualTo: getUniqueId(
@@ -259,6 +317,7 @@ class DatabaseService {
               toUserId,
             ))
         .orderBy('timestamp', descending: true)
+        .limit(per_page * page)
         .snapshots()) {
       try {
         List<Message> chats =
@@ -427,21 +486,46 @@ class DatabaseService {
     });
   }
 
-  static Future<bool> checkIsSeenAll(String userId) async {
-    QuerySnapshot checkIsSeenAllSnapshot = await recentChatRef
+  static Stream<int> checkIsSeenAll(String userId) async* {
+    await for (QuerySnapshot snap in recentChatRef
         .document(userId)
-        .collection('history')
+        .collection("history")
         .where('isSeen', isEqualTo: false)
         .where('receiverUid', isEqualTo: userId)
-        .getDocuments();
-    print(checkIsSeenAllSnapshot.documents.isEmpty);
-    return checkIsSeenAllSnapshot.documents.isNotEmpty;
+        .snapshots()) {
+      try {
+        yield snap.documents.length;
+      } catch (e) {
+        print(e);
+      }
+    }
   }
 
   static Future<List<Post>> getTrendingLike() async {
     QuerySnapshot trendingLikeSnapshot = await trendingLikeRef
         .where('delete', isEqualTo: false)
         .orderBy('likeCount', descending: true)
+        .limit(per_page)
+        .getDocuments();
+    List<Post> posts =
+        trendingLikeSnapshot.documents.map((doc) => Post.fromDoc(doc)).toList();
+    return posts;
+  }
+
+  static Future<DocumentSnapshot> _lastTrendingDoc(String idDoc) async {
+    DocumentSnapshot lastTrendingDoc =
+        await trendingLikeRef.document(idDoc).get();
+    return lastTrendingDoc;
+  }
+
+  static Future<List<Post>> getMoreTrendingLike(String idDoc) async {
+    DocumentSnapshot lastTrending;
+    lastTrending = await _lastTrendingDoc(idDoc);
+    QuerySnapshot trendingLikeSnapshot = await trendingLikeRef
+        .where('delete', isEqualTo: false)
+        .orderBy('likeCount', descending: true)
+        .startAfterDocument(lastTrending)
+        .limit(per_page)
         .getDocuments();
     List<Post> posts =
         trendingLikeSnapshot.documents.map((doc) => Post.fromDoc(doc)).toList();

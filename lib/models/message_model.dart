@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Message {
-
   String id;
   String senderUid;
   String receiverUid;
@@ -12,9 +11,16 @@ class Message {
   bool isSeen;
   String photoUrl;
 
-  Message({this.id, this.senderUid, this.receiverUid,
-      this.groupId, this.type, this.message, this.timestamp,
-      this.isSeen, this.photoUrl});
+  Message(
+      {this.id,
+      this.senderUid,
+      this.receiverUid,
+      this.groupId,
+      this.type,
+      this.message,
+      this.timestamp,
+      this.isSeen,
+      this.photoUrl});
 
   Map toMap() {
     var map = Map<String, dynamic>();
@@ -42,7 +48,4 @@ class Message {
     _message.photoUrl = map['photoUrl'];
     return _message;
   }
-
-
-
 }

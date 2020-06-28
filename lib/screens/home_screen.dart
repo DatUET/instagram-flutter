@@ -1,27 +1,25 @@
-import 'dart:convert';
-import 'dart:io';
-
+import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
-import 'package:instagram_v2/main.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:instagram_v2/models/post_model.dart';
 import 'package:instagram_v2/models/user_data.dart';
 import 'package:instagram_v2/models/user_model.dart';
 import 'package:instagram_v2/screens/camera_screen.dart';
 import 'package:instagram_v2/screens/chat_screen.dart';
 import 'package:instagram_v2/screens/comments_screen.dart';
-import 'package:instagram_v2/screens/gallery_screen.dart';
-import 'package:instagram_v2/screens/social_screen.dart';
+import 'package:instagram_v2/screens/create_post_screen.dart';
+import 'package:instagram_v2/screens/feed_screen.dart';
+import 'package:instagram_v2/screens/search_screen.dart';
 import 'package:instagram_v2/screens/splash_screen.dart';
 import 'package:instagram_v2/services/database_service.dart';
 import 'package:instagram_v2/utilities/constants.dart';
 import 'package:instagram_v2/widgets/pickup_layout.dart';
 import 'package:location/location.dart';
 import 'package:outline_material_icons/outline_material_icons.dart';
+import 'package:permission_handler/permission_handler.dart' as permission;
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -63,9 +61,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     }
 
     location.onLocationChanged.listen((LocationData currentLocation) async {
-      await DatabaseService.updateLocation(currentUserId: widget.currentUserId,
-      latitude: currentLocation.latitude,
-      longitude: currentLocation.longitude);
+      await DatabaseService.updateLocation(
+          currentUserId: widget.currentUserId,
+          latitude: currentLocation.latitude,
+          longitude: currentLocation.longitude);
     });
   }
 
@@ -73,24 +72,20 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     _firebaseMessaging.requestNotificationPermissions();
     _firebaseMessaging.configure(
       onLaunch: (message) async {
-        print('onLauch ${message.toString()}');
         _navigateToChatOrComment(message);
         return;
       },
       onMessage: (message) async {
-        print('onMessage ${message.toString()}');
         await showNotification(message);
         return;
       },
       onResume: (message) async {
-        print('onResume ${message.toString()}');
         _navigateToChatOrComment(message);
         return;
       },
     );
 
     _firebaseMessaging.getToken().then((token) async {
-      print(token);
       FirebaseUser user = await FirebaseAuth.instance.currentUser();
       DatabaseService.updateToken(user.uid, token);
     });
@@ -122,9 +117,31 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     DatabaseService.updateActive(widget.currentUserId, true);
     _pageController = PageController();
     _setUpFCM();
-    _setUpLocation();
     configLocalNotification();
     WidgetsBinding.instance.addObserver(this);
+    permission.PermissionHandler()
+        .checkPermissionStatus(permission.PermissionGroup.storage)
+        .then(_updateStatus);
+  }
+
+  _updateStatus(permission.PermissionStatus status) {
+    if (status != permission.PermissionStatus.granted) {
+      _askPermission();
+    }
+  }
+
+  _askPermission() {
+    permission.PermissionHandler().requestPermissions(
+        [permission.PermissionGroup.storage]).then((statuses) {
+      final status = statuses[permission.PermissionGroup.storage];
+      if (status != permission.PermissionStatus.granted) {
+        Fluttertoast.showToast(
+            msg: 'Please allow permission!', toastLength: Toast.LENGTH_LONG);
+      } else {
+        _updateStatus(status);
+      }
+      _setUpLocation();
+    });
   }
 
   @override
@@ -190,11 +207,12 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         body: PageView(
           controller: _pageController,
           children: <Widget>[
-            SocialScreen(
+            FeedScreen(
               currentUserId: themeStyle.currentUserId,
             ),
-            GalleyScreen(),
-            CameraScreen(_pageController)
+            SearchScreen(),
+            CreatePostScreen(),
+            CameraScreen()
           ],
           onPageChanged: (int index) {
             setState(() {
@@ -202,10 +220,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             });
           },
         ),
-        bottomNavigationBar: CupertinoTabBar(
+        bottomNavigationBar: BottomNavyBar(
           backgroundColor: themeStyle.primaryBackgroundColor,
-          currentIndex: _currentTab,
-          onTap: (int index) {
+          selectedIndex: _currentTab,
+          onItemSelected: (int index) {
             setState(() {
               _currentTab = index;
             });
@@ -215,65 +233,23 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               curve: Curves.easeIn,
             );
           },
-          activeColor: Colors.black,
           items: [
-            BottomNavigationBarItem(
-              icon: Container(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 3.0,
-                  horizontal: 40.0,
-                ),
-                decoration: BoxDecoration(
-                  color: _currentTab == 0 ? mainColor : Colors.transparent,
-                  borderRadius: BorderRadius.circular(20.0),
-                ),
-                child: Icon(
-                  OMIcons.home,
-                  size: 32.0,
-                  color: _currentTab == 0
-                      ? Colors.white
-                      : Colors.grey,
-                ),
-              ),
-            ),
-            BottomNavigationBarItem(
-              icon: Container(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 3.0,
-                  horizontal: 40.0,
-                ),
-                decoration: BoxDecoration(
-                  color: _currentTab == 1 ? mainColor : Colors.transparent,
-                  borderRadius: BorderRadius.circular(20.0),
-                ),
-                child: Icon(
-                  OMIcons.photoAlbum,
-                  size: 32.0,
-                  color: _currentTab == 1
-                      ? Colors.white
-                      : Colors.grey,
-                ),
-              ),
-            ),
-            BottomNavigationBarItem(
-              icon: Container(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 3.0,
-                  horizontal: 40.0,
-                ),
-                decoration: BoxDecoration(
-                  color: _currentTab == 2 ? mainColor : Colors.transparent,
-                  borderRadius: BorderRadius.circular(20.0),
-                ),
-                child: Icon(
-                  OMIcons.cameraEnhance,
-                  size: 32.0,
-                  color: _currentTab == 2
-                      ? Colors.white
-                      : Colors.grey,
-                ),
-              ),
-            ),
+            BottomNavyBarItem(
+                title: Text("Home"),
+                icon: Icon(Icons.home),
+                activeColor: mainColor),
+            BottomNavyBarItem(
+                title: Text("Search"),
+                icon: Icon(Icons.search),
+                activeColor: Colors.redAccent),
+            BottomNavyBarItem(
+                title: Text("Create Post"),
+                icon: Icon(OMIcons.addBox),
+                activeColor: Colors.green),
+            BottomNavyBarItem(
+                title: Text("Camera"),
+                icon: Icon(Icons.camera),
+                activeColor: Colors.deepPurpleAccent),
           ],
         ),
       ),

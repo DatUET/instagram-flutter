@@ -64,7 +64,6 @@ class _ChangePassScreenState extends State<ChangePassScreen> {
       _correctCurrentPass = await AuthService.checkLogin(
           widget.user.email, _currentPassController.text);
       _formKeyCurrentPass.currentState.validate();
-      print(_correctCurrentPass);
     }
   }
 
@@ -95,7 +94,8 @@ class _ChangePassScreenState extends State<ChangePassScreen> {
             iconTheme: IconThemeData(color: themeStyle.primaryIconColor)),
         body: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 32.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 32.0, vertical: 32.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[

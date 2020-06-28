@@ -6,12 +6,7 @@ class Report {
   final Timestamp timestamp;
   final String contentReport;
 
-  Report({
-    this.id,
-    this.userId,
-    this.timestamp,
-    this.contentReport
-});
+  Report({this.id, this.userId, this.timestamp, this.contentReport});
 
 //  factory Report.fromDoc(DocumentSnapshot doc) {
 //    return Report(

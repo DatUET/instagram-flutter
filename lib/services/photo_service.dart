@@ -12,7 +12,6 @@ class PhotoService {
     try {
       String temp =
           await platform.invokeMethod('edit photo', {'arg': imagePath});
-      print("uri: $temp");
       imageFileEdited = File(temp);
     } catch (e) {
       print(e);

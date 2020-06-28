@@ -10,8 +10,15 @@ class Distance {
   final bool isActive;
   final double distance;
 
-  Distance({this.id, this.name, this.profileImageUrl, this.email, this.bio,
-      this.type, this.isActive, this.distance});
+  Distance(
+      {this.id,
+      this.name,
+      this.profileImageUrl,
+      this.email,
+      this.bio,
+      this.type,
+      this.isActive,
+      this.distance});
 
   Map toMap() {
     var map = Map<String, dynamic>();
@@ -28,7 +35,8 @@ class Distance {
 
   factory Distance.fromMap(DocumentSnapshot doc) {
     double distance = double.parse(doc['distance'].toString());
-    String distanceFormat = distance.toStringAsFixed(distance.truncateToDouble() == distance ? 0 : 2);
+    String distanceFormat = distance
+        .toStringAsFixed(distance.truncateToDouble() == distance ? 0 : 2);
     return Distance(
         id: doc.documentID,
         name: doc['name'],
@@ -37,7 +45,6 @@ class Distance {
         bio: doc['bio'] ?? '',
         type: doc['type'],
         isActive: doc['isActive'],
-        distance: double.parse(distanceFormat)
-    );
+        distance: double.parse(distanceFormat));
   }
 }

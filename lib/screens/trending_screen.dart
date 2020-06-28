@@ -18,8 +18,39 @@ class TrendingScreen extends StatefulWidget {
 }
 
 class _TrendingScreenState extends State<TrendingScreen> {
-
   var themeStyle;
+  ScrollController _trendingScrollController = ScrollController();
+  List<Post> _trendingPost = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _setUpTrendingPost();
+    _trendingScrollController.addListener(() {
+      double maxScroll = _trendingScrollController.position.maxScrollExtent;
+      double current = _trendingScrollController.position.pixels;
+      if (maxScroll == current) {
+        _getMoreTrendingPost();
+      }
+    });
+  }
+
+  _setUpTrendingPost() async {
+    List<Post> trendingPost = await DatabaseService.getTrendingLike();
+    setState(() {
+      _trendingPost = trendingPost;
+      _isLoading = false;
+    });
+  }
+
+  _getMoreTrendingPost() async {
+    List<Post> morePost = await DatabaseService.getMoreTrendingLike(
+        _trendingPost[_trendingPost.length - 1].id);
+    setState(() {
+      _trendingPost.addAll(morePost);
+    });
+  }
 
   _buildTrending(List<Post> trendingLike) {
     return Container(
@@ -47,13 +78,13 @@ class _TrendingScreenState extends State<TrendingScreen> {
         (index * 2) / 10.0,
         GestureDetector(
             onTap: () => Navigator.push(
-              context,
-              BouncyPageRoute(
-                widget: CommentsScreen(
-                  post: post,
+                  context,
+                  BouncyPageRoute(
+                    widget: CommentsScreen(
+                      post: post,
+                    ),
+                  ),
                 ),
-              ),
-            ),
             child: Stack(
               children: <Widget>[
                 Container(
@@ -104,7 +135,7 @@ class _TrendingScreenState extends State<TrendingScreen> {
                                   decoration: BoxDecoration(
                                       color: Colors.grey,
                                       borderRadius:
-                                      BorderRadius.all(Radius.circular(12)),
+                                          BorderRadius.all(Radius.circular(12)),
                                       border: Border.all(
                                           width: 1.5,
                                           color: author.isActive
@@ -113,10 +144,10 @@ class _TrendingScreenState extends State<TrendingScreen> {
                                       image: DecorationImage(
                                           image: author.profileImageUrl.isEmpty
                                               ? AssetImage(
-                                              'assets/images/user_placeholder.jpg')
+                                                  'assets/images/user_placeholder.jpg')
                                               : CachedNetworkImageProvider(
-                                            author.profileImageUrl,
-                                          ),
+                                                  author.profileImageUrl,
+                                                ),
                                           fit: BoxFit.cover)),
                                 ),
                                 SizedBox(
@@ -126,7 +157,7 @@ class _TrendingScreenState extends State<TrendingScreen> {
                                   child: RichText(
                                     overflow: TextOverflow.ellipsis,
                                     strutStyle:
-                                    StrutStyle(fontWeight: FontWeight.w500),
+                                        StrutStyle(fontWeight: FontWeight.w500),
                                     text: TextSpan(
                                         style: TextStyle(
                                             color: themeStyle.primaryTextColor,
@@ -171,20 +202,15 @@ class _TrendingScreenState extends State<TrendingScreen> {
   Widget build(BuildContext context) {
     themeStyle = Provider.of<UserData>(context);
     return Container(
-      child: FutureBuilder(
-          future: DatabaseService.getTrendingLike(),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return Center(
+        child: _isLoading
+            ? Center(
                 child: CircularProgressIndicator(
                   valueColor: AlwaysStoppedAnimation<Color>(mainColor),
                 ),
-              );
-            }
-            return SingleChildScrollView(
-              child: _buildTrending(snapshot.data),
-            );
-          })
-    );
+              )
+            : SingleChildScrollView(
+                controller: _trendingScrollController,
+                child: _buildTrending(_trendingPost),
+              ));
   }
 }

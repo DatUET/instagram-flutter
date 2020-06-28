@@ -161,7 +161,8 @@ class _CommentsScreenState extends State<CommentsScreen> {
                           if (!snapshot.hasData) {
                             return Center(
                               child: CircularProgressIndicator(
-                                valueColor: AlwaysStoppedAnimation<Color>(mainColor),
+                                valueColor:
+                                    AlwaysStoppedAnimation<Color>(mainColor),
                               ),
                             );
                           }
@@ -170,7 +171,6 @@ class _CommentsScreenState extends State<CommentsScreen> {
                             post: widget.post,
                             author: snapshot.data,
                             isCommentScreen: true,
-
                           );
                         }),
                     StreamBuilder(
@@ -183,7 +183,8 @@ class _CommentsScreenState extends State<CommentsScreen> {
                         if (!snapshot.hasData) {
                           return Center(
                             child: CircularProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation<Color>(mainColor),
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(mainColor),
                             ),
                           );
                         }

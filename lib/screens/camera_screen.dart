@@ -12,9 +12,7 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
 class CameraScreen extends StatefulWidget {
-  final PageController pageController;
-
-  CameraScreen(this.pageController);
+  CameraScreen();
 
   @override
   _CameraScreenState createState() => _CameraScreenState();
@@ -31,7 +29,8 @@ class _CameraScreenState extends State<CameraScreen> {
 
   Future<void> _getImagePath() async {
     _dir = await getTemporaryDirectory();
-    final List<MediaCollection> collections = await MediaGallery.listMediaCollections(
+    final List<MediaCollection> collections =
+        await MediaGallery.listMediaCollections(
       mediaTypes: [MediaType.image],
     );
     final MediaPage imagePage = await collections[0].getMedias(
@@ -185,13 +184,8 @@ class _CameraScreenState extends State<CameraScreen> {
                   ),
                 ),
               ),
-              onTap: () {
-                widget.pageController.animateToPage(
-                  1,
-                  duration: Duration(milliseconds: 200),
-                  curve: Curves.easeIn,
-                );
-              },
+              onTap: () => Navigator.push(
+                  context, MaterialPageRoute(builder: (_) => GalleyScreen())),
             );
           }),
     );
